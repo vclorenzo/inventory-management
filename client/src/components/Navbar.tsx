@@ -69,7 +69,17 @@ const Navbar = (props: Props) => {
 					</div>
 					<hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-3" />
 					<div className="flex items-center gap-3 cursor-pointer">
-						<div className="w-9 h-9">image</div>
+						<div className="w-9 h-9">
+							<Image
+								src={
+									'https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/profile.jpg'
+								}
+								alt="Profile"
+								width={50}
+								height={50}
+								className="rounded-full h-full object-cover"
+							/>
+						</div>
 						<div className="font-semibold">Vanz</div>
 					</div>
 				</div>
