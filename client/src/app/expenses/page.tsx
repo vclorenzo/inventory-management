@@ -3,6 +3,7 @@ import Header from '@/components/Header';
 import { useGetExpensesByCategoryQuery } from '@/state/api';
 import { ExpenseByCategorySummary } from '@/types/DashboardMetrics.type';
 import { AggregatedData, AggregatedDataItem } from '@/types/Expenses';
+import { CircularProgress } from '@mui/material';
 import React, { useMemo, useState } from 'react';
 import {
 	Cell,
@@ -68,7 +69,11 @@ const Expenses = (props: Props) => {
 	};
 
 	if (isLoading) {
-		return <div className="py-4">Loading...</div>;
+		return (
+			<div className="py-4">
+				<CircularProgress />
+			</div>
+		);
 	}
 
 	if (isError || !expensesData) {
