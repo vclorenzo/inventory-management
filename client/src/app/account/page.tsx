@@ -16,7 +16,7 @@ const mockSettings: UserSetting[] = [
 	{ label: 'Language', value: 'English', type: 'text' },
 ];
 
-const Settings = () => {
+const Account = () => {
 	const [userSettings, setUserSettings] = useState<UserSetting[]>(mockSettings);
 
 	const handleToggleChange = (index: number) => {
@@ -27,7 +27,7 @@ const Settings = () => {
 
 	return (
 		<div className="w-full">
-			<Header name="User Settings" />
+			<Header name="Account" />
 			<div className="overflow-x-auto mt-5 shadow-md">
 				<table className="min-w-full bg-white rounded-lg">
 					<thead className="bg-gray-800 text-white">
@@ -83,4 +83,4 @@ const Settings = () => {
 	);
 };
 
-export default Settings;
+export default Account;

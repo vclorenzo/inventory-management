@@ -1,6 +1,6 @@
 'use client';
 import { useAppDispatch, useAppSelector } from '@/app/redux';
-import { setIsSidebarCollapsed } from '@/state';
+import { setIsDropdownExpanded, setIsSidebarCollapsed } from '@/state';
 import {
 	Archive,
 	CircleDollarSign,
@@ -9,51 +9,105 @@ import {
 	LucideIcon,
 	Menu,
 	SlidersHorizontal,
-	User,
+	UserRound,
+	ChevronDown,
+	ChevronUp,
+	KeyRound,
+	UserRoundPen,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-interface SidebarLinkProps {
+type SidebarLinkProps = {
 	href: string;
 	icon: LucideIcon;
 	label: string;
 	isCollapsed: boolean;
-}
+	subLinks?: {
+		href: string;
+		label: string;
+		subLinkIcon: LucideIcon;
+	}[];
+	dropdownIcon?: LucideIcon;
+	isSubLinkExpanded?: boolean;
+
+	toggleDropdown?: () => void;
+};
 
 const SidebarLink = ({
 	href,
 	icon: Icon,
+	dropdownIcon: DropdownIcon,
 	label,
 	isCollapsed,
+	subLinks,
+	isSubLinkExpanded,
+	toggleDropdown,
 }: SidebarLinkProps) => {
 	const pathname = usePathname();
 	const isActive =
 		pathname === href || (pathname === '/' && href === '/dashboard');
 
 	return (
-		<Link href={href}>
-			<div
-				className={`cursor-pointer flex items-center ${
-					isCollapsed ? 'justify-center py-4' : 'justify-start px-8 py-4'
-				}
-        hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
-					isActive ? 'bg-blue-200 text-white' : ''
-				}
-      }`}
-			>
-				<Icon className="w-6 h-6 !text-gray-700" />
+		<>
+			<>
+				<Link href={href}>
+					<div
+						className={`cursor-pointer flex items-center ${
+							isCollapsed ? 'justify-center py-4' : 'justify-start px-8 py-4'
+						}
+		hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
+			isActive ? 'bg-blue-200 text-white' : ''
+		}
+	  }`}
+					>
+						<Icon className="w-6 h-6 !text-gray-700" />
 
-				<span
-					className={`${
-						isCollapsed ? 'hidden' : 'block'
-					} font-medium text-gray-700`}
-				>
-					{label}
-				</span>
-			</div>
-		</Link>
+						<span
+							className={`${
+								isCollapsed ? 'hidden' : 'block'
+							} font-medium text-gray-700`}
+						>
+							{label}
+						</span>
+						{DropdownIcon && (
+							<DropdownIcon
+								className="w-6 h-6 !text-gray-700 ml-auto"
+								onClick={toggleDropdown}
+							/>
+						)}
+					</div>
+				</Link>
+			</>
+			{subLinks &&
+				isSubLinkExpanded &&
+				subLinks.map((subLink, index) => {
+					const SubLinkIcon = subLink.subLinkIcon || null;
+					return (
+						<Link href={subLink.href} key={index}>
+							<div
+								className={`cursor-pointer flex items-center ${
+									isCollapsed
+										? 'justify-center py-4'
+										: 'justify-start px-8 py-4'
+								}
+		hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors 
+	  }`}
+							>
+								<SubLinkIcon className="w-6 h-6 !text-gray-700" />
+
+								<span
+									className={`${
+										isCollapsed ? 'hidden' : 'block'
+									} font-medium text-gray-700`}
+								>
+									{subLink.label}
+								</span>
+							</div>
+						</Link>
+					);
+				})}
+		</>
 	);
 };
 
@@ -63,12 +117,20 @@ const Sidebar = () => {
 		(state) => state.global.isSidebarCollapsed
 	);
 
+	const isDropdownExpanded = useAppSelector(
+		(state) => state.global.isDropdownExpanded
+	);
+
 	const sidebarClassNames = `fixed flex flex-col ${
 		isSidebarCollapsed ? 'w-0 md:w-16' : 'w-72 md:w-64'
 	} bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
 
 	const toggleSidebar = () => {
 		dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
+	};
+
+	const toggleDropdown = () => {
+		dispatch(setIsDropdownExpanded(!isDropdownExpanded));
 	};
 	return (
 		<div className={sidebarClassNames}>
@@ -124,17 +186,37 @@ const Sidebar = () => {
 					label="Products"
 					isCollapsed={isSidebarCollapsed}
 				/>
-				<SidebarLink
+				{/* <SidebarLink
 					href="/users"
 					icon={User}
 					label="Users"
 					isCollapsed={isSidebarCollapsed}
-				/>
+				/> */}
 				<SidebarLink
-					href="/settings"
-					icon={SlidersHorizontal}
-					label="Settings"
+					href="/account"
+					icon={UserRound}
+					label="Account"
 					isCollapsed={isSidebarCollapsed}
+					isSubLinkExpanded={isDropdownExpanded}
+					toggleDropdown={toggleDropdown}
+					dropdownIcon={isDropdownExpanded ? ChevronUp : ChevronDown}
+					subLinks={[
+						{
+							href: '/profile',
+							subLinkIcon: UserRoundPen,
+							label: 'Profile',
+						},
+						{
+							href: '/changePassword',
+							subLinkIcon: KeyRound,
+							label: 'Change Password',
+						},
+						{
+							href: '/preferences',
+							subLinkIcon: SlidersHorizontal,
+							label: 'Preferences',
+						},
+					]}
 				/>
 				<SidebarLink
 					href="/expenses"
@@ -152,3 +234,5 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+
+//* ${isActive ? 'bg-blue-200 text-white' : ''}
