@@ -45,8 +45,10 @@ const SidebarLink = ({
 	toggleDropdown,
 }: SidebarLinkProps) => {
 	const pathname = usePathname();
-	const isActive =
+	let isActive =
 		pathname === href || (pathname === '/' && href === '/dashboard');
+
+	console.log('KANIN', pathname);
 
 	return (
 		<>
@@ -54,7 +56,9 @@ const SidebarLink = ({
 				<Link href={href}>
 					<div
 						className={`cursor-pointer flex items-center ${
-							isCollapsed ? 'justify-center py-4' : 'justify-start px-8 py-4'
+							isCollapsed
+								? 'justify-center py-4 gap-0'
+								: 'justify-start px-8 py-4'
 						}
 		hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
 			isActive ? 'bg-blue-200 text-white' : ''
@@ -72,7 +76,9 @@ const SidebarLink = ({
 						</span>
 						{DropdownIcon && (
 							<DropdownIcon
-								className="w-6 h-6 !text-gray-700 ml-auto"
+								className={`w-4 h-4 !text-gray-700 ${
+									isCollapsed ? '' : 'ml-auto'
+								}`}
 								onClick={toggleDropdown}
 							/>
 						)}
@@ -83,6 +89,7 @@ const SidebarLink = ({
 				isSubLinkExpanded &&
 				subLinks.map((subLink, index) => {
 					const SubLinkIcon = subLink.subLinkIcon || null;
+					isActive = pathname === subLink.href;
 					return (
 						<Link href={subLink.href} key={index}>
 							<div
@@ -92,7 +99,7 @@ const SidebarLink = ({
 										: 'justify-start px-8 py-4'
 								}
 		hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors 
-	  }`}
+	  ${isActive ? 'bg-blue-200 text-white' : ''}}`}
 							>
 								<SubLinkIcon className="w-6 h-6 !text-gray-700" />
 
@@ -114,11 +121,11 @@ const SidebarLink = ({
 const Sidebar = () => {
 	const dispatch = useAppDispatch();
 	const isSidebarCollapsed = useAppSelector(
-		(state) => state.global.isSidebarCollapsed
+		(state) => state.global.isSidebarCollapsed,
 	);
 
 	const isDropdownExpanded = useAppSelector(
-		(state) => state.global.isDropdownExpanded
+		(state) => state.global.isDropdownExpanded,
 	);
 
 	const sidebarClassNames = `fixed flex flex-col ${
@@ -156,7 +163,7 @@ const Sidebar = () => {
 						isSidebarCollapsed ? 'hidden' : 'block'
 					} font-extrabold text-2xl`}
 				>
-					STOCK
+					OKSHN
 				</h1>
 
 				<button
@@ -202,19 +209,19 @@ const Sidebar = () => {
 					dropdownIcon={isDropdownExpanded ? ChevronUp : ChevronDown}
 					subLinks={[
 						{
-							href: '/profile',
+							href: '/account/profile',
 							subLinkIcon: UserRoundPen,
 							label: 'Profile',
 						},
 						{
-							href: '/changePassword',
+							href: '/account/changePassword',
 							subLinkIcon: KeyRound,
 							label: 'Change Password',
 						},
 						{
-							href: '/preferences',
+							href: '/account/settings',
 							subLinkIcon: SlidersHorizontal,
-							label: 'Preferences',
+							label: 'Settings',
 						},
 					]}
 				/>
@@ -227,7 +234,7 @@ const Sidebar = () => {
 			</div>
 			{/* FOOTER */}
 			<div className={`${isSidebarCollapsed ? 'hidden' : 'block'} mb-10`}>
-				<p className="text-center text-xs text-gray-500">&copy; 2024 STOCK</p>
+				<p className="text-center text-xs text-gray-500">&copy; 2024 OKSHN</p>
 			</div>
 		</div>
 	);

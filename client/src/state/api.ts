@@ -1,7 +1,7 @@
 import {
 	DashboardMetrics,
 	ExpenseByCategorySummary,
-} from '@/types/DashboardMetrics.type';
+} from '@/types/DashboardMetrics';
 import { NewProduct, Product } from '@/types/Products';
 import { User } from '@/types/User';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
@@ -14,6 +14,11 @@ export const api = createApi({
 		getDashboardMetrics: builder.query<DashboardMetrics, void>({
 			query: () => '/dashboard',
 			providesTags: ['DashboardMetrics'],
+		}),
+		getProduct: builder.query<Product, string>({
+			query: (id) => ({
+				url: `products/${id}`,
+			}),
 		}),
 		getProducts: builder.query<Product[], string | void>({
 			query: (search) => ({
@@ -43,6 +48,7 @@ export const api = createApi({
 
 export const {
 	useGetDashboardMetricsQuery,
+	useGetProductQuery,
 	useGetProductsQuery,
 	useCreateProductMutation,
 	useGetUsersQuery,

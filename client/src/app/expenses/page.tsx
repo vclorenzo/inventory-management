@@ -1,7 +1,7 @@
 'use client';
 import Header from '@/components/Header';
 import { useGetExpensesByCategoryQuery } from '@/state/api';
-import { ExpenseByCategorySummary } from '@/types/DashboardMetrics.type';
+import { ExpenseByCategorySummary } from '@/types/DashboardMetrics';
 import { AggregatedData, AggregatedDataItem } from '@/types/Expenses';
 import { CircularProgress } from '@mui/material';
 import React, { useMemo, useState } from 'react';
@@ -52,7 +52,7 @@ const Expenses = (props: Props) => {
 				if (!acc[data.category]) {
 					acc[data.category] = { name: data.category, amount: 0 };
 					acc[data.category].color = `#${Math.floor(
-						Math.random() * 16777215
+						Math.random() * 16777215,
 					).toString(16)}`;
 					acc[data.category].amount += amount;
 				}
@@ -166,7 +166,7 @@ const Expenses = (props: Props) => {
 												index === activeIndex ? 'rgb(29, 78, 216)' : entry.color
 											}
 										/>
-									)
+									),
 								)}
 							</Pie>
 							<Tooltip />

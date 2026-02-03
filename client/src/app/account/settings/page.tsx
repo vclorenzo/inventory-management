@@ -1,38 +1,49 @@
 'use client';
+import { mockPreferencesSettings } from '@/app/constants/User';
 import Header from '@/components/Header';
 import { UserSetting } from '@/types/User';
-import React, { useState } from 'react';
-import { mockAccountSettings, mockProfileSettings } from '../constants/User';
-import Tabs from '@/components/Tabs';
-import Cards from '@/components/Cards';
-import { useGetProductsQuery } from '@/state/api';
-import { CircularProgress } from '@mui/material';
+import { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/app/redux';
+import { setIsDarkModeVisible, setIsNotificationVisible } from '@/state';
 
-const Account = () => {
-	const [userSettings, setUserSettings] =
-		useState<UserSetting[]>(mockAccountSettings);
+const Preferences = () => {
+	//Selectors
+	const isNotificationVisible = useAppSelector(
+		(state) => state.global.isNotificationVisible,
+	);
 
-	const [searchTerm, setSearchTerm] = useState('');
+	const isDarkModeVisible = useAppSelector(
+		(state) => state.global.isDarkModeVisible,
+	);
 
-	const {
-		data: products,
-		isLoading,
-		isError,
-	} = useGetProductsQuery(searchTerm);
+	//PRESET
+	mockPreferencesSettings[0].value = isNotificationVisible;
+	mockPreferencesSettings[1].value = isDarkModeVisible;
+
+	const [preferencesSettings, setPreferencesSettings] = useState<UserSetting[]>(
+		mockPreferencesSettings,
+	);
+
+	const dispatch = useAppDispatch();
 
 	const handleToggleChange = (index: number) => {
-		const settingsCopy = [...userSettings];
-		settingsCopy[index].value = !settingsCopy[index].value as boolean;
-		setUserSettings(settingsCopy);
+		const settingsCopy = [...preferencesSettings];
+		switch (index) {
+			case 0:
+				dispatch(setIsNotificationVisible(!isNotificationVisible));
+				settingsCopy[index].value = isNotificationVisible;
+				break;
+			case 1:
+				dispatch(setIsDarkModeVisible(!isDarkModeVisible));
+				settingsCopy[index].value = isDarkModeVisible;
+				break;
+		}
+		// settingsCopy[index].value = !settingsCopy[index].value as boolean;
+
+		setPreferencesSettings(settingsCopy);
 	};
 
-	if (isError || !products) {
-		return (
-			<div className="text-center text-red-500 py-4">
-				Failed to fetch products
-			</div>
-		);
-	}
+	console.log('ITLOG', preferencesSettings);
 
 	return (
 		<div className="w-full">
@@ -50,7 +61,7 @@ const Account = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{userSettings.map((setting, index) => (
+						{preferencesSettings.map((setting, index) => (
 							<tr className="hover:bg-blue-50" key={setting.label}>
 								<td className="py-2 px-4">{setting.label}</td>
 								<td className="py-2 px-4">
@@ -75,11 +86,10 @@ const Account = () => {
 											type="text"
 											className="px-4 py-2 border rounded-lg text-gray-500 focus:outline-none focus:border-blue-500"
 											value={setting.value as string}
-											disabled
 											onChange={(e) => {
-												const settingsCopy = [...userSettings];
+												const settingsCopy = [...preferencesSettings];
 												settingsCopy[index].value = e.target.value;
-												setUserSettings(settingsCopy);
+												setPreferencesSettings(settingsCopy);
 											}}
 										/>
 									)}
@@ -88,28 +98,9 @@ const Account = () => {
 						))}
 					</tbody>
 				</table>
-				<Tabs
-					tabs={[
-						{
-							label: 'Listings',
-							content: (
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg-grid-cols-3 gap-10 justify-between">
-									{isLoading ? (
-										<>
-											<CircularProgress />
-										</>
-									) : (
-										<Cards products={products} />
-									)}
-								</div>
-							),
-						},
-						{ label: 'Reviews', content: <div>Reviews content</div> },
-					]}
-				/>
 			</div>
 		</div>
 	);
 };
 
-export default Account;
+export default Preferences;

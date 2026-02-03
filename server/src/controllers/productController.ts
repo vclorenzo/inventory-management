@@ -3,6 +3,23 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+export const getProduct = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
+	try {
+		const { id } = req.params;
+		const product = await prisma.products.findUnique({
+			where: {
+				productId: id,
+			},
+		});
+		res.json(product);
+	} catch (error) {
+		res.status(500).json({ message: 'Error retrieving product' });
+	}
+};
+
 export const getProducts = async (
 	req: Request,
 	res: Response

@@ -1,6 +1,6 @@
 'use client';
 import { useGetDashboardMetricsQuery } from '@/state/api';
-import { ExpenseByCategorySummary } from '@/types/DashboardMetrics.type';
+import { ExpenseByCategorySummary } from '@/types/DashboardMetrics';
 import { CircularProgress } from '@mui/material';
 import { TrendingUp } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
@@ -27,19 +27,19 @@ const CardExpenseSummary = () => {
 			acc[category] += amount;
 			return acc;
 		},
-		{}
+		{},
 	);
 
 	const expenseCategories = Object.entries(expenseSums).map(
 		([name, value]) => ({
 			name,
 			value,
-		})
+		}),
 	);
 
 	const totalExpenses = expenseCategories.reduce(
 		(acc, category: { value: number }) => acc + category.value,
-		0
+		0,
 	);
 	const formattedTotalExpenses = totalExpenses.toFixed(2);
 
