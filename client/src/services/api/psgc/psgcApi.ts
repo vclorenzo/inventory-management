@@ -12,27 +12,32 @@ export const psgcApi = externalApi.injectEndpoints({
 			}),
 			keepUnusedDataFor: 60 * 60,
 		}),
-		getProvinces: builder.query<Province[], void>({
+		getProvinces: builder.query<Province[], string>({
 			query: (regionCode) => ({
 				url: `${baseURL}/regions/${regionCode}/provinces/`,
 				method: 'GET',
 			}),
 			keepUnusedDataFor: 60 * 60,
 		}),
-		getCities: builder.query<City[], void>({
-			query: (districtCode) => ({
-				url: `${baseURL}/districts/${districtCode}/cities/`,
+		getCities: builder.query<City[], string>({
+			query: (provinceCode) => ({
+				url: `${baseURL}/provinces/${provinceCode}/cities-municipalities/`,
 				method: 'GET',
 			}),
 			keepUnusedDataFor: 60 * 60,
 		}),
-		getBarangays: builder.query<Barangay[], void>({
+		getBarangays: builder.query<Barangay[], string>({
 			query: (cityCode) => ({
-				url: `${baseURL}/cities/${cityCode}/barangays/`,
+				url: `${baseURL}/cities-municipalities/${cityCode}/barangays/`,
 				method: 'GET',
 			}),
 		}),
 	}),
 });
 
-export const { useGetRegionsQuery } = psgcApi;
+export const {
+	useGetRegionsQuery,
+	useGetProvincesQuery,
+	useGetCitiesQuery,
+	useGetBarangaysQuery,
+} = psgcApi;

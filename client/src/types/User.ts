@@ -13,9 +13,10 @@ export type UserSetting = {
 export type UserFormValues = {
 	username: string;
 	email: string;
-	country: string;
 	region: string;
+	province: string;
 	city: string;
+	barangay: string;
 };
 
 export type ChangePasswordFormValues = {

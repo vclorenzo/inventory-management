@@ -2,24 +2,78 @@
 import { mockProfileSettings } from '@/app/constants/User';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
-import { useGetRegionsQuery } from '@/services/api/psgc/psgcApi';
+import { useAdressDropdowns } from '@/services/api/psgc/hooks/useAddressDropdown';
 import { UserFormValues, UserSetting } from '@/types/User';
-import { use, useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Profile = () => {
-	const { data: islands, isLoading, isError } = useGetRegionsQuery();
-
 	const [profileSettings, setProfileSettings] =
 		useState<UserSetting[]>(mockProfileSettings);
 
+	const [region, setRegion] = useState<string>();
+	const [province, setProvince] = useState<string>();
+	const [city, setCity] = useState<string>();
+
+	//=================================================================================
+	const handleChangeRegion = (e: any) => {
+		const value = e.target.value || undefined;
+		setRegion(value);
+		setProvince(undefined);
+		setCity(undefined);
+		setValue?.('province', '');
+		setValue?.('city', '');
+		setValue?.('barangay', '');
+	};
+
+	const handleChangeProvince = (e: any) => {
+		const value = e.target.value || undefined;
+		setProvince(value);
+		setCity(undefined);
+		setValue?.('city', '');
+		setValue?.('barangay', '');
+	};
+
+	const handleChangeCity = (e: any) => {
+		const value = e.target.value || undefined;
+		setCity(value);
+		setValue?.('barangay', '');
+	};
+
 	// RHF
 	const form = useForm<UserFormValues>();
-	const { register, handleSubmit } = form;
+	const { register, handleSubmit, setValue } = form;
 
 	const onSubmit = (data: UserFormValues) => {
 		console.log('ITLOG', data);
 	};
+
+	const { regions, provinces, cities, barangays, isLoading, isError } =
+		useAdressDropdowns({
+			regionCode: region,
+			provinceCode: province,
+			cityCode: city,
+		});
+
+	if (isLoading) {
+		return (
+			<div className="py-4">
+				<CircularProgress />
+			</div>
+		);
+	}
+
+	if (isError) {
+		return (
+			<div className="text-center text-red-500 py-4">
+				Failed to fetch products
+			</div>
+		);
+	}
+
+	console.log('ITLOG', regions, provinces, cities, barangays);
+
 	return (
 		<div className="w-full">
 			<Header name="Profile" />
@@ -60,23 +114,24 @@ const Profile = () => {
 									{...register('email')}
 								/>
 							</div>
+
+							{/* ======================================================== */}
 							<div className="flex flex-row justify-start items-center">
-								<label htmlFor="country" className="min-w-[200px]">
-									Country
+								<label htmlFor="region" className="min-w-[200px]">
+									Region
 								</label>
 								<div className="w-full max-w-sm min-w-[200px]">
 									<div className="relative">
 										<select
 											className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
-											{...register('country')}
+											{...register('region', {
+												onChange: handleChangeRegion,
+											})}
 										>
-											{/* <option value="brazil">Brazil</option>
-											<option value="bucharest">Bucharest</option>
-											<option value="london">London</option>
-											<option value="washington">Washington</option> */}
-											{islands?.map((island) => (
-												<option key={island.name} value={island.name}>
-													{island.name}
+											<option value="">Select Region</option>
+											{regions.data?.map((region) => (
+												<option key={region.code} value={region.code}>
+													{region.name}
 												</option>
 											))}
 										</select>
@@ -98,19 +153,24 @@ const Profile = () => {
 								</div>
 							</div>
 							<div className="flex flex-row justify-start items-center">
-								<label htmlFor="region" className="min-w-[200px]">
-									Region
+								<label htmlFor="province" className="min-w-[200px]">
+									Province
 								</label>
 								<div className="w-full max-w-sm min-w-[200px]">
 									<div className="relative">
 										<select
 											className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
-											{...register('region')}
+											disabled={!region}
+											{...register('province', {
+												onChange: handleChangeProvince,
+											})}
 										>
-											<option value="brazil">Brazil</option>
-											<option value="bucharest">Bucharest</option>
-											<option value="london">London</option>
-											<option value="washington">Washington</option>
+											<option value="">Select Province</option>
+											{provinces.data?.map((province) => (
+												<option key={province.code} value={province.code}>
+													{province.name}
+												</option>
+											))}
 										</select>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -137,12 +197,52 @@ const Profile = () => {
 									<div className="relative">
 										<select
 											className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
-											{...register('city')}
+											disabled={!province}
+											{...register('city', {
+												onChange: handleChangeCity,
+											})}
 										>
-											<option value="brazil">Brazil</option>
-											<option value="bucharest">Bucharest</option>
-											<option value="london">London</option>
-											<option value="washington">Washington</option>
+											<option value="">Select City</option>
+											{cities.data?.map((city) => (
+												<option key={city.code} value={city.code}>
+													{city.name}
+												</option>
+											))}
+										</select>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke-width="1.2"
+											stroke="currentColor"
+											className="h-5 w-5 ml-1 absolute top-2.5 right-2.5 text-slate-700"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+											/>
+										</svg>
+									</div>
+								</div>
+							</div>
+							<div className="flex flex-row justify-start items-center">
+								<label htmlFor="barangay" className="min-w-[200px]">
+									Barangay
+								</label>
+								<div className="w-full max-w-sm min-w-[200px]">
+									<div className="relative">
+										<select
+											className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
+											disabled={!city}
+											{...register('barangay')}
+										>
+											<option value="">Select Barangay</option>
+											{barangays.data?.map((barangay) => (
+												<option key={barangay.code} value={barangay.code}>
+													{barangay.name}
+												</option>
+											))}
 										</select>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
