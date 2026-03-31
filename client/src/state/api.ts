@@ -15,7 +15,7 @@ export const api = createApi({
 			query: () => '/dashboard',
 			providesTags: ['DashboardMetrics'],
 		}),
-		getProduct: builder.query<Product, string>({
+		getProductById: builder.query<Product, string>({
 			query: (id) => ({
 				url: `products/${id}`,
 			}),
@@ -48,8 +48,8 @@ export const api = createApi({
 
 export const {
 	useGetDashboardMetricsQuery,
-	useGetProductQuery,
 	useGetProductsQuery,
+	useGetProductByIdQuery,
 	useCreateProductMutation,
 	useGetUsersQuery,
 	useGetExpensesByCategoryQuery,

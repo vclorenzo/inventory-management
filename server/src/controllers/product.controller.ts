@@ -1,38 +1,29 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
+import * as productService from '../services/product.service';
 
 const prisma = new PrismaClient();
 
-export const getProduct = async (
+export const getProductById = async (
 	req: Request,
-	res: Response
+	res: Response,
 ): Promise<void> => {
 	try {
 		const { id } = req.params;
-		const product = await prisma.products.findUnique({
-			where: {
-				productId: id,
-			},
-		});
+		const product = await productService.getProductById(id);
 		res.json(product);
 	} catch (error) {
 		res.status(500).json({ message: 'Error retrieving product' });
 	}
 };
 
-export const getProducts = async (
+export const getAllProducts = async (
 	req: Request,
-	res: Response
+	res: Response,
 ): Promise<void> => {
 	try {
 		const search = req.query.search?.toString();
-		const products = await prisma.products.findMany({
-			where: {
-				name: {
-					contains: search,
-				},
-			},
-		});
+		const products = await productService.getAllProducts(search);
 		res.json(products);
 	} catch (error) {
 		res.status(500).json({ message: 'Error retrieving products' });
@@ -41,19 +32,17 @@ export const getProducts = async (
 
 export const createProduct = async (
 	req: Request,
-	res: Response
+	res: Response,
 ): Promise<void> => {
 	try {
 		const { productId, name, price, rating, stockQuantity } = req.body;
-		const product = await prisma.products.create({
-			data: {
-				productId,
-				name,
-				price,
-				rating,
-				stockQuantity,
-			},
-		});
+		const product = await productService.createProduct(
+			productId,
+			name,
+			price,
+			rating,
+			stockQuantity,
+		);
 		res.status(201).json(product);
 	} catch (error: any) {
 		res.status(500).json({ message: error.message });
