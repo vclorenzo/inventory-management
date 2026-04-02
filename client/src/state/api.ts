@@ -35,7 +35,7 @@ export const api = createApi({
 			}),
 			invalidatesTags: ['Products'],
 		}),
-		getUsers: builder.query<User[], void>({
+		getAllUsers: builder.query<User[], void>({
 			query: () => '/users',
 			providesTags: ['Users'],
 		}),
@@ -51,6 +51,6 @@ export const {
 	useGetProductsQuery,
 	useGetProductByIdQuery,
 	useCreateProductMutation,
-	useGetUsersQuery,
+	useGetAllUsersQuery,
 	useGetExpensesByCategoryQuery,
 } = api;

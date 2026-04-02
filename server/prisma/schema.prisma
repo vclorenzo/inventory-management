@@ -20,7 +20,7 @@ model Users {
 }
 
 model Products {
-  productId     String      @id
+  productId     String      @id @default(uuid())
   name          String
   price         Float
   rating        Float?
