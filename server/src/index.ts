@@ -8,6 +8,7 @@ import dashboardRoutes from './routes/dashboard.routes';
 import productRoutes from './routes/product.routes';
 import userRoutes from './routes/user.routes';
 import expenseRoutes from './routes/expense.routes';
+import authRoutes from './routes/auth.routes';
 
 // CONFIGURATION
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(cors());
 app.use('/dashboard', dashboardRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
+app.use('/auth', authRoutes);
 app.use('/expenses', expenseRoutes);
 
 // SERVER

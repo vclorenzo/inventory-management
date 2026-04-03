@@ -9,14 +9,17 @@ async function deleteAllData(orderedFileNames: string[]) {
 		return modelName.charAt(0).toUpperCase() + modelName.slice(1);
 	});
 
-	for (const modelName of modelNames) {
+	// Reverse the order for deletion to handle foreign key constraints
+	const reversedModelNames = modelNames.reverse();
+
+	for (const modelName of reversedModelNames) {
 		const model: any = prisma[modelName as keyof typeof prisma];
 		if (model) {
 			await model.deleteMany({});
 			console.log(`Cleared data from ${modelName}`);
 		} else {
 			console.error(
-				`Model ${modelName} not found. Please ensure the model name is correctly specified.`
+				`Model ${modelName} not found. Please ensure the model name is correctly specified.`,
 			);
 		}
 	}

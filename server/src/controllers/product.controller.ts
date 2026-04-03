@@ -13,11 +13,12 @@ export const getProductById = async (
 		const product = await productService.getProductById(id);
 		if (!product) {
 			res.status(404).json({ message: 'Product not found' });
+		} else {
+			res.status(200).json({
+				message: 'Product retrieved successfully',
+				product,
+			});
 		}
-		res.status(200).json({
-			message: 'Product retrieved successfully',
-			product,
-		});
 	} catch (error) {
 		res.status(500).json({ message: 'Error retrieving product' });
 	}
@@ -46,12 +47,12 @@ export const createProduct = async (
 ): Promise<void> => {
 	try {
 		const { name, price, rating, stockQuantity } = req.body;
-		const product = await productService.createProduct(
+		const product = await productService.createProduct({
 			name,
 			price,
 			rating,
 			stockQuantity,
-		);
+		});
 		res.status(201).json(product);
 	} catch (error: any) {
 		res.status(500).json({ message: error.message });

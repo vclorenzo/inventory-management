@@ -1,6 +1,6 @@
 'use client';
 import Header from '@/components/Header';
-import { useGetUsersQuery } from '@/state/api';
+import { useGetAllUsersQuery } from '@/state/api';
 import { CircularProgress } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
@@ -13,7 +13,7 @@ const columns: GridColDef[] = [
 ];
 
 const Users = (props: Props) => {
-	const { data: users, isError, isLoading } = useGetUsersQuery();
+	const { data: users, isError, isLoading } = useGetAllUsersQuery();
 
 	if (isLoading) {
 		return (
