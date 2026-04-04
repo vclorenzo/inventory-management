@@ -25,15 +25,24 @@ export const getUserById = async (
 };
 
 export const getAllUsers = async (
-	_req: Request,
+	req: Request,
 	res: Response,
 ): Promise<void> => {
 	try {
-		const users = await userService.getAllUsers();
+		const page = Math.max(Number(req.query.page) || 1, 1);
+		const limit = Math.max(Number(req.query.limit) || 10, 1);
+		const { users, totalCount } = await userService.getAllUsers({
+			page,
+			limit,
+		});
+		const totalPages = Math.max(Math.ceil(totalCount / limit), 1);
 		res.status(200).json({
 			message: 'Successfully retrieved users',
-			user: users ?? [],
-			count: users?.length ?? 0,
+			users,
+			page,
+			limit,
+			totalPages,
+			totalCount,
 		});
 	} catch (error: any) {
 		res.status(500).json(error.message);

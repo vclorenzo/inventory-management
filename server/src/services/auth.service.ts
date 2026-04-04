@@ -1,4 +1,5 @@
 import logger from '#config/logger.ts';
+import { jwtToken } from '#src/utils/jwt.ts';
 import { PrismaClient, Products } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
@@ -50,6 +51,7 @@ export const createUser = async ({
 				role,
 			},
 			select: {
+				userId: true,
 				name: true,
 				email: true,
 				role: true,
@@ -57,9 +59,57 @@ export const createUser = async ({
 			},
 		});
 		logger.info(`User ${newUser.email} created successfully`);
-		return newUser;
+		const token = jwtToken.sign({
+			id: newUser.userId,
+			email: newUser.email,
+			role: newUser.role,
+		});
+		return { newUser, token };
 	} catch (error) {
 		logger.error(`Error creating the user: ${error}`);
+		throw error;
+	}
+};
+
+export const authenticateUser = async ({
+	email,
+	password,
+}: {
+	email: string;
+	password: string;
+}) => {
+	try {
+		const user = await prisma.users.findFirst({
+			where: {
+				email,
+			},
+			select: {
+				userId: true,
+				name: true,
+				email: true,
+				password: true,
+				role: true,
+			},
+		});
+		if (!user) throw new Error('Invalid credentials');
+		const isMatch = await comparePassword(password, user.password);
+		const token = jwtToken.sign({
+			id: user.userId,
+			email: user.email,
+			role: user.role,
+		});
+
+		if (!isMatch) throw new Error('Invalid credentials');
+		return {
+			user: {
+				name: user.name,
+				email: user.email,
+				role: user.role,
+			},
+			token,
+		};
+	} catch (error) {
+		logger.error(`Error authenticating user: ${error}`);
 		throw error;
 	}
 };

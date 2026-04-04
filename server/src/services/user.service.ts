@@ -2,9 +2,22 @@ import { PrismaClient, Users } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getAllUsers = async () => {
+export const getAllUsers = async ({
+	page = 1,
+	limit = 10,
+}: {
+	page?: number;
+	limit?: number;
+}) => {
 	try {
-		return await prisma.users.findMany();
+		const [totalCount, users] = await prisma.$transaction([
+			prisma.products.count(),
+			prisma.products.findMany({
+				skip: (page - 1) * limit,
+				take: limit,
+			}),
+		]);
+		return { users, totalCount };
 	} catch (error) {
 		throw error;
 	}

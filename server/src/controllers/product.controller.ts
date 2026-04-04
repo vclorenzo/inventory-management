@@ -1,8 +1,5 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import * as productService from '../services/product.service';
-
-const prisma = new PrismaClient();
 
 export const getProductById = async (
 	req: Request,
@@ -30,11 +27,22 @@ export const getAllProducts = async (
 ): Promise<void> => {
 	try {
 		const search = req.query.search?.toString();
-		const products = await productService.getAllProducts(search);
+		const page = Math.max(Number(req.query.page) || 1, 1);
+		const limit = Math.max(Number(req.query.limit) || 10, 1);
+		const { products, totalCount } = await productService.getAllProducts({
+			search,
+			page,
+			limit,
+		});
+		const totalPages = Math.max(Math.ceil(totalCount / limit), 1);
+
 		res.status(200).json({
 			message: 'Successfully retrieved products',
-			user: products ?? [],
-			count: products?.length ?? 0,
+			products,
+			page,
+			limit,
+			totalPages,
+			totalCount,
 		});
 	} catch (error) {
 		res.status(500).json({ message: 'Error retrieving products' });

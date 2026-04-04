@@ -2,15 +2,26 @@ import { PrismaClient, Products } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getAllProducts = async (search?: string) => {
+export const getAllProducts = async ({
+	search,
+	page = 1,
+	limit = 10,
+}: {
+	search?: string;
+	page?: number;
+	limit?: number;
+} = {}) => {
 	try {
-		return await prisma.products.findMany({
-			where: {
-				name: {
-					contains: search,
-				},
-			},
-		});
+		const where = search ? { name: { contains: search } } : {};
+		const [totalCount, products] = await prisma.$transaction([
+			prisma.products.count({ where }),
+			prisma.products.findMany({
+				where,
+				skip: (page - 1) * limit,
+				take: limit,
+			}),
+		]);
+		return { products, totalCount };
 	} catch (error) {
 		throw error;
 	}
@@ -18,7 +29,7 @@ export const getAllProducts = async (search?: string) => {
 
 export const getProductById = async (id: string) => {
 	try {
-		return await prisma.products.findUnique({
+		return await prisma.products.findFirst({
 			where: {
 				productId: id,
 			},
