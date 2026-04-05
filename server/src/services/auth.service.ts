@@ -1,4 +1,5 @@
 import logger from '#config/logger.ts';
+import { AppError } from '#error/AppError.ts';
 import { jwtToken } from '#src/utils/jwt.ts';
 import { PrismaClient, Products } from '@prisma/client';
 import bcrypt from 'bcrypt';
@@ -34,41 +35,36 @@ export const createUser = async ({
 	password: string;
 	role: string;
 }) => {
-	try {
-		const existingUser = await prisma.users.findUnique({
-			where: { email },
-		});
+	const existingUser = await prisma.users.findUnique({
+		where: { email },
+	});
 
-		if (existingUser) {
-			throw new Error('User with this email already exists');
-		}
-		const password_hash = await hashPassword(password);
-		const newUser = await prisma.users.create({
-			data: {
-				email,
-				name,
-				password: password_hash,
-				role,
-			},
-			select: {
-				userId: true,
-				name: true,
-				email: true,
-				role: true,
-				created_at: true,
-			},
-		});
-		logger.info(`User ${newUser.email} created successfully`);
-		const token = jwtToken.sign({
-			id: newUser.userId,
-			email: newUser.email,
-			role: newUser.role,
-		});
-		return { newUser, token };
-	} catch (error) {
-		logger.error(`Error creating the user: ${error}`);
-		throw error;
+	if (existingUser) {
+		throw new AppError('Email already exists', 409);
 	}
+	const password_hash = await hashPassword(password);
+	const newUser = await prisma.users.create({
+		data: {
+			email,
+			name,
+			password: password_hash,
+			role,
+		},
+		select: {
+			userId: true,
+			name: true,
+			email: true,
+			role: true,
+			created_at: true,
+		},
+	});
+	logger.info(`User ${newUser.email} created successfully`);
+	const token = jwtToken.sign({
+		id: newUser.userId,
+		email: newUser.email,
+		role: newUser.role,
+	});
+	return { newUser, token };
 };
 
 export const authenticateUser = async ({

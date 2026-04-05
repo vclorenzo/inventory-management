@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-export const userIdSchema = z.object({
-	id: z
-		.string()
-		.regex(/^\d+$/, 'ID must be a valid number')
-		.transform(Number)
-		.refine((val) => val > 0, 'ID must be a positive number'),
-});
+// export const userIdSchema = z.object({
+// 	id: z
+// 		.string()
+// 		.regex(/^\d+$/, 'ID must be a valid number')
+// 		.transform(Number)
+// 		.refine((val) => val > 0, 'ID must be a positive number'),
+// });
 
 export const updateUserSchema = z
 	.object({

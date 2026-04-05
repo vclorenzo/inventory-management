@@ -1,3 +1,4 @@
+import logger from '#config/logger.ts';
 import { PrismaClient, Users } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -19,6 +20,7 @@ export const getAllUsers = async ({
 		]);
 		return { users, totalCount };
 	} catch (error) {
+		logger.error('Failed to load users', { error });
 		throw error;
 	}
 };
@@ -31,6 +33,7 @@ export const getUserById = async (id: string) => {
 			},
 		});
 	} catch (error) {
+		logger.error('Error getting user by id ${id}:', error);
 		throw error;
 	}
 };
@@ -41,11 +44,14 @@ export const updateUser = async (id: string, data: Partial<Users>) => {
 		if (!existingUser) {
 			throw new Error('User not found');
 		}
-		return await prisma.users.update({
+		const updatedUser = await prisma.users.update({
 			where: { userId: id },
 			data: { name: data.name },
 		});
+		logger.info(`User ${updatedUser.email} updated successfully`);
+		return updatedUser;
 	} catch (error) {
+		logger.error(`Error updating user ${id}:`, error);
 		throw error;
 	}
 };
@@ -56,10 +62,13 @@ export const deleteUser = async (id: string) => {
 		if (!existingUser) {
 			throw new Error('User not found');
 		}
-		return await prisma.users.delete({
+		const deletedUser = await prisma.users.delete({
 			where: { userId: id },
 		});
+		logger.info(`User ${deletedUser.email} deleted successfully`);
+		return deletedUser;
 	} catch (error) {
+		logger.error(`Error deleting user ${id}:`, error);
 		throw error;
 	}
 };

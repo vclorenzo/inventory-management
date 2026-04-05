@@ -5,8 +5,10 @@ import {
 	signinSchema,
 	signupSchema,
 } from '#src/validations/auth.validations.ts';
+import { CreateUserInput } from '#types/user.types.ts';
 import { cookies } from '#utils/cookies.ts';
 import { jwtToken } from '#utils/jwt.ts';
+import { sanitizeUserInput } from '#utils/sanitize.ts';
 import { Request, Response, NextFunction } from 'express';
 
 export const signup = async (
@@ -14,35 +16,23 @@ export const signup = async (
 	res: Response,
 	next: NextFunction,
 ) => {
-	try {
-		const validationResult = signupSchema.safeParse(req.body);
-		if (!validationResult.success) {
-			return res.status(400).json({
-				error: 'Validation failed',
-				details: formatValidationError(validationResult.error),
-			});
-		}
-		const { name, email, password, role } = validationResult.data;
-		const { newUser, token } = await createUser({
-			name,
-			email,
-			password,
-			role,
-		});
+	// try {
+	const sanitized = sanitizeUserInput(req.body);
 
-		cookies.set(res, 'token', token);
-		logger.info(`User registered successfully: ${email}`);
-		return res.status(201).json({
-			message: 'User registered',
-			newUser,
-		});
-	} catch (error: any) {
-		logger.error('Signup error', error);
-		if (error.message === 'User with this email already exists') {
-			return res.status(409).json({ error: 'Email already exists' });
-		}
-		next(error);
-	}
+	const dto: CreateUserInput = {
+		name: sanitized.name,
+		email: sanitized.email,
+		password: sanitized.password,
+		role: sanitized.role,
+	};
+	const { newUser, token } = await createUser(dto);
+
+	cookies.set(res, 'token', token);
+	logger.info(`User registered successfully: ${newUser.email}`);
+	return res.status(201).json({
+		message: 'User registered',
+		newUser,
+	});
 };
 
 export const signin = async (
