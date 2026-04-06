@@ -40,6 +40,7 @@ export const createUser = async ({
 	});
 
 	if (existingUser) {
+		logger.error(`Email already exists`);
 		throw new AppError('Email already exists', 409);
 	}
 	const password_hash = await hashPassword(password);
@@ -87,7 +88,11 @@ export const authenticateUser = async ({
 				role: true,
 			},
 		});
-		if (!user) throw new Error('Invalid credentials');
+		if (!user) {
+			logger.error(`Invalid credentials`);
+			throw new AppError('Invalid credentials', 401);
+		}
+
 		const isMatch = await comparePassword(password, user.password);
 		const token = jwtToken.sign({
 			id: user.userId,
@@ -95,7 +100,10 @@ export const authenticateUser = async ({
 			role: user.role,
 		});
 
-		if (!isMatch) throw new Error('Invalid credentials');
+		if (!isMatch) {
+			logger.error(`Invalid credentials`);
+			throw new AppError('Invalid credentials', 401);
+		}
 		return {
 			user: {
 				name: user.name,

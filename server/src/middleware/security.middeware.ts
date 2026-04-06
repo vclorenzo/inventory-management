@@ -1,67 +1,47 @@
-// import rateLimit from 'express-rate-limit';
-// import helmet from 'helmet';
-// import isbot from 'isbot';
-// import logger from '#config/logger.js';
+import logger from '#config/logger.ts';
+import { Request, Response, NextFunction } from 'express';
+import rateLimit from 'express-rate-limit';
 
-// export const securityHeaders = helmet();
+type Role = 'admin' | 'user' | 'guest';
 
-// export const securityMiddleware = (req, res, next) => {
-// 	const role = req.user?.role || 'guest';
+const createLimiter = (role: Role, max: number) =>
+  rateLimit({
+    windowMs: 60 * 1000,
+    max,
+    standardHeaders: true,
+    legacyHeaders: false,
 
-// 	let limit;
-// 	let message;
+    handler: (req: Request, res: Response) => {
+      logger.warn('Rate limit exceeded', {
+        ip: req.ip,
+        userAgent: req.get('User-Agent'),
+        path: req.path,
+        role,
+      });
 
-// 	switch (role) {
-// 		case 'admin':
-// 			limit = 20;
-// 			message = 'Admin request limit exceeded (20 per minute). Slow down';
-// 			break;
+      res.status(429).json({
+        error: 'Too many requests',
+        message: `${role} request limit exceeded`,
+      });
+    },
+  });
 
-// 		case 'user':
-// 			limit = 10;
-// 			message = 'User request limit exceeded (10 per minute). Slow down';
-// 			break;
+const limiters = {
+  admin: createLimiter('admin', 20),
+  user: createLimiter('user', 10),
+  guest: createLimiter('guest', 5),
+};
 
-// 		case 'guest':
-// 			limit = 5;
-// 			message = 'Guest request limit exceeded (5 per minute). Slow down';
-// 			break;
-// 	}
+export const securityMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const rawRole = req.user?.role;
 
-// 	const limiter = rateLimit({
-// 		windowMs: 60 * 1000,
-// 		max: limit,
-// 		keyGenerator: () => req.ip,
-// 		handler: (req, res) => {
-// 			logger.warn('Rate limit exceeded', {
-// 				ip: req.ip,
-// 				userAgent: req.get('User-Agent'),
-// 				path: req.path,
-// 			});
+  const role: Role = (req.user?.role as Role) ?? 'guest';
 
-// 			return res.status(429).json({
-// 				error: 'Too Many Requests',
-// 				message,
-// 			});
-// 		},
-// 	});
+  return limiters[role](req, res, next);
+};
 
-// 	limiter(req, res, () => {
-// 		const userAgent = req.get('User-Agent');
-
-// 		if (isbot(userAgent)) {
-// 			logger.warn('Bot request blocked', {
-// 				ip: req.ip,
-// 				userAgent,
-// 				path: req.path,
-// 			});
-
-// 			return res.status(403).json({
-// 				error: 'Forbidden',
-// 				message: 'Automated requests are not allowed',
-// 			});
-// 		}
-
-// 		next();
-// 	});
-// };
+export default securityMiddleware;

@@ -4,9 +4,9 @@ import { Request, Response, NextFunction } from 'express';
 
 export const errorHandler = (
 	err: any,
-	req: Request,
+	_req: Request,
 	res: Response,
-	next: NextFunction,
+	_next: NextFunction,
 ) => {
 	if (err instanceof AppError) {
 		return res.status(err.statusCode).json({

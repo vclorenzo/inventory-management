@@ -1,6 +1,10 @@
-export type CreateUserInput = {
+export type CreateSignupInput = {
 	name: string;
 	email: string;
 	password: string;
-	role: string; // TODO only allow certain roles
+	role: 'admin' | 'user' | 'guest';
+};
+export type CreateSigninInput = {
+	email: string;
+	password: string;
 };

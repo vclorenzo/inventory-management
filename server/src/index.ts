@@ -10,6 +10,8 @@ import dashboardRoutes from './routes/dashboard.routes';
 import expenseRoutes from './routes/expense.routes';
 import productRoutes from './routes/product.routes';
 import userRoutes from './routes/user.routes';
+// import { botBlocker } from '#middleware/botBlocker.ts';
+import securityMiddleware from '#middleware/security.middeware.ts';
 
 // CONFIGURATION
 dotenv.config();
@@ -21,6 +23,8 @@ app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
+// app.use(botBlocker);
+app.use(securityMiddleware);
 
 // ROUTES
 app.use('/dashboard', dashboardRoutes);

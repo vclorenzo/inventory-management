@@ -1,19 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import logger from '#config/logger.js';
 import { jwtToken } from '#utils/jwt.js';
+import logger from '#config/logger.ts';
 
 interface DecodedToken {
 	email: string;
 	role: string;
 	[key: string]: unknown;
-}
-
-declare global {
-	namespace Express {
-		interface Request {
-			user?: DecodedToken;
-		}
-	}
 }
 
 export const authenticateToken = (
