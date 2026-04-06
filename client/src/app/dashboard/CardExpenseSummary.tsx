@@ -1,5 +1,5 @@
 'use client';
-import { useGetDashboardMetricsQuery } from '@/state/api';
+import { useGetDashboardMetricsQuery } from '@/state/internal/dashboardApi';
 import { ExpenseByCategorySummary } from '@/types/DashboardMetrics';
 import { CircularProgress } from '@mui/material';
 import { TrendingUp } from 'lucide-react';

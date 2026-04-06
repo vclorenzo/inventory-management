@@ -1,5 +1,5 @@
 'use client';
-import StoreProvider, { useAppSelector } from '@/app/redux';
+import StoreProvider, { useAppSelector } from '@/state/redux';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import React, { useEffect } from 'react';

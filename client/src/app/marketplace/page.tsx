@@ -1,14 +1,11 @@
 'use client';
 import CreateProductModal from '@/app/products/CreateProductModal';
 import Cards from '@/components/Cards';
-import Header from '@/components/Header';
-import { useCreateProductMutation, useGetProductsQuery } from '@/state/api';
+import { useCreateProductMutation, useGetProductsQuery } from '@/state/internal/productsApi';
 import { ProductFormData } from '@/types/Products';
-import { CircularProgress, Rating } from '@mui/material';
-import { PlusCircleIcon, SearchIcon } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import React, { useState } from 'react';
+import { CircularProgress } from '@mui/material';
+import { SearchIcon } from 'lucide-react';
+import { useState } from 'react';
 
 type Props = {};
 

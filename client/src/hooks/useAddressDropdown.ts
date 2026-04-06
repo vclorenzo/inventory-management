@@ -3,7 +3,7 @@ import {
 	useGetProvincesQuery,
 	useGetCitiesQuery,
 	useGetBarangaysQuery,
-} from '@/services/api/psgc/psgcApi';
+} from '@/state/external/psgcApi';
 
 type Params = {
 	regionCode?: string;
@@ -38,7 +38,7 @@ export function useAdressDropdowns({
 			provinces.isLoading ||
 			cities.isLoading ||
 			barangays.isLoading,
-		isError:
+		error:
 			regions.isError ||
 			provinces.isError ||
 			cities.isError ||

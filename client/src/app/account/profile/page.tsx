@@ -2,7 +2,7 @@
 import { mockProfileSettings } from '@/app/constants/User';
 import Button from '@/components/Button';
 import Header from '@/components/Header';
-import { useAdressDropdowns } from '@/services/api/psgc/hooks/useAddressDropdown';
+import { useAdressDropdowns } from '@/hooks/useAddressDropdown';
 import { UserFormValues, UserSetting } from '@/types/User';
 import { CircularProgress } from '@mui/material';
 import { useState } from 'react';
@@ -49,7 +49,7 @@ const Profile = () => {
 		console.log('ITLOG', data);
 	};
 
-	const { regions, provinces, cities, barangays, isLoading, isError } =
+	const { regions, provinces, cities, barangays, isLoading, error } =
 		useAdressDropdowns({
 			regionCode: region,
 			provinceCode: province,
@@ -64,7 +64,7 @@ const Profile = () => {
 		);
 	}
 
-	if (isError) {
+	if (error) {
 		return (
 			<div className="text-center text-red-500 py-4">
 				Failed to fetch products

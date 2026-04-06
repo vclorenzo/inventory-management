@@ -1,5 +1,5 @@
 'use client';
-import { useGetDashboardMetricsQuery } from '@/state/api';
+import { useGetDashboardMetricsQuery } from '@/state/internal/dashboardApi';
 import { CircularProgress, Rating } from '@mui/material';
 import { ShoppingBag } from 'lucide-react';
 import Image from 'next/image';

@@ -1,6 +1,6 @@
 'use client';
 import Header from '@/components/Header';
-import { useGetAllUsersQuery } from '@/state/api';
+import { useUsers } from '@/hooks/useUsers';
 import { CircularProgress } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
@@ -13,7 +13,7 @@ const columns: GridColDef[] = [
 ];
 
 const Users = (props: Props) => {
-	const { data: users, isError, isLoading } = useGetAllUsersQuery();
+	const { users, error, isLoading } = useUsers();
 
 	if (isLoading) {
 		return (
@@ -23,7 +23,7 @@ const Users = (props: Props) => {
 		);
 	}
 
-	if (isError || !users) {
+	if (error || !users) {
 		return (
 			<div className="text-center text-red-500 py-4">Failed to fetch users</div>
 		);

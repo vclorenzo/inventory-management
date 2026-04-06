@@ -1,22 +1,20 @@
 'use client';
-import { useGetProductQuery } from '@/state/api';
 import { CircularProgress, Rating } from '@mui/material';
+import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
-import React from 'react';
-
+import { useGetProductByIdQuery } from '@/state/internal/productsApi';
+import Image from 'next/image';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import Image from 'next/image';
 
 const ProductDetails = ({ params }: { params: { productId: string } }) => {
 	const {
 		data: product,
 		isLoading,
 		isError,
-	} = useGetProductQuery(params.productId);
+	} = useGetProductByIdQuery(params.productId);
 
 	if (isLoading) {
 		return (

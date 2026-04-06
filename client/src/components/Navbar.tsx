@@ -1,11 +1,7 @@
 'use client';
-import { useAppDispatch, useAppSelector } from '@/app/redux';
+import { useAppDispatch, useAppSelector } from '@/state/redux';
 import { setIsDarkMode, setIsSidebarCollapsed } from '@/state';
-import {
-	toggleDarkMode,
-	useIsDarkModeVisible,
-	useIsNotificationVisible,
-} from '@/utils/GlobalUtils';
+
 import {
 	Bell,
 	Menu,
@@ -19,6 +15,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 import Button from './Button';
+import { toggleDarkMode, useIsDarkModeVisible, useIsNotificationVisible } from '@/utils/global';
 
 type Props = {};
 

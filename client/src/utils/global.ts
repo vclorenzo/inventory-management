@@ -1,4 +1,4 @@
-import { useAppSelector } from '@/app/redux';
+import { useAppSelector } from '@/state/redux';
 import { setIsDarkMode } from '../state';
 
 //FUNCTIONS

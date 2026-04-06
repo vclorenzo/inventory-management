@@ -1,11 +1,11 @@
 'use client';
-import Header from '@/components/Header';
-import { UserSetting } from '@/types/User';
-import React, { useState } from 'react';
-import { mockAccountSettings, mockProfileSettings } from '../constants/User';
-import Tabs from '@/components/Tabs';
 import Cards from '@/components/Cards';
-import { useGetProductsQuery } from '@/state/api';
+import Header from '@/components/Header';
+import Tabs from '@/components/Tabs';
+import { UserSetting } from '@/types/User';
+import { useState } from 'react';
+import { mockAccountSettings } from '../constants/User';
+import { useGetProductsQuery } from '@/state/internal/productsApi';
 import { CircularProgress } from '@mui/material';
 
 const Account = () => {

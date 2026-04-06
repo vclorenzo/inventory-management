@@ -1,5 +1,5 @@
 'use client';
-import { useAppDispatch, useAppSelector } from '@/app/redux';
+import { useAppDispatch, useAppSelector } from '@/state/redux';
 import { setIsDropdownExpanded, setIsSidebarCollapsed } from '@/state';
 import {
 	Archive,

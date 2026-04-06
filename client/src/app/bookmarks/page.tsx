@@ -1,9 +1,8 @@
 'use client';
 import Header from '@/components/Header';
-import { useGetProductsQuery } from '@/state/api';
+import { useGetProductsQuery } from '@/state/internal/productsApi';
 import { CircularProgress } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import React from 'react';
 
 type Props = {};
 

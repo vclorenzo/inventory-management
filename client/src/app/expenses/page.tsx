@@ -1,6 +1,6 @@
 'use client';
 import Header from '@/components/Header';
-import { useGetExpensesByCategoryQuery } from '@/state/api';
+import { useGetExpensesByCategoryQuery } from '@/state/internal/expensesApi';
 import { ExpenseByCategorySummary } from '@/types/DashboardMetrics';
 import { AggregatedData, AggregatedDataItem } from '@/types/Expenses';
 import { CircularProgress } from '@mui/material';

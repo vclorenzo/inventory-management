@@ -1,5 +1,5 @@
 'use client';
-import { useGetProductQuery } from '@/state/api';
+import { useGetProductByIdQuery } from '@/state/api';
 import { CircularProgress, Rating } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
@@ -16,7 +16,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 		data: product,
 		isLoading,
 		isError,
-	} = useGetProductQuery(params.productId);
+	} = useGetProductByIdQuery(params.productId);
 
 	if (isLoading) {
 		return (
