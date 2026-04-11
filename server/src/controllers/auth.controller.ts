@@ -1,15 +1,12 @@
 import logger from '#config/logger.ts';
 import { authenticateUser, createUser } from '#src/services/auth.service.ts';
-import { formatValidationError } from '#src/utils/format.ts';
-import {
-	signinSchema,
-	signupSchema,
-} from '#src/validations/auth.validations.ts';
-import { CreateSignupInput, CreateSigninInput } from '#types/user.types.ts';
+import { CreateSigninInput, CreateSignupInput } from '#types/user.types.ts';
 import { cookies } from '#utils/cookies.ts';
-import { jwtToken } from '#utils/jwt.ts';
 import { sanitizeSigninInput, sanitizeSignupInput } from '#utils/sanitize.ts';
-import { Request, Response, NextFunction } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { NextFunction, Request, Response } from 'express';
+
+const prisma = new PrismaClient();
 
 export const signup = async (
 	req: Request,
@@ -44,14 +41,6 @@ export const signin = async (
 	next: NextFunction,
 ) => {
 	try {
-		// const validationResult = signinSchema.safeParse(req.body);
-		// if (!validationResult.success) {
-		// 	return res.status(400).json({
-		// 		error: 'Validation failed',
-		// 		details: formatValidationError(validationResult.error),
-		// 	});
-		// }
-		// const { email, password } = validationResult.data;
 		const sanitized = sanitizeSigninInput(req.body);
 		const dto: CreateSigninInput = {
 			email: sanitized.email,
@@ -72,7 +61,7 @@ export const signin = async (
 };
 
 export const signout = async (
-	req: Request,
+	_req: Request,
 	res: Response,
 	next: NextFunction,
 ) => {
@@ -82,6 +71,42 @@ export const signout = async (
 		return res.status(200).json({ message: 'Signed out successfully' });
 	} catch (error) {
 		logger.error('Signout error', error);
+		next(error);
+	}
+};
+
+export const me = async (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const id = (req.user as any)?.id as string | undefined;
+		const email = (req.user as any)?.email as string | undefined;
+
+		if (!id && !email) {
+			return res.status(401).json({
+				error: 'Authentication required',
+				message: 'Invalid session',
+			});
+		}
+
+		const user = await prisma.users.findFirst({
+			where: {
+				...(id ? { userId: id } : {}),
+				...(email ? { email } : {}),
+			},
+			select: {
+				userId: true,
+				name: true,
+				email: true,
+				role: true,
+				created_at: true,
+			},
+		});
+
+		if (!user) {
+			return res.status(404).json({ message: 'User not found' });
+		}
+
+		return res.status(200).json({ user });
+	} catch (error) {
 		next(error);
 	}
 };

@@ -1,8 +1,3 @@
-import CardExpenseSummary from '@/app/dashboard/CardExpenseSummary';
-import CardPopularProducts from '@/app/dashboard/CardPopularProducts';
-import CardPurchaseSummary from '@/app/dashboard/CardPurchaseSummary';
-import CardSalesSummary from '@/app/dashboard/CardSalesSummary';
-import StatCard from '@/app/dashboard/StatCard';
 import {
 	CheckCircle,
 	Package,
@@ -10,6 +5,11 @@ import {
 	TrendingDown,
 	TrendingUp,
 } from 'lucide-react';
+import CardPopularProducts from './CardPopularProducts';
+import CardSalesSummary from './CardSalesSummary';
+import CardPurchaseSummary from './CardPurchaseSummary';
+import CardExpenseSummary from './CardExpenseSummary';
+import StatCard from './StatCard';
 
 type Props = {};
 

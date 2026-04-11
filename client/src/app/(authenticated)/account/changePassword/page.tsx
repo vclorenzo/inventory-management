@@ -1,9 +1,9 @@
 'use client';
-import { mockChangePAsswordSettings } from '@/app/constants/User';
 import Header from '@/components/Header';
 import { ChangePasswordFormValues, UserSetting } from '@/types/User';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { mockChangePAsswordSettings } from '../../constants/User';
 
 const ChangePassword = () => {
 	const [ChangePasswordSettings, setChangePasswordSettings] = useState<

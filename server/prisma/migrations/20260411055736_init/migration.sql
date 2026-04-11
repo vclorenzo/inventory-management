@@ -12,6 +12,20 @@ CREATE TABLE "Users" (
 );
 
 -- CreateTable
+CREATE TABLE "Profile" (
+    "profileId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "region" TEXT,
+    "province" TEXT,
+    "city" TEXT,
+    "barangay" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Profile_pkey" PRIMARY KEY ("profileId")
+);
+
+-- CreateTable
 CREATE TABLE "Products" (
     "productId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -98,6 +112,12 @@ CREATE TABLE "ExpenseByCategory" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Profile_userId_key" ON "Profile"("userId");
+
+-- AddForeignKey
+ALTER TABLE "Profile" ADD CONSTRAINT "Profile_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("userId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Sales" ADD CONSTRAINT "Sales_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Products"("productId") ON DELETE RESTRICT ON UPDATE CASCADE;

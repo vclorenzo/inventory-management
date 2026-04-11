@@ -1,5 +1,6 @@
 import { errorHandler } from '#middleware/error.middleware.ts';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -22,14 +23,21 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
 app.use(morgan('common'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+app.use(
+	cors({
+		origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+		credentials: true,
+	}),
+);
+app.use(cookieParser());
 // app.use(botBlocker);
-app.use(securityMiddleware);
+// app.use(securityMiddleware);
 
 // ROUTES
 app.use('/dashboard', dashboardRoutes);
 app.use('/products', productRoutes);
 app.use('/users', userRoutes);
+app.use('/profiles', userRoutes);
 app.use('/auth', authRoutes);
 app.use('/expenses', expenseRoutes);
 

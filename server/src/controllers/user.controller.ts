@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import * as userService from '../services/user.service';
 import logger from '#config/logger.ts';
@@ -7,8 +7,10 @@ const prisma = new PrismaClient();
 export const getUserById = async (
 	req: Request,
 	res: Response,
+	next: NextFunction
 ): Promise<void> => {
 	try {
+		
 		const { id } = req.params;
 		const user = await userService.getUserById(id);
 

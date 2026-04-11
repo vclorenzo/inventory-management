@@ -10,7 +10,6 @@ const router = Router();
 
 router.get('/', getAllUsers);
 router.get('/:id', getUserById);
-router.get('/', getAllUsers);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 

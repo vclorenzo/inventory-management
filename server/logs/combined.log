@@ -1,0 +1,140 @@
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T06:51:48.389Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-09T06:51:50.884Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-09T07:04:15.082Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-09T07:04:43.205Z"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/products","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:04:45.926Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/me","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:04:59.748Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/dashboard","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:04:59.751Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/me","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:10:23.802Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/products","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:10:23.804Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/products","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:10:26.926Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/dashboard","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:10:36.016Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:06.641Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:10.892Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:13.509Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:17.412Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:18.147Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:18.502Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:18.664Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:18.820Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:18.974Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/me","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:25.120Z","userAgent":"PostmanRuntime/7.53.0"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:33.705Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:35.790Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:39.153Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"ip":"127.0.0.1","level":"warn","message":"Rate limit exceeded","path":"/auth/sign-in","role":"guest","service":"acquisitions-api","timestamp":"2026-04-09T07:11:39.672Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T07:13:51.729Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-09T07:13:51.850Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T07:16:52.443Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-09T07:16:54.188Z"}
+{"level":"error","message":"Email already exists","service":"acquisitions-api","timestamp":"2026-04-09T07:18:36.758Z"}
+{"level":"info","message":"User test10@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-04-09T07:18:45.469Z"}
+{"level":"info","message":"User registered successfully: test10@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T07:18:45.471Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T07:31:25.711Z"}
+{"level":"info","message":"User test20@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-04-09T08:17:31.907Z"}
+{"level":"info","message":"User registered successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T08:17:31.909Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T08:17:33.533Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T08:17:49.618Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T08:17:51.167Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T08:17:51.283Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:04:32.724Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:04:32.821Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:04:50.251Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:04:54.186Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:04:54.307Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:06:17.580Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:06:22.625Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:06:35.890Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:06:36.017Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:06:38.354Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:14:51.194Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:14:54.179Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:14:57.798Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:15:02.946Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:15:03.037Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:15:06.880Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:15:44.630Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:15:44.762Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:18:38.119Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-09T13:18:39.631Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-09T13:18:42.117Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-09T13:18:42.226Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T02:58:58.281Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-11T02:58:58.438Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-11T02:59:01.899Z"}
+{"level":"info","message":"User signed in successfully: test20@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T02:59:07.036Z"}
+{"level":"info","message":"User authenticated test20@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-11T02:59:07.071Z"}
+{"level":"info","message":"User test10@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:34:42.732Z"}
+{"level":"info","message":"User registered successfully: test10@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:34:42.738Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:35:47.733Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:35:47.734Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:35:52.062Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:35:52.062Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:03.281Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:03.281Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:04.084Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:04.085Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:07.767Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:07.767Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:18.131Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:36:18.132Z"}
+{"level":"info","message":"User test2@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:36:41.276Z"}
+{"level":"info","message":"User registered successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:36:41.277Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-11T03:36:41.368Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:36:44.686Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:36:49.748Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:37:29.790Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:37:41.152Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:37:42.914Z"}
+{"level":"info","message":"User test10@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:38:33.781Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:38:48.822Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:39:22.624Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-11T03:39:22.760Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:39:25.169Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:29.743Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:29.744Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:30.718Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:30.718Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.065Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.065Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.222Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.223Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.391Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.392Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.550Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.550Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.709Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.710Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.875Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:31.875Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.034Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.034Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.191Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.191Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.358Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.358Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.521Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.521Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.677Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.677Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.847Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:32.847Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.015Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.016Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.182Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.183Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.343Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.343Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.558Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.558Z"}
+{"level":"info","message":"User signed in successfully: test10@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:40:45.594Z"}
+{"level":"info","message":"User authenticated test10@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-11T03:40:45.679Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:41:42.091Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:42:55.785Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-04-11T03:43:07.666Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T03:43:12.396Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-04-11T03:43:12.501Z"}
+{"level":"info","message":"User test10@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-04-11T06:20:38.829Z"}
+{"level":"info","message":"User registered successfully: test10@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T06:20:38.836Z"}
+{"level":"info","message":"User signed in successfully: test10@gmail.com","service":"acquisitions-api","timestamp":"2026-04-11T06:29:36.279Z"}
+{"level":"info","message":"User authenticated test10@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-04-11T06:29:36.458Z"}

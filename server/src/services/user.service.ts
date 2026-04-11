@@ -12,8 +12,8 @@ export const getAllUsers = async ({
 }) => {
 	try {
 		const [totalCount, users] = await prisma.$transaction([
-			prisma.products.count(),
-			prisma.products.findMany({
+			prisma.users.count(),
+			prisma.users.findMany({
 				skip: (page - 1) * limit,
 				take: limit,
 			}),

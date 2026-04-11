@@ -30,3 +30,8 @@ body,
 		grid-template-rows: repeat(8, 7.5vh);
 	}
 }
+
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/scrollbar';

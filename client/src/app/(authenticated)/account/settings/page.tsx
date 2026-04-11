@@ -1,10 +1,10 @@
 'use client';
-import { mockPreferencesSettings } from '@/app/constants/User';
 import Header from '@/components/Header';
 import { UserSetting } from '@/types/User';
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/state/redux';
 import { setIsDarkModeVisible, setIsNotificationVisible } from '@/state';
+import { mockPreferencesSettings } from '../../constants/User';
 
 const Preferences = () => {
 	//Selectors

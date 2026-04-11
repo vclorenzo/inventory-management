@@ -1,11 +1,14 @@
 'use client';
-import CreateProductModal from '@/app/products/CreateProductModal';
 import Cards from '@/components/Cards';
-import { useCreateProductMutation, useGetProductsQuery } from '@/state/internal/productsApi';
+import {
+	useCreateProductMutation,
+	useGetProductsQuery,
+} from '@/state/internal/productsApi';
 import { ProductFormData } from '@/types/Products';
 import { CircularProgress } from '@mui/material';
 import { SearchIcon } from 'lucide-react';
 import { useState } from 'react';
+import CreateProductModal from '../products/CreateProductModal';
 
 type Props = {};
 
@@ -58,7 +61,7 @@ const Marketplace = (props: Props) => {
 				</div>
 			</div>
 			{/* PRODUCTS LIST */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg-grid-cols-3 gap-10 justify-between">
+			<div className="grid grid-cols-1 sm:grid-cols-4 lg-grid-cols-5 gap-10 justify-between">
 				{isLoading ? (
 					<>
 						<CircularProgress />

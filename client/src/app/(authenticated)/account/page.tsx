@@ -93,7 +93,7 @@ const Account = () => {
 						{
 							label: 'Listings',
 							content: (
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg-grid-cols-3 gap-10 justify-between">
+								<div className="grid grid-cols-1 sm:grid-cols-4 lg-grid-cols-5 gap-10 justify-between">
 									{isLoading ? (
 										<>
 											<CircularProgress />

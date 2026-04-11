@@ -21,6 +21,24 @@ model Users {
   role  String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  profile Profile?
+}
+
+
+model Profile {
+  profileId String  @id @default(uuid())
+  userId    String  @unique
+
+  region    String?
+  province  String?
+  city      String?
+  barangay  String?
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 model Products {

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { jwtToken } from '#utils/jwt.js';
+import { jwtToken } from '#utils/jwt.ts';
 import logger from '#config/logger.ts';
 
 interface DecodedToken {
