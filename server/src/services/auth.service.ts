@@ -11,7 +11,7 @@ export const hashPassword = async (password: string) => {
 		return await bcrypt.hash(password, 10);
 	} catch (error) {
 		logger.error(`Error hashing the password ${error}`);
-		throw new Error('Error hashing');
+		throw new AppError('Error hashing');
 	}
 };
 
@@ -20,7 +20,7 @@ export const comparePassword = async (password: string, hash: string) => {
 		return await bcrypt.compare(password, hash);
 	} catch (error) {
 		logger.error(`Error comparing passwords: ${error}`);
-		throw new Error('Error comparing passwords');
+		throw new AppError('Error comparing passwords');
 	}
 };
 
@@ -44,12 +44,15 @@ export const createUser = async ({
 		throw new AppError('Email already exists', 409);
 	}
 	const password_hash = await hashPassword(password);
-	const newUser = await prisma.users.create({
+	const created = await prisma.users.create({
 		data: {
 			email,
 			name,
 			password: password_hash,
 			role,
+			profile: {
+				create: {},
+			},
 		},
 		select: {
 			userId: true,
@@ -57,8 +60,19 @@ export const createUser = async ({
 			email: true,
 			role: true,
 			created_at: true,
+			profile: {
+				select: { profileId: true },
+			},
 		},
 	});
+	const newUser = {
+		userId: created.userId,
+		name: created.name,
+		email: created.email,
+		role: created.role,
+		created_at: created.created_at,
+		profileId: created.profile!.profileId,
+	};
 	logger.info(`User ${newUser.email} created successfully`);
 	const token = jwtToken.sign({
 		id: newUser.userId,
@@ -75,45 +89,40 @@ export const authenticateUser = async ({
 	email: string;
 	password: string;
 }) => {
-	try {
-		const user = await prisma.users.findFirst({
-			where: {
-				email,
-			},
-			select: {
-				userId: true,
-				name: true,
-				email: true,
-				password: true,
-				role: true,
-			},
-		});
-		if (!user) {
-			logger.error(`Invalid credentials`);
-			throw new AppError('Invalid credentials', 401);
-		}
+	const user = await prisma.users.findFirst({
+		where: {
+			email,
+		},
+		select: {
+			userId: true,
+			name: true,
+			email: true,
+			password: true,
+			role: true,
+		},
+	});
+	if (!user) {
+		logger.error(`Invalid credentials`);
+		throw new AppError('Invalid credentials', 401);
+	}
 
-		const isMatch = await comparePassword(password, user.password);
-		const token = jwtToken.sign({
-			id: user.userId,
+	const isMatch = await comparePassword(password, user.password);
+	const token = jwtToken.sign({
+		id: user.userId,
+		email: user.email,
+		role: user.role,
+	});
+
+	if (!isMatch) {
+		logger.error(`Invalid credentials`);
+		throw new AppError('Invalid credentials', 401);
+	}
+	return {
+		user: {
+			name: user.name,
 			email: user.email,
 			role: user.role,
-		});
-
-		if (!isMatch) {
-			logger.error(`Invalid credentials`);
-			throw new AppError('Invalid credentials', 401);
-		}
-		return {
-			user: {
-				name: user.name,
-				email: user.email,
-				role: user.role,
-			},
-			token,
-		};
-	} catch (error) {
-		logger.error(`Error authenticating user: ${error}`);
-		throw error;
-	}
+		},
+		token,
+	};
 };

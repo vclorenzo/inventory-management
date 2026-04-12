@@ -1,3 +1,4 @@
+import { AppError } from '#error/AppError.ts';
 import { PrismaClient, Products } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -68,7 +69,7 @@ export const updateProduct = async (id: string, data: Partial<Products>) => {
 	try {
 		const existingProduct = await getProductById(id);
 		if (!existingProduct) {
-			throw new Error('Product does not exist');
+			throw new AppError('Product does not exist');
 		}
 
 		return await prisma.products.update({
@@ -88,7 +89,7 @@ export const deleteProduct = async (id: string) => {
 	try {
 		const existingProduct = await getProductById(id);
 		if (!existingProduct) {
-			throw new Error('Product does not exist');
+			throw new AppError('Product does not exist');
 		}
 		return await prisma.products.delete({
 			where: { productId: id },

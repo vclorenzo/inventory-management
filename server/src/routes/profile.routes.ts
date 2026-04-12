@@ -1,16 +1,12 @@
-// import { Router } from 'express';
-// import {
-// 	getAllUsers,
-// 	getUserById,
-// 	updateUser,
-// 	deleteUser,
-// } from '../controllers/user.controller';
+import {
+  getProfileById,
+  updateProfile,
+} from "#controllers/profile.controller.ts";
+import { Router } from "express";
 
-// const router = Router();
+const router = Router();
 
-// router.get('/', getAllUsers);
-// router.get('/:id', getUserById);
-// router.put('/:id', updateUser);
-// router.delete('/:id', deleteUser);
+router.get("/:id", getProfileById);
+router.put("/:id", updateProfile);
 
-// export default router;
+export default router;

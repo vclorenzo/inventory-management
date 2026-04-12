@@ -1,52 +1,58 @@
-// import logger from '#config/logger.ts';
-// import { PrismaClient, Users } from '@prisma/client';
+import logger from '#config/logger.ts';
+import { PrismaClient, Profile } from '@prisma/client';
+import * as userService from './user.service';
+import { AppError } from '#error/AppError.ts';
 
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
-// export const getProfileById = async (id: string) => {
-// 	try {
-// 		return await prisma.profile.findUnique({
-// 			where: {
-// 				userId: id,
-// 			},
-// 		});
-// 	} catch (error) {
-// 		logger.error('Error getting user by id ${id}:', error);
-// 		throw error;
-// 	}
-// };
+export const getProfileById = async (id: string) => {
+	const existingUser = await userService.getUserById(id);
+	if (!existingUser) {
+		throw new AppError('User not found');
+	}
+	const profile = await prisma.users.findUnique({
+		where: {
+			userId: id,
+		},
+		select: {
+			name: true,
+			email: true,
+			profile: {
+				select: {
+					region: true,
+					province: true,
+					city: true,
+					barangay: true,
+				},
+			},
+		},
+	});
+	return { email: existingUser.email, ...profile };
+};
 
-// export const updateProfile = async (id: string, data: Partial<Profiles>) => {
-// 	try {
-// 		const existingProfile = await getProfileById(id);
-// 		if (!existingProfile) {
-// 			throw new Error('Profile not found');
-// 		}
-// 		const updatedProfile = await prisma.users.update({
-// 			where: { userId: id },
-// 			data: { name: data.name },
-// 		});
-// 		logger.info(`Profile ${updatedProfile.email} updated successfully`);
-// 		return updatedProfile;
-// 	} catch (error) {
-// 		logger.error(`Error updating user ${id}:`, error);
-// 		throw error;
-// 	}
-// };
+export const updateProfile = async (
+	id: string,
+	data: Partial<Profile> & { name?: string },
+) => {
+	const existingUser = await userService.getUserById(id);
+	if (!existingUser) {
+		throw new AppError('User not found');
+	}
 
-// export const deleteProfile = async (id: string) => {
-// 	try {
-// 		const existingProfile = await getProfileById(id);
-// 		if (!existingProfile) {
-// 			throw new Error('Profile not found');
-// 		}
-// 		const deletedProfile = await prisma.users.delete({
-// 			where: { userId: id },
-// 		});
-// 		logger.info(`Profile ${deletedProfile.email} deleted successfully`);
-// 		return deletedProfile;
-// 	} catch (error) {
-// 		logger.error(`Error deleting user ${id}:`, error);
-// 		throw error;
-// 	}
-// };
+	let updatedUser = existingUser;
+	if (data.name !== undefined) {
+		updatedUser = await userService.updateUser(id, { name: data.name });
+	}
+
+	const updatedProfile = await prisma.profile.update({
+		where: { userId: id },
+		data: {
+			region: data.region,
+			province: data.province,
+			city: data.city,
+			barangay: data.barangay,
+		},
+	});
+	logger.info(`Profile ${updatedUser.name} updated successfully`);
+	return { email: existingUser.email, updatedProfile };
+};

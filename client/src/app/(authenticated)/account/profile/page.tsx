@@ -3,19 +3,26 @@ import Button from "@/components/Button";
 import Header from "@/components/Header";
 import { useAdressDropdowns } from "@/hooks/useAddressDropdown";
 import { useMe } from "@/hooks/useMe";
-import { UserFormValues, UserSetting } from "@/types/User";
+import { UserFormValues } from "@/types/User";
 import { CircularProgress } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { mockProfileSettings } from "../../constants/User";
+import { useProfile } from "@/hooks/useProfile";
+import { useUpdateProfileMutation } from "@/state/internal/profileApi";
 
 const Profile = () => {
-  const [profileSettings, setProfileSettings] =
-    useState<UserSetting[]>(mockProfileSettings);
-
   const router = useRouter();
+  const [updateProfile, { isLoading: isUpdateLoading }] =
+    useUpdateProfileMutation();
   const { me, isLoading: isMeLoading, error: meError } = useMe();
+  const userId = me?.data.userId;
+
+  const {
+    profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useProfile(userId ?? "");
 
   const [region, setRegion] = useState<string>();
   const [province, setProvince] = useState<string>();
@@ -48,7 +55,7 @@ const Profile = () => {
 
   // RHF
   const form = useForm<UserFormValues>();
-  const { register, handleSubmit, setValue, reset, getValues } = form;
+  const { register, handleSubmit, setValue, reset } = form;
 
   useEffect(() => {
     // Redirect unauthenticated users to login
@@ -57,16 +64,28 @@ const Profile = () => {
   }, [meError, router]);
 
   useEffect(() => {
-    if (!me) return;
+    if (!profile) return;
+    const r = profile.region ?? "";
+    const p = profile.province ?? "";
+    const c = profile.city ?? "";
+    const b = profile.barangay ?? "";
+    setRegion(r || undefined);
+    setProvince(p || undefined);
+    setCity(c || undefined);
     reset({
-      ...getValues(),
-      name: me.user.name ?? "",
-      email: me.user.email ?? "",
+      name: profile.name ?? "",
+      email: profile.email ?? "",
+      region: r,
+      province: p,
+      city: c,
+      barangay: b,
     });
-  }, [me, reset, getValues]);
+  }, [profile, reset]);
 
   const onSubmit = (data: UserFormValues) => {
-    console.log("ITLOG", data);
+    if (!userId) return;
+    const { name, region, province, city, barangay } = data;
+    updateProfile({ userId, name, region, province, city, barangay });
   };
 
   const { regions, provinces, cities, barangays, isLoading, error } =
@@ -76,7 +95,7 @@ const Profile = () => {
       cityCode: city,
     });
 
-  if (isMeLoading || isLoading) {
+  if (isMeLoading || isProfileLoading || isLoading || isUpdateLoading) {
     return (
       <div className="py-4">
         <CircularProgress />
@@ -92,7 +111,7 @@ const Profile = () => {
     );
   }
 
-  console.log("ITLOG", regions, provinces, cities, barangays);
+  console.log("ITLOG", me, profile);
 
   return (
     <div className="w-full">

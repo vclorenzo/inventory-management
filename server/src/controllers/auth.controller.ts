@@ -1,4 +1,5 @@
 import logger from '#config/logger.ts';
+import * as userService from '#services/user.service.ts';
 import { authenticateUser, createUser } from '#src/services/auth.service.ts';
 import { CreateSigninInput, CreateSignupInput } from '#types/user.types.ts';
 import { cookies } from '#utils/cookies.ts';
@@ -28,7 +29,7 @@ export const signup = async (
 		logger.info(`User registered successfully: ${newUser.email}`);
 		return res.status(201).json({
 			message: 'User registered',
-			newUser,
+			data: newUser,
 		});
 	} catch (error) {
 		next(error);
@@ -53,7 +54,7 @@ export const signin = async (
 		logger.info(`User signed in successfully: ${user.email}`);
 		return res.status(200).json({
 			message: 'Signed in successfully',
-			user,
+			data: user,
 		});
 	} catch (error: any) {
 		next(error);
@@ -77,35 +78,22 @@ export const signout = async (
 
 export const me = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const id = (req.user as any)?.id as string | undefined;
-		const email = (req.user as any)?.email as string | undefined;
+		const id = (req.user as any)?.id as string;
 
-		if (!id && !email) {
+		if (!id) {
 			return res.status(401).json({
 				error: 'Authentication required',
 				message: 'Invalid session',
 			});
 		}
 
-		const user = await prisma.users.findFirst({
-			where: {
-				...(id ? { userId: id } : {}),
-				...(email ? { email } : {}),
-			},
-			select: {
-				userId: true,
-				name: true,
-				email: true,
-				role: true,
-				created_at: true,
-			},
-		});
+		const user = await userService.getUserById(id);
 
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' });
 		}
 
-		return res.status(200).json({ user });
+		return res.status(200).json({ data: user });
 	} catch (error) {
 		next(error);
 	}

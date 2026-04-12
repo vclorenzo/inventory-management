@@ -1,11 +1,14 @@
-import { api } from '../api';
-import { User } from '@/types/User';
+import { User } from "@/types/User";
+import { api } from "../api";
 
 export const usersApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getAllUsers: builder.query<User[], void>({
-      query: () => '/users',
-      providesTags: ['Users'],
+      query: () => ({
+        url: "/users",
+        method: "GET",
+      }),
+      providesTags: ["Users"],
     }),
   }),
 });

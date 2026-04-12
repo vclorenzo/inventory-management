@@ -13,7 +13,7 @@ export const getProductById = async (
 		} else {
 			res.status(200).json({
 				message: 'Product retrieved successfully',
-				product,
+				data: product,
 			});
 		}
 	} catch (error) {
@@ -38,7 +38,7 @@ export const getAllProducts = async (
 
 		res.status(200).json({
 			message: 'Successfully retrieved products',
-			products,
+			data: products,
 			page,
 			limit,
 			totalPages,
@@ -61,7 +61,7 @@ export const createProduct = async (
 			rating,
 			stockQuantity,
 		});
-		res.status(201).json(product);
+		res.status(201).json({ data: product });
 	} catch (error: any) {
 		res.status(500).json({ message: error.message });
 	}
@@ -75,7 +75,7 @@ export const updateProduct = async (
 		const { id } = req.params;
 		const data = req.body;
 		const updatedProduct = await productService.updateProduct(id, data);
-		res.status(200).json(updatedProduct);
+		res.status(200).json({ data: updatedProduct });
 	} catch (error: any) {
 		res.status(500).json({ message: error.message });
 	}
