@@ -47,3 +47,14 @@
 {"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.343Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.558Z"}
 {"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-11T03:39:33.558Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T05:54:35.815Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T05:54:35.817Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T07:11:12.549Z"}
+{"level":"error","message":"Error authenticating user: Error: Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T07:11:12.552Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T07:16:45.736Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T07:45:38.405Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-12T07:46:37.236Z"}
+{"level":"error","message":"Email already exists","service":"acquisitions-api","timestamp":"2026-04-13T10:45:25.796Z"}
+{"level":"error","message":"Email already exists","service":"acquisitions-api","timestamp":"2026-04-13T10:46:05.454Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-13T10:46:59.473Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-13T17:16:44.599Z"}

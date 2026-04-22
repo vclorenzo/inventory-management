@@ -1,0 +1,75 @@
+---
+description: Best practices for React/Next.js/TypeScript/Tailwind/Redux in this repo
+alwaysApply: false
+globs:
+  - client/**
+---
+
+# Modern web development standards (React, Next.js, TS)
+
+## Development philosophy
+- Prefer **clean, maintainable, scalable** solutions that follow **SOLID**
+- Favor **functional, declarative** patterns over imperative ones
+- Maximize **type safety** and benefits from static analysis
+- Build **component-driven** UI with clear boundaries and composition
+
+## Planning before coding
+- Start with a **step-by-step plan** and brief **pseudocode**
+- Call out **data flow**, component boundaries, and state ownership
+- Identify **edge cases**, loading/empty states, and failure modes up front
+
+## Code style (JS/TS)
+- Indentation: **tabs**
+- Strings: **single quotes** (unless escaping would be worse)
+- **No semicolons** unless required for disambiguation
+- Keep lines \(\le\) **80 chars** when reasonable; refactor vs wrapping endlessly
+- Use `===`/`!==` (no `==`)
+- Use braces for multi-line conditionals; keep `} else {` on one line
+- Eliminate unused variables/imports; don’t ignore errors in callbacks/promises
+- Use trailing commas in multi-line objects/arrays
+
+## Naming conventions
+- **PascalCase**: React components, types, interfaces
+- **camelCase**: variables, functions, methods, hooks, props
+- **UPPERCASE**: env vars, constants, global config
+- **kebab-case**: directories and file names (e.g. `user-profile.tsx`)
+- Handlers: `handleClick`, `handleSubmit`; booleans: `isLoading`, `hasError`
+- Prefer full words; ok abbreviations: `err`, `req`, `res`, `props`, `ref`
+
+## React best practices
+- Use **function components**; define components with the `function` keyword
+- Keep components small; extract reusable logic into **custom hooks**
+- Ensure `useEffect` has correct deps and **cleanups**
+- Lists: use stable keys (avoid index keys)
+- Performance: use `memo`, `useCallback`, `useMemo` only when it helps
+- Avoid inline callbacks in JSX when it causes re-renders; lift/define handlers
+
+## Next.js (App Router) practices
+- Default to **Server Components**; add `'use client'` only when required
+- Use Next primitives appropriately: `next/image`, `next/link`, `next/script`
+- Implement **loading**, **error boundaries**, and sensible caching
+- Prefer URL params/search params for server-driven state when appropriate
+
+## TypeScript standards
+- Assume **strict** TypeScript; avoid `any`
+- Define clear interfaces for props/state and Redux slice state
+- Use type guards for nullable/optional values
+- Use generics where they improve correctness; use utility types deliberately
+- Prefer `interface` for object shapes (especially when extending)
+
+## State management
+- Local: `useState` for simple state; `useReducer` for complex transitions
+- Global: **Redux Toolkit** with feature-focused slices; normalized state
+- Access state via selectors; avoid “god slices”
+
+## UI, styling, and accessibility
+- Prefer **Tailwind CSS**; mobile-first responsive design
+- Use **shadcn/ui** components and **Radix** primitives where appropriate
+- Ensure a11y: semantic HTML, keyboard nav, focus management, contrast, ARIA
+- Provide clear, accessible validation and error feedback
+
+## Validation, testing, security, docs
+- Forms: **Zod** + (when applicable) **React Hook Form**
+- Tests: Jest + React Testing Library; mock external calls; test user workflows
+- Security: sanitize untrusted HTML (e.g. DOMPurify); avoid XSS pitfalls
+- Docs: use JSDoc for public APIs; keep docs concise with examples when useful

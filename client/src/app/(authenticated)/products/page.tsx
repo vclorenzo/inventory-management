@@ -44,6 +44,8 @@ const Products = (props: Props) => {
 		);
 	}
 
+	console.log('ITLOG', products);
+
 	return (
 		<div className="mx-auto pb-5 w-full">
 			{/* SEARCH BAR */}

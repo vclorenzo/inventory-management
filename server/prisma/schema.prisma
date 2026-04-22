@@ -46,7 +46,11 @@ model Products {
   name          String
   price         Float
   rating        Float?
+  productCategory      String
+  brand         String
+  condition     String
   stockQuantity Int
+  description   String
   Sales         Sales[]
   Purchases     Purchases[]
 }
