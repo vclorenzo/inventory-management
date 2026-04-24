@@ -58,3 +58,4 @@
 {"level":"error","message":"Email already exists","service":"acquisitions-api","timestamp":"2026-04-13T10:46:05.454Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-13T10:46:59.473Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-13T17:16:44.599Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-23T03:53:29.762Z"}

@@ -24,3 +24,26 @@ export type ChangePasswordFormValues = {
   newPassword: string;
   confirmPassword: string;
 };
+
+export type UserResponse = {
+  message: string;
+  updatedUser: {
+    email: string;
+    updatedProfile: {
+      userId: string;
+      name: string;
+      email: string;
+      password: string;
+      role: string;
+      created_at: string;
+      updated_at: string;
+    };
+  };
+};
+
+export type UserRequest = {
+  name?: string;
+  email?: string;
+  password?: string;
+  role?: string;
+};
