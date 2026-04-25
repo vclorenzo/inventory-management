@@ -1,4 +1,5 @@
 import { ReusableFieldConfig } from "@/types/components/ReactHookForm";
+import { ChevronDown } from "lucide-react";
 import React from "react";
 import type {
   FieldPath,
@@ -91,27 +92,33 @@ const ReactHookForm = <TFormValues extends FieldValues>({
                   const selectRegister = register(field.name, field.rules);
 
                   return (
-                    <select
-                      id={field.name}
-                      disabled={field.disabled}
-                      {...selectRegister}
-                      onChange={(e) => {
-                        selectRegister.onChange(e);
-                        field.onChange?.(e);
-                      }}
-                      className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
-                    >
-                      <option value="">{field.placeholder ?? "Select"}</option>
-                      {field.options?.map((opt) => (
-                        <option
-                          key={opt.value}
-                          value={opt.value}
-                          disabled={opt.disabled}
-                        >
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="relative w-full">
+                      <select
+                        id={field.name}
+                        disabled={field.disabled}
+                        {...selectRegister}
+                        onChange={(e) => {
+                          selectRegister.onChange(e);
+                          field.onChange?.(e);
+                        }}
+                        className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-9 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
+                      >
+                        <option value="">{field.placeholder ?? "Select"}</option>
+                        {field.options?.map((opt) => (
+                          <option
+                            key={opt.value}
+                            value={opt.value}
+                            disabled={opt.disabled}
+                          >
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                        aria-hidden
+                      />
+                    </div>
                   );
                 })()
               ) : field.type === "textarea" ? (

@@ -1,4 +1,4 @@
-import { User, UserRequest, UserResponse } from "@/types/User";
+import { User, UserRequest, UserResponse } from "@/types/pages/User";
 import { api } from "../api";
 
 export const usersApi = api.injectEndpoints({

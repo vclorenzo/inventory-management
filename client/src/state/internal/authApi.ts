@@ -1,10 +1,12 @@
 import {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   MeResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
   SignUpResponse,
-} from "@/types/Auth";
+} from "@/types/pages/Auth";
 import { api } from "../api";
 
 export const authApi = api.injectEndpoints({
@@ -36,6 +38,16 @@ export const authApi = api.injectEndpoints({
       query: () => "/auth/me",
       providesTags: ["Auth"],
     }),
+    changePassword: builder.mutation<
+      ChangePasswordResponse,
+      ChangePasswordRequest
+    >({
+      query: (body) => ({
+        url: "/auth/change-password",
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -44,4 +56,5 @@ export const {
   useSignUpMutation,
   useSignInMutation,
   useSignOutMutation,
+  useChangePasswordMutation,
 } = authApi;

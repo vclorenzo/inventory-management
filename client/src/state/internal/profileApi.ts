@@ -1,4 +1,8 @@
-import { Profile, ProfileRequest, ProfileResponse } from "@/types/Profile";
+import {
+  Profile,
+  ProfileRequest,
+  ProfileResponse,
+} from "@/types/pages/Profile";
 import { api } from "../api";
 
 type GetProfileResponse = {

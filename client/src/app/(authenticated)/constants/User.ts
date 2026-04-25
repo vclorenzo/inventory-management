@@ -1,4 +1,4 @@
-import { UserSetting } from "@/types/User";
+import { UserSetting } from "@/types/pages/User";
 
 export const mockAccountSettings: UserSetting[] = [
   { label: "Username", value: "john_doe", type: "text" },

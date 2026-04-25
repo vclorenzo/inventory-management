@@ -1,54 +1,62 @@
 import type { ReusableFieldConfig } from "@/types/components/ReactHookForm";
-import type { ChangePasswordFormValues } from "@/types/User";
-import { ChangeEvent } from "react";
+import type { ChangePasswordFormValues } from "@/types/pages/User";
+import type { UseFormGetValues } from "react-hook-form";
 
 type Args = {
-  handleChangeOldPassword: (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
-  handleChangeNewPassword: (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
-  handleChangeConfirmPassword: (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
+  getValues: UseFormGetValues<ChangePasswordFormValues>;
 };
 
 export function buildChangePasswordFields({
-  handleChangeOldPassword,
-  handleChangeNewPassword,
-  handleChangeConfirmPassword,
+  getValues,
 }: Args): ReusableFieldConfig<ChangePasswordFormValues>[] {
   return [
     {
       name: "oldPassword",
       label: "Old Password",
-      type: "text",
+      type: "password",
+      autoComplete: "current-password",
       rules: {
-        required: "Old Password is required",
-        minLength: { value: 2, message: "Name must be at least 2 characters" },
+        required: "Current password is required",
       },
-      onChange: handleChangeOldPassword,
     },
     {
       name: "newPassword",
       label: "New Password",
       type: "password",
+      autoComplete: "new-password",
       rules: {
-        required: "New Password is required",
-        minLength: { value: 2, message: "Name must be at least 2 characters" },
+        required: "New password is required",
+        minLength: {
+          value: 6,
+          message: "New password must be at least 6 characters",
+        },
+        maxLength: {
+          value: 128,
+          message: "New password must be at most 128 characters",
+        },
+        validate: (value: string) => {
+          const old = getValues("oldPassword");
+          if (!value || !old) return true;
+          if (value === old) {
+            return "New password must be different from your current password";
+          }
+          return true;
+        },
       },
-      onChange: handleChangeNewPassword,
     },
     {
       name: "confirmPassword",
       label: "Confirm Password",
       type: "password",
+      autoComplete: "new-password",
       rules: {
-        required: "Confirm Password is required",
-        minLength: { value: 2, message: "Name must be at least 2 characters" },
+        required: "Please confirm your new password",
+        validate: (value: string) => {
+          if (!value) return true;
+          const next = getValues("newPassword");
+          return value === next || "Passwords do not match";
+        },
       },
-      onChange: handleChangeConfirmPassword,
     },
   ];
 }

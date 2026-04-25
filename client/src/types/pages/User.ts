@@ -25,6 +25,13 @@ export type ChangePasswordFormValues = {
   confirmPassword: string;
 };
 
+export type SignUpFormValues = {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+};
+
 export type UserResponse = {
   message: string;
   updatedUser: {

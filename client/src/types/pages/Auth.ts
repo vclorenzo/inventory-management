@@ -41,3 +41,12 @@ export type MeResponse = {
 		created_at?: string;
 	};
 };
+
+export type ChangePasswordRequest = {
+	oldPassword: string;
+	newPassword: string;
+};
+
+export type ChangePasswordResponse = {
+	message: string;
+};

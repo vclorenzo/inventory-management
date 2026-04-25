@@ -1,9 +1,9 @@
 import {
   DashboardMetrics,
   ExpenseByCategorySummary,
-} from "@/types/DashboardMetrics";
-import { NewProduct, Product } from "@/types/Products";
-import { User } from "@/types/User";
+} from "@/types/pages/DashboardMetrics";
+import { NewProduct, Product } from "@/types/pages/Products";
+import { User } from "@/types/pages/User";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const api = createApi({
