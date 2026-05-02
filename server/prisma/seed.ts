@@ -1,29 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
+
 const prisma = new PrismaClient();
 
-async function deleteAllData(orderedFileNames: string[]) {
-	const modelNames = orderedFileNames.map((fileName) => {
-		const modelName = path.basename(fileName, path.extname(fileName));
-		return modelName.charAt(0).toUpperCase() + modelName.slice(1);
-	});
-
-	// Reverse the order for deletion to handle foreign key constraints
-	const reversedModelNames = modelNames.reverse();
-
-	for (const modelName of reversedModelNames) {
-		const model: any = prisma[modelName as keyof typeof prisma];
-		if (model) {
-			await model.deleteMany({});
-			console.log(`Cleared data from ${modelName}`);
-		} else {
-			console.error(
-				`Model ${modelName} not found. Please ensure the model name is correctly specified.`,
-			);
-		}
-	}
-}
+/** Primary-key field per Prisma model (camelCase name from seed JSON filename). */
+const MODEL_ID_FIELD: Record<string, string> = {
+	users: 'userId',
+	products: 'productId',
+	sales: 'saleId',
+	purchases: 'purchaseId',
+	expenses: 'expenseId',
+	salesSummary: 'salesSummaryId',
+	purchaseSummary: 'purchaseSummaryId',
+	expenseSummary: 'expenseSummaryId',
+	expenseByCategory: 'expenseByCategoryId',
+};
 
 async function main() {
 	const dataDirectory = path.join(__dirname, 'seedData');
@@ -40,8 +32,6 @@ async function main() {
 		'expenseByCategory.json',
 	];
 
-	await deleteAllData(orderedFileNames);
-
 	for (const fileName of orderedFileNames) {
 		const filePath = path.join(dataDirectory, fileName);
 		const jsonData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -53,10 +43,20 @@ async function main() {
 			continue;
 		}
 
+		const idField = MODEL_ID_FIELD[modelName];
+
 		for (const data of jsonData) {
-			await model.create({
-				data,
-			});
+			if (idField && idField in data && typeof model.upsert === 'function') {
+				const id = data[idField as keyof typeof data];
+				const { [idField]: _id, ...updateFields } = data;
+				await model.upsert({
+					where: { [idField]: id },
+					create: data,
+					update: updateFields,
+				});
+			} else {
+				await model.create({ data });
+			}
 		}
 
 		console.log(`Seeded ${modelName} with data from ${fileName}`);

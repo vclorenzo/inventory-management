@@ -1,5 +1,6 @@
 import { Product, NewProduct } from "@/types/pages/Products";
 import { api } from "../api";
+import { url } from "inspector";
 
 export const productsApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -19,10 +20,18 @@ export const productsApi = api.injectEndpoints({
     }),
 
     createProduct: builder.mutation<Product, NewProduct>({
-      query: (newProduct) => ({
+      query: (body) => ({
         url: "/products",
         method: "POST",
-        body: newProduct,
+        body,
+      }),
+      invalidatesTags: ["Products"],
+    }),
+    updateProduct: builder.mutation<Product, Product>({
+      query: ({ productId, ...body }) => ({
+        url: `/products/${productId}`,
+        method: "PUT",
+        body,
       }),
       invalidatesTags: ["Products"],
     }),
@@ -33,4 +42,5 @@ export const {
   useGetProductsQuery,
   useGetProductByIdQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
 } = productsApi;

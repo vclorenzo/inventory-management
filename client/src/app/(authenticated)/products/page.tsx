@@ -1,15 +1,12 @@
 "use client";
 import Cards from "@/components/Cards";
 import Header from "@/components/Header";
-import {
-  useCreateProductMutation,
-  useGetProductsQuery,
-} from "@/state/internal/productsApi";
-import { ProductFormData } from "@/types/pages/Products";
+import { useProducts } from "@/hooks/useProducts";
+import { ProductFormValues } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
-import CreateProductModal from "./CreateProductModal";
+import ProductModal from "./ProductModal";
 
 type Props = {};
 
@@ -18,17 +15,16 @@ const Products = (props: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    data: products,
-    isLoading,
-    isError,
-  } = useGetProductsQuery(searchTerm);
-
-  const [createProduct] = useCreateProductMutation();
-  const handleCreateProduct = async (productData: ProductFormData) => {
+    products,
+    createProduct,
+    isLoading: isGetProductsLoading,
+    isError: hasGetProductsError,
+  } = useProducts();
+  const handleCreateProduct = async (productData: ProductFormValues) => {
     await createProduct(productData);
   };
 
-  if (isLoading) {
+  if (isGetProductsLoading) {
     return (
       <div className="py-4">
         <CircularProgress />
@@ -36,15 +32,13 @@ const Products = (props: Props) => {
     );
   }
 
-  if (isError || !products) {
+  if (hasGetProductsError || !products) {
     return (
       <div className="text-center text-red-500 py-4">
         Failed to fetch products
       </div>
     );
   }
-
-  console.log("ITLOG", products);
 
   return (
     <div className="mx-auto pb-5 w-full">
@@ -76,7 +70,7 @@ const Products = (props: Props) => {
       </div>
       {/* PRODUCTS LIST */}
       <div className="grid grid-cols-1 sm:grid-cols-4 lg-grid-cols-5 gap-10 justify-between">
-        {isLoading ? (
+        {isGetProductsLoading ? (
           <>
             <CircularProgress />
           </>
@@ -85,12 +79,13 @@ const Products = (props: Props) => {
         )}
       </div>
       {/* MODAL */}
-      <CreateProductModal
+      <ProductModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
         }}
-        onCreate={handleCreateProduct}
+        onSend={handleCreateProduct}
+        isProductLoading={isGetProductsLoading}
       />
     </div>
   );

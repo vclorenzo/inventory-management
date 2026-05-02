@@ -12,9 +12,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
-import { breadcrumbItems } from "../../constants/User";
+
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Bookmark } from "lucide-react";
+import { breadcrumbItems } from "@/app/(authenticated)/constants/User";
 
 const productImageUrls = (length: number) => {
   const images = [];
@@ -94,7 +95,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
   const inStock = product.stockQuantity > 0;
 
   return (
-    <div className="mx-auto w-full max-w-6xl pb-10">
+    <div className="mx-auto w-full max-w-5xl pb-10">
       <div className="mb-6 flex items-center justify-between gap-3">
         <Breadcrumbs items={breadcrumbItems(product.name)} />
         {/* <Link
@@ -125,7 +126,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             // scrollbar={{ hide: true }}
           >
             {images.map((image, idx) => (
-              <SwiperSlide>
+              <SwiperSlide key={product.productId}>
                 <div className="flex flex-row items-center gap-3 justify-center">
                   <Image
                     src={image.src}
@@ -212,7 +213,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
             <Link
               href="/"
-              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800"
             >
               Add to Cart
             </Link>
@@ -226,7 +227,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           <div className="mt-3 flex flex-col gap-3 sm:flex-row justify-center">
             <Link
               href="/products"
-              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+              className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800"
             >
               Browse more products
             </Link>

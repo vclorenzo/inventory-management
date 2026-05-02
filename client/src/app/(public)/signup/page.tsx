@@ -1,23 +1,18 @@
 "use client";
 
+import { roleOptions } from "@/app/(authenticated)/constants/User";
 import ReactHookForm from "@/components/forms/ReactHookForm";
+import { buildSignupFormFields } from "@/constants/SignupForm";
 import { useSignUpMutation } from "@/state/internal/authApi";
 import { ReusableFieldConfig } from "@/types/components/ReactHookForm";
 import { SignUpFormValues } from "@/types/pages/User";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 export default function SignupPage() {
   const router = useRouter();
   const [signUp, { isLoading: isSignUpLoading }] = useSignUpMutation();
-
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<SignUpFormValues>({
@@ -29,14 +24,13 @@ export default function SignupPage() {
     },
   });
 
-  const { watch, getValues, trigger } = form;
+  const { getValues } = form;
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: SignUpFormValues) => {
     setError(null);
 
     try {
-      await signUp({ name, email, password, role }).unwrap();
+      await signUp(values).unwrap();
       router.push("/");
     } catch (err: any) {
       setError(
@@ -47,9 +41,10 @@ export default function SignupPage() {
     }
   };
 
-  const fields: ReusableFieldConfig<SignUpFormValues>[] = useMemo(() => {
-    buildChangePasswordFields({ getValues });
-  }, [getValues]);
+  const fields: ReusableFieldConfig<SignUpFormValues>[] = useMemo(
+    () => buildSignupFormFields({ roleOptions, getValues }),
+    [getValues],
+  );
 
   return (
     <div className="w-full flex justify-center">
@@ -62,8 +57,10 @@ export default function SignupPage() {
           form={form}
           fields={fields}
           onSubmit={onSubmit}
-          submitLabel="Save"
+          submitLabel="Register"
           isSubmitting={isSignUpLoading}
+          link="/login"
+          linkText="Don’t have an account? Sign in"
         />
       </div>
     </div>

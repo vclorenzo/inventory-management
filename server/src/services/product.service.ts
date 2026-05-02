@@ -1,12 +1,12 @@
 import { AppError } from "#error/AppError.ts";
-import { PrismaClient, Products } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export const getAllProducts = async ({
   search,
   page = 1,
-  limit = 10,
+  limit,
 }: {
   search?: string;
   page?: number;
@@ -14,13 +14,16 @@ export const getAllProducts = async ({
 } = {}) => {
   try {
     const where = search ? { name: { contains: search } } : {};
+
     const [totalCount, products] = await prisma.$transaction([
       prisma.products.count({ where }),
-      prisma.products.findMany({
-        where,
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
+      limit !== undefined
+        ? prisma.products.findMany({
+            where,
+            skip: (page - 1) * limit,
+            take: limit,
+          })
+        : prisma.products.findMany({ where }),
     ]);
     return { products, totalCount };
   } catch (error) {
@@ -49,6 +52,9 @@ export const createProduct = async ({
   rating,
   stockQuantity,
   description,
+  paymentMethods = [],
+  meetupLocations = [],
+  shippingDetails,
 }: {
   name: string;
   productCategory: string;
@@ -58,6 +64,9 @@ export const createProduct = async ({
   rating: number;
   stockQuantity: number;
   description: string;
+  paymentMethods?: string[];
+  meetupLocations?: string[];
+  shippingDetails?: string | null;
 }) => {
   try {
     return await prisma.products.create({
@@ -70,6 +79,9 @@ export const createProduct = async ({
         rating,
         stockQuantity,
         description,
+        paymentMethods,
+        meetupLocations,
+        shippingDetails,
       },
     });
   } catch (error) {
@@ -77,7 +89,17 @@ export const createProduct = async ({
   }
 };
 
-export const updateProduct = async (id: string, data: Partial<Products>) => {
+type ProductUpdatePayload = {
+  name?: string;
+  price?: number;
+  rating?: number | null;
+  stockQuantity?: number;
+  paymentMethods?: string[];
+  meetupLocations?: string[];
+  shippingDetails?: string | null;
+};
+
+export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
   try {
     const existingProduct = await getProductById(id);
     if (!existingProduct) {
@@ -91,6 +113,9 @@ export const updateProduct = async (id: string, data: Partial<Products>) => {
         price: data.price,
         rating: data.rating,
         stockQuantity: data.stockQuantity,
+        paymentMethods: data.paymentMethods,
+        meetupLocations: data.meetupLocations,
+        shippingDetails: data.shippingDetails,
       },
     });
   } catch (error) {

@@ -43,3 +43,21 @@ export const breadcrumbItems = (productId: string) => {
     { label: productId },
   ];
 };
+
+export const roleOptions = [
+  {
+    value: "admin",
+    label: "admin",
+    disabled: false,
+  },
+  {
+    value: "guest",
+    label: "guest",
+    disabled: false,
+  },
+  {
+    value: "user",
+    label: "user",
+    disabled: false,
+  },
+];

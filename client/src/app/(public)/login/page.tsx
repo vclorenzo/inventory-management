@@ -1,24 +1,34 @@
 "use client";
 
+import ReactHookForm from "@/components/forms/ReactHookForm";
+import { buildLoginFormFields } from "@/constants/LoginForm";
 import { useSignInMutation } from "@/state/internal/authApi";
-import Link from "next/link";
+import { ReusableFieldConfig } from "@/types/components/ReactHookForm";
+import { LoginFormValues } from "@/types/pages/User";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [signIn, { isLoading }] = useSignInMutation();
+  const [signIn, { isLoading: isSignInLoading }] = useSignInMutation();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<LoginFormValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const { getValues } = form;
+
+  const onSubmit = async (values: LoginFormValues) => {
     setError(null);
 
     try {
-      await signIn({ email, password }).unwrap();
+      await signIn(values).unwrap();
       router.push("/");
     } catch (err: any) {
       setError(
@@ -29,6 +39,11 @@ export default function LoginPage() {
     }
   };
 
+  const fields: ReusableFieldConfig<LoginFormValues>[] = useMemo(
+    () => buildLoginFormFields({ getValues }),
+    [getValues],
+  );
+
   return (
     <div className="w-full flex justify-center">
       <div className="w-full max-w-md bg-white border border-gray-100 shadow-sm rounded-xl p-6">
@@ -36,67 +51,15 @@ export default function LoginPage() {
           <h1 className="text-2xl font-semibold text-gray-900">Sign in</h1>
           <p className="text-sm text-gray-500">Use your account to continue.</p>
         </div>
-
-        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-          <div className="flex flex-col gap-1">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label
-              className="text-sm font-medium text-gray-700"
-              htmlFor="password"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:border-blue-500"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full h-[50px] rounded bg-blue-500 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isLoading ? "Signing in…" : "Sign in"}
-          </button>
-
-          <p className="text-xs text-gray-500">
-            Don’t have an account?{" "}
-            <Link className="text-blue-600 hover:underline" href="/signup">
-              Create one
-            </Link>
-          </p>
-        </form>
+        <ReactHookForm
+          form={form}
+          fields={fields}
+          onSubmit={onSubmit}
+          submitLabel="Login"
+          isSubmitting={isSignInLoading}
+          link="/signup"
+          linkText="Don’t have an account? Sign up"
+        />
       </div>
     </div>
   );

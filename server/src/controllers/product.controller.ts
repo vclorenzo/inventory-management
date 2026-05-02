@@ -28,13 +28,19 @@ export const getAllProducts = async (
   try {
     const search = req.query.search?.toString();
     const page = Math.max(Number(req.query.page) || 1, 1);
-    const limit = Math.max(Number(req.query.limit) || 10, 1);
+    const parsedLimit = Number(req.query.limit);
+    const limit =
+      req.query.limit !== undefined && !Number.isNaN(parsedLimit)
+        ? Math.max(parsedLimit, 1)
+        : undefined;
+
     const { products, totalCount } = await productService.getAllProducts({
       search,
       page,
       limit,
     });
-    const totalPages = Math.max(Math.ceil(totalCount / limit), 1);
+    const totalPages =
+      limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1;
 
     res.status(200).json({
       message: "Successfully retrieved products",
@@ -63,6 +69,9 @@ export const createProduct = async (
       rating,
       stockQuantity,
       description,
+      paymentMethods,
+      meetupLocations,
+      shippingDetails,
     } = req.body;
     const product = await productService.createProduct({
       name,
@@ -73,6 +82,9 @@ export const createProduct = async (
       rating,
       stockQuantity,
       description,
+      paymentMethods,
+      meetupLocations,
+      shippingDetails,
     });
     res.status(201).json({ data: product });
   } catch (error: any) {

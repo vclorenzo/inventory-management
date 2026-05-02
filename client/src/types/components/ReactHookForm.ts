@@ -29,4 +29,6 @@ export type ReusableFieldConfig<TFormValues extends FieldValues> = {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
   className?: string;
+  link?: string;
+  linkText?: string;
 };

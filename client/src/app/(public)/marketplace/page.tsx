@@ -1,14 +1,14 @@
 "use client";
+import CreateProductModal from "@/app/(authenticated)/products/ProductModal";
 import Cards from "@/components/Cards";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
 } from "@/state/internal/productsApi";
-import { ProductFormData } from "@/types/pages/Products";
+import { ProductFormValues } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-import CreateProductModal from "../products/CreateProductModal";
 
 type Props = {};
 
@@ -23,7 +23,7 @@ const Marketplace = (props: Props) => {
   } = useGetProductsQuery(searchTerm);
 
   const [createProduct] = useCreateProductMutation();
-  const handleCreateProduct = async (productData: ProductFormData) => {
+  const handleCreateProduct = async (productData: ProductFormValues) => {
     await createProduct(productData);
   };
 

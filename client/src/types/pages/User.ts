@@ -31,6 +31,10 @@ export type SignUpFormValues = {
   password: string;
   role: string;
 };
+export type LoginFormValues = {
+  email: string;
+  password: string;
+};
 
 export type UserResponse = {
   message: string;

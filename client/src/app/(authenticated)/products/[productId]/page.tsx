@@ -1,26 +1,54 @@
 "use client";
-import { useGetProductByIdQuery } from "@/state/internal/productsApi";
 import { CircularProgress, Rating } from "@mui/material";
+import { useState } from "react";
+import { A11y, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
-import React from "react";
 
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { useProductById } from "@/hooks/useProducts";
+import { ProductFormValues } from "@/types/pages/Products";
+import { ChevronLeft, ExternalLink, MapPin, Package, Pen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, Package } from "lucide-react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { breadcrumbItems } from "../../constants/User";
-import Breadcrumbs from "@/components/Breadcrumbs";
-import { Bookmark } from "lucide-react";
+import ProductModal from "../ProductModal";
+
+const sellerReviews = [
+  {
+    reviewer: "eubartolome4",
+    avatarLabel: "eu",
+    monthsAgo: 5,
+    comment: "easy to talk to. great to transact with!",
+    productName: "Dotted desk mat Tokyo City",
+    productPrice: "PHP 800",
+  },
+  {
+    reviewer: "rownadjiane",
+    avatarLabel: "ro",
+    monthsAgo: 8,
+    comment: "fast and smooth transaction. thank you!",
+    productName: "Camel trekking / hiking pole",
+    productPrice: "PHP 300",
+  },
+  {
+    reviewer: "ultrvlnc",
+    avatarLabel: "ul",
+    yearsAgo: 4,
+    comment:
+      "Approachable seller who responded quickly to my queries! " +
+      "Transaction went off without a hitch. :^)",
+  },
+];
 
 const productImageUrls = (length: number) => {
   const images = [];
   for (let i = 0; i < length; i++) {
     images.push({
-      src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
+      src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/products${
         Math.floor(Math.random() * 3) + 1
       }.png`,
     });
@@ -37,13 +65,19 @@ const stockTone = (qty: number) => {
 
 const ProductDetails = ({ params }: { params: { productId: string } }) => {
   const {
-    data: product,
-    isLoading,
-    isError,
-    error,
-  } = useGetProductByIdQuery(params.productId);
+    product,
+    isLoading: isGetProductsLoading,
+    isError: hasGetProductsError,
+    updateProduct,
+  } = useProductById(params.productId);
 
-  if (isLoading) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleUpdateProduct = (productData: ProductFormValues) => {
+    updateProduct({ productId: params.productId, ...productData });
+  };
+
+  if (isGetProductsLoading) {
     return (
       <div className="w-full py-10 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -54,7 +88,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
     );
   }
 
-  if (isError || !product) {
+  if (hasGetProductsError || !product) {
     return (
       <div className="w-full py-10">
         <div className="mx-auto max-w-5xl rounded-2xl border border-red-200 bg-red-50 p-6">
@@ -64,14 +98,16 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             </div>
             <div className="flex-1">
               <div className="font-semibold text-red-900">
-                We couldn’t load this product.
+                We couldn’t load this products.
               </div>
               <div className="mt-1 text-sm text-red-800">
                 Please try again, or go back to the products list.
               </div>
-              {error && (
+              {hasGetProductsError && (
                 <div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-red-900 ring-1 ring-red-200">
-                  {typeof error === "string" ? error : JSON.stringify(error)}
+                  {typeof hasGetProductsError === "string"
+                    ? hasGetProductsError
+                    : JSON.stringify(hasGetProductsError)}
                 </div>
               )}
               <div className="mt-4">
@@ -92,26 +128,22 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 
   const images = productImageUrls(3);
   const inStock = product.stockQuantity > 0;
+  const paymentMethods = Array.isArray(product.paymentMethods)
+    ? product.paymentMethods
+    : [];
+  const meetupLocations = Array.isArray(product.meetupLocations)
+    ? product.meetupLocations
+    : [];
+  const shippingDetails =
+    typeof product.shippingDetails === "string" &&
+    product.shippingDetails.trim()
+      ? product.shippingDetails
+      : null;
 
   return (
-    <div className="mx-auto w-full max-w-6xl pb-10">
+    <div className="mx-auto w-full max-w-5xl pb-10">
       <div className="mb-6 flex items-center justify-between gap-3">
         <Breadcrumbs items={breadcrumbItems(product.name)} />
-        {/* <Link
-          href="/products"
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-200 hover:bg-gray-50"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Products
-        </Link>
-        <div className="flex items-center gap-2">
-          <span className="hidden sm:inline text-xs text-gray-500">
-            Product ID
-          </span>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200">
-            {product.productId}
-          </span>
-        </div> */}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -125,7 +157,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             // scrollbar={{ hide: true }}
           >
             {images.map((image, idx) => (
-              <SwiperSlide>
+              <SwiperSlide key={product.productId}>
                 <div className="flex flex-row items-center gap-3 justify-center">
                   <Image
                     src={image.src}
@@ -210,29 +242,154 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
-            <Link
-              href="/"
+            <button className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800">
+              Mark as Reserved
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
               className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
             >
-              Add to Cart
-            </Link>
-            <Link
-              href="/products"
-              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-            >
-              <Bookmark />
-            </Link>
+              <Pen />
+            </button>
           </div>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row justify-center">
-            <Link
-              href="/products"
-              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-            >
-              Browse more products
-            </Link>
+            <button className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800">
+              Delete
+            </button>
           </div>
         </div>
       </div>
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold text-gray-900">Description</h2>
+          <div className="mt-4 space-y-4 text-gray-700">
+            {product.description}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+            Transaction Details
+          </h2>
+          <div className="mt-6 space-y-5">
+            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+              <p className="text-xl font-semibold text-gray-900">Payment</p>
+              {paymentMethods.length > 0 ? (
+                <ul className="mt-2 space-y-1 text-gray-700">
+                  {paymentMethods.map((method) => (
+                    <li key={method}>- {method}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-700">No payment methods provided.</p>
+              )}
+            </div>
+            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+              <p className="text-xl font-semibold text-gray-900">Meet-up</p>
+              {meetupLocations.length > 0 ? (
+                <div className="mt-2 space-y-2 text-gray-700">
+                  {meetupLocations.map((location) => (
+                    <div
+                      key={location.name}
+                      className="flex items-center gap-2"
+                    >
+                      <MapPin className="h-4 w-4 text-gray-500" />
+                      <Link href={location.mapLink}>{location.name}</Link>
+                      <ExternalLink className="h-4 w-4 text-gray-500" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-gray-700">
+                  No meet-up locations provided.
+                </p>
+              )}
+            </div>
+            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+              <p className="text-xl font-semibold text-gray-900">Shipping</p>
+              <p className="mt-1 text-gray-700">
+                {shippingDetails ?? "No shipping details provided."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+          <article className="space-y-2">
+            <div className="flex  justify-center items-center gap-3">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
+                vl
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-gray-900">Vanz Lorenzo</p>
+              </div>
+            </div>
+          </article>
+          <div className="flex justify-center gap-5 mt-5">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-700">5.0</span>
+              <Rating value={5} readOnly size="small" />
+              <span className="text-gray-500">(11)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-gray-500" />
+              <span>Pateros</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-5 mt-5">
+          <h2 className="text-xl font-semibold tracking-tight text-gray-900">
+            Seller Reviews
+          </h2>
+        </div>
+
+        <div className="mt-5 space-y-7">
+          {sellerReviews.map((review) => (
+            <article
+              key={`${review.reviewer}-${review.comment}`}
+              className="space-y-2"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
+                  {review.avatarLabel}
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-900">
+                    {review.reviewer}
+                  </p>
+                  <span className="text-gray-400">•</span>
+                  <p className="text-sm text-gray-500">
+                    {review.monthsAgo
+                      ? `${review.monthsAgo} months ago`
+                      : `${review.yearsAgo} years ago`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pl-14">
+                <Rating value={5} readOnly size="small" />
+                <p className="mt-1 text-gray-700">{review.comment}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          className="mt-6 inline-flex items-center text-sm font-medium text-teal-700 hover:text-teal-800"
+        >
+          Read all reviews
+          <span className="ml-1 text-base">›</span>
+        </button>
+      </div>
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+        }}
+        onSend={handleUpdateProduct}
+        isProductLoading={isGetProductsLoading}
+      />
     </div>
   );
 };

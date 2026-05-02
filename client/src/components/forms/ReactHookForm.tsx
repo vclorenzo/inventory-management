@@ -1,12 +1,13 @@
 import { ReusableFieldConfig } from "@/types/components/ReactHookForm";
 import { ChevronDown } from "lucide-react";
-import React from "react";
+import React, { ReactNode } from "react";
 import type {
   FieldPath,
   FieldValues,
   RegisterOptions,
   UseFormReturn,
 } from "react-hook-form";
+import Link from "next/link";
 
 type Props<TFormValues extends FieldValues> = {
   form: UseFormReturn<TFormValues>;
@@ -15,6 +16,9 @@ type Props<TFormValues extends FieldValues> = {
   submitLabel?: string;
   isSubmitting?: boolean;
   className?: string;
+  link?: string;
+  linkText?: string;
+  children?: ReactNode;
 };
 
 function getErrorMessage(err: unknown) {
@@ -31,6 +35,9 @@ const ReactHookForm = <TFormValues extends FieldValues>({
   submitLabel = "Save",
   isSubmitting,
   className,
+  link,
+  linkText,
+  children,
 }: Props<TFormValues>) => {
   const {
     register,
@@ -78,11 +85,9 @@ const ReactHookForm = <TFormValues extends FieldValues>({
         return (
           <div
             key={field.name}
-            className={
-              field.className ?? "flex flex-row justify-start items-center"
-            }
+            className={field.className ?? "justify-start items-center"}
           >
-            <label htmlFor={field.name} className="min-w-[200px]">
+            <label htmlFor={field.name} className="min-w-[200px] font-bold">
               {field.label}
             </label>
 
@@ -103,7 +108,9 @@ const ReactHookForm = <TFormValues extends FieldValues>({
                         }}
                         className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded pl-3 pr-9 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md appearance-none cursor-pointer"
                       >
-                        <option value="">{field.placeholder ?? "Select"}</option>
+                        <option value="">
+                          {field.placeholder ?? "Select"}
+                        </option>
                         {field.options?.map((opt) => (
                           <option
                             key={opt.value}
@@ -151,6 +158,8 @@ const ReactHookForm = <TFormValues extends FieldValues>({
         );
       })}
 
+      {children}
+
       <button
         type="submit"
         disabled={isSubmitting}
@@ -162,6 +171,14 @@ const ReactHookForm = <TFormValues extends FieldValues>({
       >
         {submitLabel}
       </button>
+      {link && linkText && (
+        <p className="text-xs text-gray-500">
+          {linkText}{" "}
+          <Link className="text-blue-600 hover:underline" href={`${link}`}>
+            here
+          </Link>
+        </p>
+      )}
     </form>
   );
 };
