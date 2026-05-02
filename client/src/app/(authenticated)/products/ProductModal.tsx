@@ -10,8 +10,10 @@ import { Plus, Trash2, XCircleIcon } from "lucide-react";
 type ProductModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  onSend: (formData: ProductFormValues) => void;
+  onSend: (formData: ProductFormValues) => void | Promise<void>;
   isProductLoading: boolean;
+  /** When set (e.g. on product detail), the form opens with these values */
+  defaultValues?: ProductFormValues;
 };
 
 const createMeetupLocation = () => ({
@@ -20,11 +22,27 @@ const createMeetupLocation = () => ({
   mapLink: "",
 });
 
+const EMPTY_PRODUCT_FORM: ProductFormValues = {
+  name: "",
+  productCategory: "",
+  brand: "",
+  condition: "",
+  price: 0,
+  stockQuantity: 0,
+  status: "",
+  rating: 0,
+  description: "",
+  paymentMethods: [],
+  meetupLocations: [createMeetupLocation()],
+  shippingDetails: "",
+};
+
 const ProductModal = ({
   isOpen,
   onClose,
   onSend,
   isProductLoading,
+  defaultValues,
 }: ProductModalProps) => {
   const [paymentMethodInput, setPaymentMethodInput] = useState("");
 
@@ -42,21 +60,10 @@ const ProductModal = ({
   const meetupLocations = watch("meetupLocations") ?? [];
 
   useEffect(() => {
-    reset({
-      name: "",
-      productCategory: "",
-      brand: "",
-      condition: "",
-      price: 0,
-      stockQuantity: 0,
-      rating: 0,
-      description: "",
-      paymentMethods: [],
-      meetupLocations: [createMeetupLocation()],
-      shippingDetails: "",
-    });
+    if (!isOpen) return;
+    reset(defaultValues ?? EMPTY_PRODUCT_FORM);
     setPaymentMethodInput("");
-  }, [reset]);
+  }, [isOpen, defaultValues, reset]);
 
   useEffect(() => {
     register("paymentMethods", {
@@ -157,8 +164,8 @@ const ProductModal = ({
     );
   };
 
-  const onSubmit = (data: ProductFormValues) => {
-    onSend(data);
+  const onSubmit = async (data: ProductFormValues) => {
+    await Promise.resolve(onSend(data));
     onClose();
   };
 
@@ -168,7 +175,9 @@ const ProductModal = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-20">
       <div className="relative top-20 mx-auto p-5 border w-[fit-content] shadow-lg rounded-md bg-white">
         <div className="flex flex-row justify-between items-center">
-          <Header name="Create New Product" />
+          <Header
+            name={defaultValues ? "Edit Product" : "Create New Product"}
+          />
           <button onClick={onClose}>
             <XCircleIcon />
           </button>
@@ -260,7 +269,7 @@ const ProductModal = ({
               <div className="space-y-3">
                 {meetupLocations.map((location, index) => (
                   <div
-                    key={`${index}-${location.name}-${location.address}`}
+                    key={index}
                     className="rounded-lg border border-gray-200 p-4"
                   >
                     <div className="mb-3 flex items-center justify-between">

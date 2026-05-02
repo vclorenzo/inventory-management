@@ -51,6 +51,7 @@ export const createProduct = async ({
   price,
   rating,
   stockQuantity,
+  status,
   description,
   paymentMethods = [],
   meetupLocations = [],
@@ -63,6 +64,7 @@ export const createProduct = async ({
   price: number;
   rating: number;
   stockQuantity: number;
+  status: string;
   description: string;
   paymentMethods?: string[];
   meetupLocations?: string[];
@@ -78,6 +80,7 @@ export const createProduct = async ({
         price,
         rating,
         stockQuantity,
+        status,
         description,
         paymentMethods,
         meetupLocations,
@@ -94,6 +97,7 @@ type ProductUpdatePayload = {
   price?: number;
   rating?: number | null;
   stockQuantity?: number;
+  status?: string;
   paymentMethods?: string[];
   meetupLocations?: string[];
   shippingDetails?: string | null;
@@ -113,6 +117,7 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
         price: data.price,
         rating: data.rating,
         stockQuantity: data.stockQuantity,
+        status: data.status,
         paymentMethods: data.paymentMethods,
         meetupLocations: data.meetupLocations,
         shippingDetails: data.shippingDetails,

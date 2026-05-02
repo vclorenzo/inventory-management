@@ -12,7 +12,7 @@ import Link from "next/link";
 type Props<TFormValues extends FieldValues> = {
   form: UseFormReturn<TFormValues>;
   fields: ReusableFieldConfig<TFormValues>[];
-  onSubmit: (values: TFormValues) => void;
+  onSubmit: (values: TFormValues) => void | Promise<void>;
   submitLabel?: string;
   isSubmitting?: boolean;
   className?: string;

@@ -1,6 +1,5 @@
 import { Product, NewProduct } from "@/types/pages/Products";
 import { api } from "../api";
-import { url } from "inspector";
 
 export const productsApi = api.injectEndpoints({
   endpoints: (builder) => ({
@@ -17,6 +16,7 @@ export const productsApi = api.injectEndpoints({
     getProductById: builder.query<Product, string>({
       query: (id) => `products/${id}`,
       transformResponse: (response: { data: Product }) => response.data,
+      providesTags: ["Products"],
     }),
 
     createProduct: builder.mutation<Product, NewProduct>({

@@ -50,6 +50,7 @@ model Products {
   brand         String
   condition     String
   stockQuantity Int
+  status        String
   description   String
   paymentMethods String[] @default([])
   meetupLocations Json @default(dbgenerated("'[]'::jsonb"))

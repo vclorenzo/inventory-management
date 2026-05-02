@@ -1,12 +1,13 @@
 "use client";
 import { CircularProgress, Rating } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { A11y, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { useProductById } from "@/hooks/useProducts";
 import { ProductFormValues } from "@/types/pages/Products";
+import { productToFormValues } from "@/utils/productForm";
 import { ChevronLeft, ExternalLink, MapPin, Package, Pen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,10 +58,15 @@ const productImageUrls = (length: number) => {
   return images;
 };
 
-const stockTone = (qty: number) => {
-  if (qty <= 0) return "bg-red-50 text-red-700 ring-red-200";
-  if (qty <= 10) return "bg-amber-50 text-amber-800 ring-amber-200";
-  return "bg-emerald-50 text-emerald-800 ring-emerald-200";
+const statusTone = (status: string) => {
+  const normalized = status.trim().toLowerCase();
+  if (normalized === "available")
+    return "bg-emerald-50 text-emerald-800 ring-emerald-200";
+  if (normalized === "unavailable")
+    return "bg-rose-50 text-rose-800 ring-rose-200";
+  if (normalized === "unlisted")
+    return "bg-slate-50 text-slate-700 ring-slate-200";
+  return "bg-gray-50 text-gray-800 ring-gray-200";
 };
 
 const ProductDetails = ({ params }: { params: { productId: string } }) => {
@@ -69,12 +75,40 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
     isLoading: isGetProductsLoading,
     isError: hasGetProductsError,
     updateProduct,
+    updateProductState,
   } = useProductById(params.productId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleUpdateProduct = (productData: ProductFormValues) => {
-    updateProduct({ productId: params.productId, ...productData });
+  const modalDefaultValues = useMemo(
+    () => (product ? productToFormValues(product) : undefined),
+    [product],
+  );
+
+  const handleUpdateProduct = async (productData: ProductFormValues) => {
+    await updateProduct({
+      productId: params.productId,
+      ...productData,
+    }).unwrap();
+  };
+
+  const handleMarkAsReserved = async () => {
+    if (!product) return;
+    const values = productToFormValues(product);
+    await updateProduct({
+      productId: params.productId,
+      ...values,
+      status: "Unavailable",
+    }).unwrap();
+  };
+  const handleMarkAsUnlisted = async () => {
+    if (!product) return;
+    const values = productToFormValues(product);
+    await updateProduct({
+      productId: params.productId,
+      ...values,
+      status: "Unlisted",
+    }).unwrap();
   };
 
   if (isGetProductsLoading) {
@@ -127,7 +161,6 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
   }
 
   const images = productImageUrls(3);
-  const inStock = product.stockQuantity > 0;
   const paymentMethods = Array.isArray(product.paymentMethods)
     ? product.paymentMethods
     : [];
@@ -183,11 +216,11 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
                   ${product.price.toFixed(2)}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${stockTone(
-                    product.stockQuantity,
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusTone(
+                    product.status,
                   )}`}
                 >
-                  {inStock ? "In stock" : "Out of stock"}
+                  {product.status}
                 </span>
               </div>
             </div>
@@ -242,7 +275,16 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
-            <button className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800">
+            <button
+              type="button"
+              disabled={
+                product.status === "Unavailable" ||
+                product.status === "Unlisted" ||
+                updateProductState.isLoading
+              }
+              className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              onClick={handleMarkAsReserved}
+            >
               Mark as Reserved
             </button>
             <button
@@ -253,7 +295,13 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             </button>
           </div>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row justify-center">
-            <button className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800">
+            <button
+              onClick={handleMarkAsUnlisted}
+              disabled={
+                product.status === "Unlisted" || updateProductState.isLoading
+              }
+              className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Delete
             </button>
           </div>
@@ -388,7 +436,8 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           setIsModalOpen(false);
         }}
         onSend={handleUpdateProduct}
-        isProductLoading={isGetProductsLoading}
+        isProductLoading={updateProductState.isLoading}
+        defaultValues={modalDefaultValues}
       />
     </div>
   );

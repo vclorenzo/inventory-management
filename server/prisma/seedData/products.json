@@ -8,7 +8,17 @@
     "description": "Nike Dunk Low",
     "price": 456.04,
     "rating": 2.25,
-    "stockQuantity": 124834
+    "stockQuantity": 124834,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "BGC High Street",
+        "address": "Bonifacio Global City, Taguig",
+        "mapLink": "https://maps.google.com/?q=BGC+High+Street"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "8ac1ac77-7358-425e-be16-0bdde9f02e59",
@@ -19,7 +29,17 @@
     "description": "Nike Dunk Low",
     "price": 899.05,
     "rating": 3.56,
-    "stockQuantity": 799402
+    "stockQuantity": 799402,
+    "status": "Available",
+    "paymentMethods": ["Credit Card", "GCash"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
@@ -30,7 +50,17 @@
     "description": "Nike Dunk Low",
     "price": 264.37,
     "rating": 3.23,
-    "stockQuantity": 842192
+    "stockQuantity": 842192,
+    "status": "Unavailable",
+    "paymentMethods": ["Cash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": null
   },
   {
     "productId": "af84cc12-4fea-4f58-aece-f2ce92ca9580",
@@ -41,7 +71,17 @@
     "description": "Nike Dunk Low",
     "price": 555.93,
     "rating": 4.09,
-    "stockQuantity": 236333
+    "stockQuantity": 236333,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "Cash"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "86e3bb1c-2f5d-4774-98f3-4df7cddd0a0f",
@@ -52,7 +92,17 @@
     "description": "Nike Dunk Low",
     "price": 82.62,
     "rating": 4.8,
-    "stockQuantity": 601208
+    "stockQuantity": 601208,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
@@ -63,7 +113,17 @@
     "description": "Nike Dunk Low",
     "price": 435.44,
     "rating": 0.27,
-    "stockQuantity": 124068
+    "stockQuantity": 124068,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "440c9e80-6bf8-4eb3-b2d2-f81936d67de3",
@@ -74,7 +134,17 @@
     "description": "Nike Dunk Low",
     "price": 759.15,
     "rating": 2.46,
-    "stockQuantity": 234525
+    "stockQuantity": 234525,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "BGC High Street",
+        "address": "Bonifacio Global City, Taguig",
+        "mapLink": "https://maps.google.com/?q=BGC+High+Street"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "98255f4e-40a6-470f-89a5-0792729f8947",
@@ -85,7 +155,17 @@
     "description": "Nike Dunk Low",
     "price": 974.99,
     "rating": 4.82,
-    "stockQuantity": 739009
+    "stockQuantity": 739009,
+    "status": "Available",
+    "paymentMethods": ["Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
@@ -96,7 +176,17 @@
     "description": "Nike Dunk Low",
     "price": 639.9,
     "rating": 1.17,
-    "stockQuantity": 754285
+    "stockQuantity": 754285,
+    "status": "Available",
+    "paymentMethods": ["GCash"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days."
   },
   {
     "productId": "8a8391b2-b4ac-4847-b652-66ffd8d65875",
@@ -107,7 +197,17 @@
     "description": "Nike Dunk Low",
     "price": 62.95,
     "rating": 4.6,
-    "stockQuantity": 205240
+    "stockQuantity": 205240,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal", "Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "be2157fb-7454-405e-9511-bf7ba81b7726",
@@ -116,9 +216,19 @@
     "brand": "Nike",
     "condition": "Brand New",
     "description": "Nike Dunk Low",
-    "price": 699.0,
+    "price": 699,
     "rating": 1.65,
-    "stockQuantity": 399124
+    "stockQuantity": 399124,
+    "status": "Available",
+    "paymentMethods": ["Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "BGC High Street",
+        "address": "Bonifacio Global City, Taguig",
+        "mapLink": "https://maps.google.com/?q=BGC+High+Street"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "fdf1ba3d-fa06-4ce5-90ff-d081c5d37176",
@@ -129,7 +239,17 @@
     "description": "Nike Dunk Low",
     "price": 899.61,
     "rating": 2.39,
-    "stockQuantity": 196884
+    "stockQuantity": 196884,
+    "status": "Unavailable",
+    "paymentMethods": ["Cash", "PayPal", "Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": null
   },
   {
     "productId": "afded6df-058f-477d-9878-e0e0b1d3dff3",
@@ -140,7 +260,17 @@
     "description": "Nike Dunk Low",
     "price": 575.6,
     "rating": 4.38,
-    "stockQuantity": 673658
+    "stockQuantity": 673658,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "GCash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "daa29167-82a7-474b-9687-b8b903e7ec69",
@@ -151,7 +281,17 @@
     "description": "Nike Dunk Low",
     "price": 492.35,
     "rating": 1.07,
-    "stockQuantity": 205143
+    "stockQuantity": 205143,
+    "status": "Available",
+    "paymentMethods": ["Credit Card", "Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "ccb83982-71f3-4497-bad8-7e64c6920dc6",
@@ -162,7 +302,17 @@
     "description": "Nike Dunk Low",
     "price": 304.69,
     "rating": 2.62,
-    "stockQuantity": 388596
+    "stockQuantity": 388596,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "1936d406-e89e-40e4-bff7-1827532269d4",
@@ -173,7 +323,17 @@
     "description": "Nike Dunk Low",
     "price": 845.15,
     "rating": 2.21,
-    "stockQuantity": 631658
+    "stockQuantity": 631658,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "GCash"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "c849a535-5f8b-47e3-889c-015693a644ac",
@@ -184,7 +344,17 @@
     "description": "Nike Dunk Low",
     "price": 880.09,
     "rating": 1.49,
-    "stockQuantity": 65457
+    "stockQuantity": 65457,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "GCash", "Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "0c3e80ee-59b3-4fc4-b760-8b07acc2d3ae",
@@ -195,7 +365,17 @@
     "description": "Nike Dunk Low",
     "price": 51.66,
     "rating": 1.53,
-    "stockQuantity": 263383
+    "stockQuantity": 263383,
+    "status": "Available",
+    "paymentMethods": ["Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "d8f5bee3-f3eb-4071-a124-6b857e0fd798",
@@ -206,7 +386,17 @@
     "description": "Nike Dunk Low",
     "price": 746.88,
     "rating": 4.71,
-    "stockQuantity": 616812
+    "stockQuantity": 616812,
+    "status": "Available",
+    "paymentMethods": ["GCash", "PayPal"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days."
   },
   {
     "productId": "8d15de86-0e4a-4414-9166-7a33610202d3",
@@ -217,7 +407,17 @@
     "description": "Nike Dunk Low",
     "price": 17.1,
     "rating": 0.79,
-    "stockQuantity": 604774
+    "stockQuantity": 604774,
+    "status": "Available",
+    "paymentMethods": ["GCash"],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days."
   },
   {
     "productId": "ea8fd0b9-c2d9-4d43-9c23-44cb99d079bb",
@@ -228,7 +428,17 @@
     "description": "Nike Dunk Low",
     "price": 905.04,
     "rating": 3.71,
-    "stockQuantity": 909107
+    "stockQuantity": 909107,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal", "Cash", "Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "25d01c80-bca1-4a00-b1d0-0fbd39ff9e89",
@@ -239,7 +449,17 @@
     "description": "Nike Dunk Low",
     "price": 184.41,
     "rating": 1.98,
-    "stockQuantity": 953695
+    "stockQuantity": 953695,
+    "status": "Available",
+    "paymentMethods": ["GCash", "PayPal", "Cash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days."
   },
   {
     "productId": "1d6df6e3-b7ea-4507-9d66-87c6ee8ed5b9",
@@ -250,7 +470,17 @@
     "description": "Nike Dunk Low",
     "price": 163.6,
     "rating": 0.81,
-    "stockQuantity": 341530
+    "stockQuantity": 341530,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "000a8c23-5bca-436c-a216-4e747a94c511",
@@ -261,7 +491,17 @@
     "description": "Nike Dunk Low",
     "price": 196.27,
     "rating": 1.6,
-    "stockQuantity": 967173
+    "stockQuantity": 967173,
+    "status": "Unavailable",
+    "paymentMethods": ["Cash", "GCash"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": null
   },
   {
     "productId": "c5b600dc-6bfb-492a-b335-c3cc8c707959",
@@ -272,7 +512,17 @@
     "description": "Nike Dunk Low",
     "price": 602.37,
     "rating": 0.13,
-    "stockQuantity": 162208
+    "stockQuantity": 162208,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal", "Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "9d5fafbc-312b-47e8-ada1-283918f0c3b5",
@@ -283,7 +533,17 @@
     "description": "Nike Dunk Low",
     "price": 564.82,
     "rating": 4.74,
-    "stockQuantity": 33021
+    "stockQuantity": 33021,
+    "status": "Unlisted",
+    "paymentMethods": ["PayPal"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch."
   },
   {
     "productId": "0114d5d4-ae48-46fa-b0ca-afe60eb88add",
@@ -294,7 +554,17 @@
     "description": "Nike Dunk Low",
     "price": 664.2,
     "rating": 0.13,
-    "stockQuantity": 363992
+    "stockQuantity": 363992,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "Cash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "e5b0da8c-148d-4680-b262-8609fb8a10da",
@@ -305,7 +575,17 @@
     "description": "Nike Dunk Low",
     "price": 685.1,
     "rating": 1.5,
-    "stockQuantity": 635092
+    "stockQuantity": 635092,
+    "status": "Available",
+    "paymentMethods": ["GCash", "Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days."
   },
   {
     "productId": "2be5b024-2c96-4f29-912c-c6f36353f799",
@@ -316,7 +596,17 @@
     "description": "Nike Dunk Low",
     "price": 373.81,
     "rating": 1.06,
-    "stockQuantity": 35383
+    "stockQuantity": 35383,
+    "status": "Available",
+    "paymentMethods": ["Credit Card", "PayPal"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "fcf2e432-62a3-4b6f-a34d-36e42a12272e",
@@ -327,7 +617,17 @@
     "description": "Nike Dunk Low",
     "price": 669.97,
     "rating": 1.34,
-    "stockQuantity": 880242
+    "stockQuantity": 880242,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "fc4c81e5-f1ac-40f5-8c6f-da3fbad5599d",
@@ -338,7 +638,17 @@
     "description": "Nike Dunk Low",
     "price": 100.11,
     "rating": 0.49,
-    "stockQuantity": 896782
+    "stockQuantity": 896782,
+    "status": "Unavailable",
+    "paymentMethods": ["Cash"],
+    "meetupLocations": [
+      {
+        "name": "BGC High Street",
+        "address": "Bonifacio Global City, Taguig",
+        "mapLink": "https://maps.google.com/?q=BGC+High+Street"
+      }
+    ],
+    "shippingDetails": null
   },
   {
     "productId": "07238d8e-0037-4972-87ca-0df206ee3e42",
@@ -349,7 +659,17 @@
     "description": "Nike Dunk Low",
     "price": 22.99,
     "rating": 3.42,
-    "stockQuantity": 635344
+    "stockQuantity": 635344,
+    "status": "Available",
+    "paymentMethods": ["Credit Card", "PayPal"],
+    "meetupLocations": [
+      {
+        "name": "BGC High Street",
+        "address": "Bonifacio Global City, Taguig",
+        "mapLink": "https://maps.google.com/?q=BGC+High+Street"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "154b7860-23a2-4564-ad99-1745ab7122ef",
@@ -360,7 +680,17 @@
     "description": "Nike Dunk Low",
     "price": 45.45,
     "rating": 0.34,
-    "stockQuantity": 456487
+    "stockQuantity": 456487,
+    "status": "Available",
+    "paymentMethods": ["Bank Transfer", "Cash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM."
   },
   {
     "productId": "8d4bf814-65d4-4df4-84cc-68911d925fdf",
@@ -371,7 +701,17 @@
     "description": "Nike Dunk Low",
     "price": 847.6,
     "rating": 1.79,
-    "stockQuantity": 638956
+    "stockQuantity": 638956,
+    "status": "Available",
+    "paymentMethods": ["Credit Card"],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation."
   },
   {
     "productId": "a52bf1bd-3d35-4cd2-849a-354e3952e2d2",
@@ -382,6 +722,16 @@
     "description": "Nike Dunk Low",
     "price": 969.47,
     "rating": 3.66,
-    "stockQuantity": 248630
+    "stockQuantity": 248630,
+    "status": "Unavailable",
+    "paymentMethods": ["Cash"],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": null
   }
 ]

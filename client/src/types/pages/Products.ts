@@ -9,6 +9,7 @@ export interface Product {
   price: number;
   rating: number;
   stockQuantity: number;
+  status: string;
   description: string;
   paymentMethods: string[];
   meetupLocations: meetupLocations[];
@@ -36,6 +37,7 @@ export type ProductFormValues = {
   condition: string;
   price: number;
   stockQuantity: number;
+  status: string;
   rating: number;
   description: string;
   paymentMethods: string[];

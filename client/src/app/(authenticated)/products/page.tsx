@@ -17,11 +17,12 @@ const Products = (props: Props) => {
   const {
     products,
     createProduct,
+    createProductState,
     isLoading: isGetProductsLoading,
     isError: hasGetProductsError,
   } = useProducts();
   const handleCreateProduct = async (productData: ProductFormValues) => {
-    await createProduct(productData);
+    await createProduct(productData).unwrap();
   };
 
   if (isGetProductsLoading) {
@@ -85,7 +86,7 @@ const Products = (props: Props) => {
           setIsModalOpen(false);
         }}
         onSend={handleCreateProduct}
-        isProductLoading={isGetProductsLoading}
+        isProductLoading={createProductState.isLoading}
       />
     </div>
   );

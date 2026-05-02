@@ -35,7 +35,11 @@ CREATE TABLE "Products" (
     "brand" TEXT NOT NULL,
     "condition" TEXT NOT NULL,
     "stockQuantity" INTEGER NOT NULL,
+    "status" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "paymentMethods" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "meetupLocations" JSONB NOT NULL DEFAULT '[]'::jsonb,
+    "shippingDetails" TEXT,
 
     CONSTRAINT "Products_pkey" PRIMARY KEY ("productId")
 );
