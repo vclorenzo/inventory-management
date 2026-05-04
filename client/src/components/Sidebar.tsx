@@ -186,18 +186,7 @@ const Sidebar = () => {
           label="Inventory"
           isCollapsed={isSidebarCollapsed}
         />
-        <SidebarLink
-          href="/products"
-          icon={Clipboard}
-          label="Products"
-          isCollapsed={isSidebarCollapsed}
-        />
-        {/* <SidebarLink
-					href="/users"
-					icon={User}
-					label="Users"
-					isCollapsed={isSidebarCollapsed}
-				/> */}
+
         <SidebarLink
           href="/account"
           icon={UserRound}

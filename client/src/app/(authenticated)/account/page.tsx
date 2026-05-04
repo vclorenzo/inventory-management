@@ -7,6 +7,7 @@ import { useState } from "react";
 import { mockAccountSettings } from "../constants/User";
 import { useGetProductsQuery } from "@/state/internal/productsApi";
 import { CircularProgress } from "@mui/material";
+import ProductsCatalog from "@/components/ProductsCatalog";
 
 const Account = () => {
   const [userSettings, setUserSettings] =
@@ -93,15 +94,15 @@ const Account = () => {
             {
               label: "Listings",
               content: (
-                <div className="grid grid-cols-1 sm:grid-cols-4 lg-grid-cols-5 gap-10 justify-between">
+                <>
                   {isLoading ? (
                     <>
                       <CircularProgress />
                     </>
                   ) : (
-                    <Cards products={products} />
+                    <ProductsCatalog />
                   )}
-                </div>
+                </>
               ),
             },
             { label: "Reviews", content: <div>Reviews content</div> },

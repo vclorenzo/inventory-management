@@ -6,11 +6,11 @@ import { ProductFormValues } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
-import ProductModal from "./ProductModal";
+import ProductModal from "../app/(authenticated)/products/ProductModal";
 
 type Props = {};
 
-const Products = (props: Props) => {
+const ProductsCatalog = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -92,4 +92,4 @@ const Products = (props: Props) => {
   );
 };
 
-export default Products;
+export default ProductsCatalog;
