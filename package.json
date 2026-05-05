@@ -4,6 +4,9 @@
 	"main": "index.js",
 	"scripts": {
 		"dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+		"docker:up": "docker compose up --build",
+		"docker:down": "docker compose down",
+		"docker:down:volumes": "docker compose down -v",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {

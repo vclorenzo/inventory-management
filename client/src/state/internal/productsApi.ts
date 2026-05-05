@@ -14,7 +14,7 @@ export const productsApi = api.injectEndpoints({
     }),
 
     getProductById: builder.query<Product, string>({
-      query: (id) => `products/${id}`,
+      query: (id) => `/products/${id}`,
       transformResponse: (response: { data: Product }) => response.data,
       providesTags: ["Products"],
     }),

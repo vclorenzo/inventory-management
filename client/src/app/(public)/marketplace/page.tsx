@@ -1,5 +1,5 @@
 "use client";
-import CreateProductModal from "@/app/(authenticated)/products/ProductModal";
+import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import Cards from "@/components/Cards";
 import {
   useCreateProductMutation,
@@ -22,7 +22,8 @@ const Marketplace = (props: Props) => {
     isError,
   } = useGetProductsQuery(searchTerm);
 
-  const [createProduct] = useCreateProductMutation();
+  const [createProduct, { isLoading: isCreateProductLoading }] =
+    useCreateProductMutation();
   const handleCreateProduct = async (productData: ProductFormValues) => {
     await createProduct(productData);
   };
@@ -71,12 +72,13 @@ const Marketplace = (props: Props) => {
         )}
       </div>
       {/* MODAL */}
-      <CreateProductModal
+      <ProductModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
         }}
-        onCreate={handleCreateProduct}
+        onSend={handleCreateProduct}
+        isProductLoading={isCreateProductLoading}
       />
     </div>
   );

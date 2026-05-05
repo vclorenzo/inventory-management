@@ -19,7 +19,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"seed": "ts-node prisma/seed.ts",
 		"build": "rimraf dist && npx tsc",
-		"start": "npm run build && node dist/index.js",
+		"start": "tsx src/index.ts",
 		"dev": "npm run build && concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/index.ts\""
 	},
 	"keywords": [],
@@ -41,6 +41,7 @@
 		"morgan": "^1.10.0",
 		"prisma": "^5.19.1",
 		"rimraf": "^6.0.1",
+		"tsx": "^4.21.0",
 		"validator": "^13.15.35",
 		"winston": "^3.19.0",
 		"zod": "^4.3.6"
