@@ -11,7 +11,7 @@ COPY . .
 RUN npx prisma generate
 
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=8000
 ENV RUN_SEED=true
-EXPOSE 3001
+EXPOSE 8000
 CMD ["sh", "-c", "npx prisma migrate deploy && if [ \"$RUN_SEED\" = \"true\" ]; then npm run seed; else echo 'Skipping seed (RUN_SEED='$RUN_SEED')'; fi && npm run start"]

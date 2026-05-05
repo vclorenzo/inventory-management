@@ -24,24 +24,24 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      PORT: 3001
+      PORT: 8000
       CORS_ORIGIN: http://localhost:3000
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/inventory?schema=public
       RUN_SEED: "true"
     ports:
-      - "3001:3001"
+      - "8000:8000"
 
   client:
     build:
       context: ./client
       args:
-        NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
     container_name: pern-client
     depends_on:
       - server
     environment:
       PORT: 3000
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:3001
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
     ports:
       - "3000:3000"
 
