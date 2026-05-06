@@ -18,6 +18,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useMe } from "@/hooks/useMe";
 
 type SidebarLinkProps = {
   href: string;
@@ -127,6 +128,10 @@ const Sidebar = () => {
     (state) => state.global.isDropdownExpanded,
   );
 
+  const { me } = useMe();
+  const role = me?.data.role;
+  const isAdmin = role === "admin";
+
   const sidebarClassNames = `fixed flex flex-col ${
     isSidebarCollapsed ? "w-0 md:w-16" : "w-72 md:w-64"
   } bg-white transition-all duration-300 overflow-hidden h-full shadow-md z-40`;
@@ -174,51 +179,81 @@ const Sidebar = () => {
       </div>
       {/* LINKS */}
       <div className="flex-grow mt-8">
-        <SidebarLink
-          href="/dashboard"
-          icon={Layout}
-          label="Dashboard"
-          isCollapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/inventory"
-          icon={Archive}
-          label="Inventory"
-          isCollapsed={isSidebarCollapsed}
-        />
-
-        <SidebarLink
-          href="/account"
-          icon={UserRound}
-          label="Account"
-          isCollapsed={isSidebarCollapsed}
-          isSubLinkExpanded={isDropdownExpanded}
-          toggleDropdown={toggleDropdown}
-          dropdownIcon={isDropdownExpanded ? ChevronUp : ChevronDown}
-          subLinks={[
-            {
-              href: "/account/profile",
-              subLinkIcon: UserRoundPen,
-              label: "Profile",
-            },
-            {
-              href: "/account/changePassword",
-              subLinkIcon: KeyRound,
-              label: "Change Password",
-            },
-            {
-              href: "/account/settings",
-              subLinkIcon: SlidersHorizontal,
-              label: "Settings",
-            },
-          ]}
-        />
-        <SidebarLink
-          href="/expenses"
-          icon={CircleDollarSign}
-          label="Expenses"
-          isCollapsed={isSidebarCollapsed}
-        />
+        {isAdmin ? (
+          <>
+            <SidebarLink
+              href="/dashboard"
+              icon={Layout}
+              label="Dashboard"
+              isCollapsed={isSidebarCollapsed}
+            />
+            <SidebarLink
+              href="/inventory"
+              icon={Archive}
+              label="Inventory"
+              isCollapsed={isSidebarCollapsed}
+            />
+            <SidebarLink
+              href="/account"
+              icon={UserRound}
+              label="Account"
+              isCollapsed={isSidebarCollapsed}
+              isSubLinkExpanded={isDropdownExpanded}
+              toggleDropdown={toggleDropdown}
+              dropdownIcon={isDropdownExpanded ? ChevronUp : ChevronDown}
+              subLinks={[
+                {
+                  href: "/account/profile",
+                  subLinkIcon: UserRoundPen,
+                  label: "Profile",
+                },
+                {
+                  href: "/account/changePassword",
+                  subLinkIcon: KeyRound,
+                  label: "Change Password",
+                },
+                {
+                  href: "/account/settings",
+                  subLinkIcon: SlidersHorizontal,
+                  label: "Settings",
+                },
+              ]}
+            />
+            <SidebarLink
+              href="/expenses"
+              icon={CircleDollarSign}
+              label="Expenses"
+              isCollapsed={isSidebarCollapsed}
+            />
+          </>
+        ) : (
+          <SidebarLink
+            href="/account"
+            icon={UserRound}
+            label="Account"
+            isCollapsed={isSidebarCollapsed}
+            isSubLinkExpanded={isDropdownExpanded}
+            toggleDropdown={toggleDropdown}
+            dropdownIcon={isDropdownExpanded ? ChevronUp : ChevronDown}
+            subLinks={[
+              {
+                href: "/account/profile",
+                subLinkIcon: UserRoundPen,
+                label: "Profile",
+              },
+              {
+                href: "/account/changePassword",
+                subLinkIcon: KeyRound,
+                label: "Change Password",
+              },
+              {
+                href: "/account/settings",
+                subLinkIcon: SlidersHorizontal,
+                label: "Settings",
+              },
+            ]}
+          />
+        )}
       </div>
       {/* FOOTER */}
       <div className={`${isSidebarCollapsed ? "hidden" : "block"} mb-10`}>

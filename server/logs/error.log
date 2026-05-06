@@ -97,3 +97,7 @@
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-28T03:47:02.962Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-28T03:47:06.988Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-04-28T03:47:08.878Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-05T16:35:32.097Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-05T16:35:36.186Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-05T16:35:43.423Z"}
+{"level":"error","message":"User not found","service":"acquisitions-api","timestamp":"2026-05-05T16:36:09.013Z"}
