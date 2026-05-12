@@ -1,6 +1,21 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
 
+const parseCsv = (value?: string): string[] | undefined => {
+  if (!value) return undefined;
+  const parsed = value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return parsed.length ? parsed : undefined;
+};
+
+const parseNumber = (value: unknown): number | undefined => {
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? undefined : parsed;
+};
+
 export const getProductById = async (
   req: Request,
   res: Response,
@@ -27,6 +42,27 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const search = req.query.search?.toString();
+    const category = parseCsv(req.query.category?.toString());
+    const brand = parseCsv(req.query.brand?.toString());
+    const condition = parseCsv(req.query.condition?.toString());
+    const status = parseCsv(req.query.status?.toString());
+    const minPrice = parseNumber(req.query.minPrice);
+    const maxPrice = parseNumber(req.query.maxPrice);
+    const minRating = parseNumber(req.query.minRating);
+    const maxRating = parseNumber(req.query.maxRating);
+    const minStock = parseNumber(req.query.minStock);
+    const maxStock = parseNumber(req.query.maxStock);
+    const sortBy = req.query.sortBy?.toString() as
+      | "relevance"
+      | "name"
+      | "price"
+      | "rating"
+      | "stockQuantity"
+      | undefined;
+    const sortOrder = req.query.sortOrder?.toString() as
+      | "asc"
+      | "desc"
+      | undefined;
     const page = Math.max(Number(req.query.page) || 1, 1);
     const parsedLimit = Number(req.query.limit);
     const limit =
@@ -36,6 +72,18 @@ export const getAllProducts = async (
 
     const { products, totalCount } = await productService.getAllProducts({
       search,
+      category,
+      brand,
+      condition,
+      status,
+      minPrice,
+      maxPrice,
+      minRating,
+      maxRating,
+      minStock,
+      maxStock,
+      sortBy,
+      sortOrder,
       page,
       limit,
     });

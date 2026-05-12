@@ -6,8 +6,10 @@ import { UserSetting } from "@/types/pages/User";
 import { useState } from "react";
 import { mockAccountSettings } from "../constants/User";
 import { useGetProductsQuery } from "@/state/internal/productsApi";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Rating } from "@mui/material";
 import ProductsCatalog from "@/components/ProductsCatalog";
+import { MapPin } from "lucide-react";
+import Reviews from "@/components/Reviews";
 
 const Account = () => {
   const [userSettings, setUserSettings] =
@@ -40,53 +42,30 @@ const Account = () => {
       <Header name="Account" />
       <div className="overflow-x-auto mt-5 shadow-md">
         <table className="min-w-full bg-white rounded-lg">
-          <thead className="bg-gray-800 text-white">
-            <tr>
-              <th className="text-left py-3 px-4 uppercase font-semibold text-sm">
-                Setting
-              </th>
-              <th className="text-left py-3 px-4 uppercase font-semibold text-sm">
-                Value
-              </th>
-            </tr>
-          </thead>
           <tbody>
-            {userSettings.map((setting, index) => (
-              <tr className="hover:bg-blue-50" key={setting.label}>
-                <td className="py-2 px-4">{setting.label}</td>
-                <td className="py-2 px-4">
-                  {setting.type === "toggle" ? (
-                    <label className="inline-flex relative items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={setting.value as boolean}
-                        onChange={() => handleToggleChange(index)}
-                      />
-                      <div
-                        className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-blue-400 peer-focus:ring-4 
-                        transition peer-checked:after:translate-x-full peer-checked:after:border-white 
-                        after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white 
-                        after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-blue-600"
-                      ></div>
-                    </label>
-                  ) : (
-                    <input
-                      type="text"
-                      className="px-4 py-2 border rounded-lg text-gray-500 focus:outline-none focus:border-blue-500"
-                      value={setting.value as string}
-                      disabled
-                      onChange={(e) => {
-                        const settingsCopy = [...userSettings];
-                        settingsCopy[index].value = e.target.value;
-                        setUserSettings(settingsCopy);
-                      }}
-                    />
-                  )}
-                </td>
-              </tr>
-            ))}
+            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+              <article className="space-y-2">
+                <div className="flex  justify-center items-center gap-3">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
+                    vl
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-gray-900">Vanz Lorenzo</p>
+                  </div>
+                </div>
+              </article>
+              <div className="flex justify-center gap-5 mt-5">
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-700">5.0</span>
+                  <Rating value={5} readOnly size="small" />
+                  <span className="text-gray-500">(11)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <span>Pateros</span>
+                </div>
+              </div>
+            </div>
           </tbody>
         </table>
         <Tabs
@@ -105,7 +84,14 @@ const Account = () => {
                 </>
               ),
             },
-            { label: "Reviews", content: <div>Reviews content</div> },
+            {
+              label: "Reviews",
+              content: (
+                <div className={`filter-panel mb-24`}>
+                  <Reviews />
+                </div>
+              ),
+            },
           ]}
         />
       </div>

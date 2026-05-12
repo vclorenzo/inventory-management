@@ -1,12 +1,13 @@
 import {
+  ProductQueryParams,
   useCreateProductMutation,
   useGetProductByIdQuery,
   useGetProductsQuery,
   useUpdateProductMutation,
 } from "@/state/internal/productsApi";
 
-export const useProducts = (search?: string) => {
-  const query = useGetProductsQuery(search);
+export const useProducts = (params?: string | ProductQueryParams) => {
+  const query = useGetProductsQuery(params);
   const [createProduct, createProductState] = useCreateProductMutation();
 
   return {

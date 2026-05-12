@@ -17,33 +17,8 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { breadcrumbItems } from "../../constants/User";
 import ProductModal from "../ProductModal";
-
-const sellerReviews = [
-  {
-    reviewer: "eubartolome4",
-    avatarLabel: "eu",
-    monthsAgo: 5,
-    comment: "easy to talk to. great to transact with!",
-    productName: "Dotted desk mat Tokyo City",
-    productPrice: "PHP 800",
-  },
-  {
-    reviewer: "rownadjiane",
-    avatarLabel: "ro",
-    monthsAgo: 8,
-    comment: "fast and smooth transaction. thank you!",
-    productName: "Camel trekking / hiking pole",
-    productPrice: "PHP 300",
-  },
-  {
-    reviewer: "ultrvlnc",
-    avatarLabel: "ul",
-    yearsAgo: 4,
-    comment:
-      "Approachable seller who responded quickly to my queries! " +
-      "Transaction went off without a hitch. :^)",
-  },
-];
+import Reviews from "@/components/Reviews";
+import ProfileBanner from "@/components/ProfileBanner";
 
 const productImageUrls = (length: number) => {
   const images = [];
@@ -362,73 +337,8 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
         </div>
       </div>
       <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
-          <article className="space-y-2">
-            <div className="flex  justify-center items-center gap-3">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
-                vl
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-gray-900">Vanz Lorenzo</p>
-              </div>
-            </div>
-          </article>
-          <div className="flex justify-center gap-5 mt-5">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-700">5.0</span>
-              <Rating value={5} readOnly size="small" />
-              <span className="text-gray-500">(11)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <span>Pateros</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-5 mt-5">
-          <h2 className="text-xl font-semibold tracking-tight text-gray-900">
-            Seller Reviews
-          </h2>
-        </div>
-
-        <div className="mt-5 space-y-7">
-          {sellerReviews.map((review) => (
-            <article
-              key={`${review.reviewer}-${review.comment}`}
-              className="space-y-2"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
-                  {review.avatarLabel}
-                </div>
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-gray-900">
-                    {review.reviewer}
-                  </p>
-                  <span className="text-gray-400">•</span>
-                  <p className="text-sm text-gray-500">
-                    {review.monthsAgo
-                      ? `${review.monthsAgo} months ago`
-                      : `${review.yearsAgo} years ago`}
-                  </p>
-                </div>
-              </div>
-
-              <div className="pl-14">
-                <Rating value={5} readOnly size="small" />
-                <p className="mt-1 text-gray-700">{review.comment}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <button
-          type="button"
-          className="mt-6 inline-flex items-center text-sm font-medium text-teal-700 hover:text-teal-800"
-        >
-          Read all reviews
-          <span className="ml-1 text-base">›</span>
-        </button>
+        <ProfileBanner />
+        <Reviews />
       </div>
       <ProductModal
         isOpen={isModalOpen}
