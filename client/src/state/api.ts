@@ -19,6 +19,7 @@ export const api = createApi({
     "Expenses",
     "Auth",
     "Profile",
+    "Reviews",
   ],
   endpoints: () => ({}),
 });

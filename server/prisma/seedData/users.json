@@ -1,44 +1,44 @@
 [
-	{
-		"userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
-		"name": "Vanz Lorenzo",
-		"email": "vc.lorenzo16@gmail.com",
-		"password": "123123",
-		"role": "admin"
-	},
-	{
-		"userId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
-		"name": "Inesita",
-		"email": "imcconnachie1@oaic.gov.au",
-		"password": "123123",
-		"role": "user"
-	},
-	{
-		"userId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
-		"name": "Tulley",
-		"email": "tbridywater2@wikimedia.org",
-		"password": "123123",
-		"role": "user"
-	},
-	{
-		"userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
-		"name": "Amelia",
-		"email": "atondeur3@posterous.com",
-		"password": "123123",
-		"role": "user"
-	},
-	{
-		"userId": "22c29051-d301-4cc2-86dd-c19695408adb",
-		"name": "Bucky",
-		"email": "btompkin4@moonfruit.com",
-		"password": "123123",
-		"role": "user"
-	},
-	{
-		"userId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
-		"name": "Sherline",
-		"email": "sinston5@issuu.com",
-		"password": "123123",
-		"role": "user"
-	}
+  {
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "name": "Vanz Lorenzo",
+    "email": "vc.lorenzo16@gmail.com",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "admin"
+  },
+  {
+    "userId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+    "name": "Inesita",
+    "email": "imcconnachie1@oaic.gov.au",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "user"
+  },
+  {
+    "userId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+    "name": "Tulley",
+    "email": "tbridywater2@wikimedia.org",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "user"
+  },
+  {
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Amelia",
+    "email": "atondeur3@posterous.com",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "user"
+  },
+  {
+    "userId": "22c29051-d301-4cc2-86dd-c19695408adb",
+    "name": "Bucky",
+    "email": "btompkin4@moonfruit.com",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "user"
+  },
+  {
+    "userId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+    "name": "Sherline",
+    "email": "sinston5@issuu.com",
+    "password": "$2b$10$icRn7B9dPWx0KrVNHMiLN.2Q6eiKXOGvk3m0/R7clHOozMnw2DVEC",
+    "role": "user"
+  }
 ]

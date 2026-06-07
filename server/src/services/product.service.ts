@@ -1,5 +1,5 @@
 import { AppError } from "#error/AppError.ts";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, Users } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -54,9 +54,7 @@ export const getAllProducts = async ({
     }
 
     if (condition?.length) {
-      whereParts.push(
-        Prisma.sql`p."condition" IN (${Prisma.join(condition)})`,
-      );
+      whereParts.push(Prisma.sql`p."condition" IN (${Prisma.join(condition)})`);
     }
 
     if (status?.length) {
@@ -117,8 +115,7 @@ export const getAllProducts = async ({
     } else if (sortBy === "rating") {
       orderBySql = Prisma.sql`COALESCE(p."rating", 0) ${safeSortOrder}, p."name" ASC`;
     } else if (sortBy === "stockQuantity") {
-      orderBySql =
-        Prisma.sql`p."stockQuantity" ${safeSortOrder}, p."name" ASC`;
+      orderBySql = Prisma.sql`p."stockQuantity" ${safeSortOrder}, p."name" ASC`;
     } else if (sortBy === "name") {
       orderBySql = Prisma.sql`p."name" ${safeSortOrder}`;
     } else if (hasSearch) {
@@ -151,9 +148,12 @@ export const getAllProducts = async ({
         FROM "Products" p
         WHERE ${whereSql}
       `,
-      prisma.$queryRaw`
+      prisma.$queryRaw<
+        (Prisma.ProductsGetPayload<object> & { userName: string })[]
+      >`
         SELECT p.*
         FROM "Products" p
+        INNER JOIN "Users" u ON p."userId" = u."userId"
         WHERE ${whereSql}
         ORDER BY ${orderBySql}
         ${paginationSql}
@@ -181,6 +181,7 @@ export const getProductById = async (id: string) => {
 
 export const createProduct = async ({
   name,
+  userId,
   productCategory,
   brand,
   condition,
@@ -194,6 +195,7 @@ export const createProduct = async ({
   shippingDetails,
 }: {
   name: string;
+  userId: string;
   productCategory: string;
   brand: string;
   condition: string;
@@ -210,6 +212,7 @@ export const createProduct = async ({
     return await prisma.products.create({
       data: {
         name,
+        userId,
         productCategory,
         brand,
         condition,
@@ -230,6 +233,10 @@ export const createProduct = async ({
 
 type ProductUpdatePayload = {
   name?: string;
+  productCategory?: string;
+  brand?: string;
+  condition?: string;
+  description?: string;
   price?: number;
   rating?: number | null;
   stockQuantity?: number;
@@ -250,6 +257,10 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
       where: { productId: id },
       data: {
         name: data.name,
+        productCategory: data.productCategory,
+        brand: data.brand,
+        condition: data.condition,
+        description: data.description,
         price: data.price,
         rating: data.rating,
         stockQuantity: data.stockQuantity,
@@ -269,8 +280,12 @@ export const deleteProduct = async (id: string) => {
     if (!existingProduct) {
       throw new AppError("Product does not exist");
     }
-    return await prisma.products.delete({
-      where: { productId: id },
+    return await prisma.$transaction(async (tx) => {
+      await tx.sales.deleteMany({ where: { productId: id } });
+      await tx.purchases.deleteMany({ where: { productId: id } });
+      return tx.products.delete({
+        where: { productId: id },
+      });
     });
   } catch (error) {
     throw error;

@@ -14,6 +14,7 @@ export interface Product {
   paymentMethods: string[];
   meetupLocations: meetupLocations[];
   shippingDetails: string | null;
+  userId: string;
 }
 
 export interface NewProduct {

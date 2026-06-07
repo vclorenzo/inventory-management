@@ -101,3 +101,24 @@
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-05T16:35:36.186Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-05T16:35:43.423Z"}
 {"level":"error","message":"User not found","service":"acquisitions-api","timestamp":"2026-05-05T16:36:09.013Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-30T07:03:05.663Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-30T07:03:07.184Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-30T07:03:07.758Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-05-30T07:03:08.995Z"}
+{"body":"{\r\n  \"userId\": \"22c29051-d301-4cc2-86dd-c19695408adb\",\r\n  \"name\": \r\n  \"rating\": 5,\r\n  \"comment\": \"Goods\"\r\n}","expose":true,"level":"error","message":"Expected ',' or '}' after property value in JSON at position 78 (line 4 column 11)","service":"acquisitions-api","stack":"SyntaxError: Expected ',' or '}' after property value in JSON at position 78 (line 4 column 11)\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n    at invokeCallback (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:238:16)\n    at done (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:518:28)\n    at IncomingMessage.emit (node:domain:489:12)\n    at endReadableNT (node:internal/streams/readable:1698:12)","status":400,"statusCode":400,"timestamp":"2026-05-30T09:17:01.773Z","type":"entity.parse.failed"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T11:47:52.296Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T11:47:54.884Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T11:48:31.212Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T12:33:52.184Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T12:33:56.152Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T12:34:11.330Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T12:35:07.722Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:18:01.424Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:18:08.999Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:20:05.892Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:20:06.919Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:20:09.247Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:20:14.820Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:21:14.044Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:21:14.878Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-07T13:58:29.684Z"}

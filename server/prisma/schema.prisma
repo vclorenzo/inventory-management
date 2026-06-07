@@ -23,6 +23,9 @@ model Users {
   updated_at DateTime @updatedAt
 
   profile Profile?
+  products Products[]
+  reviewsReceived Reviews[] @relation("ReviewedUser")
+  reviewsWritten  Reviews[] @relation("Reviewer")
 }
 
 
@@ -42,21 +45,23 @@ model Profile {
 }
 
 model Products {
-  productId     String      @id @default(uuid())
-  name          String
-  price         Float
-  rating        Float?
-  productCategory      String
-  brand         String
-  condition     String
-  stockQuantity Int
-  status        String
-  description   String
-  paymentMethods String[] @default([])
-  meetupLocations Json @default(dbgenerated("'[]'::jsonb"))
-  shippingDetails String?
-  Sales         Sales[]
-  Purchases     Purchases[]
+  productId        String      @id @default(uuid())
+  userId           String
+  name             String
+  price            Float
+  rating           Float?
+  productCategory  String
+  brand            String
+  condition        String
+  stockQuantity    Int
+  status           String
+  description      String
+  paymentMethods   String[]    @default([])
+  meetupLocations  Json        @default(dbgenerated("'[]'::jsonb"))
+  shippingDetails  String?
+  owner            Users       @relation(fields: [userId], references: [userId])
+  Sales            Sales[]
+  Purchases        Purchases[]
 }
 
 model Sales {
@@ -114,4 +119,15 @@ model ExpenseByCategory {
   amount              BigInt
   date                DateTime
   expenseSummary      ExpenseSummary @relation(fields: [expenseSummaryId], references: [expenseSummaryId])
+}
+
+model Reviews {
+  reviewId     String @id @default(uuid())
+  userId       String
+  reviewerId   String
+  rating       Int
+  comment      String
+
+  reviewedUser Users @relation("ReviewedUser", fields: [userId], references: [userId])
+  reviewer     Users @relation("Reviewer", fields: [reviewerId], references: [userId])
 }

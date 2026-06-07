@@ -108,6 +108,12 @@ export const createProduct = async (
   res: Response,
 ): Promise<void> => {
   try {
+    const userId = (req.user as { id?: string })?.id;
+    if (!userId) {
+      res.status(401).json({ message: "Authentication required" });
+      return;
+    }
+
     const {
       name,
       productCategory,
@@ -124,6 +130,7 @@ export const createProduct = async (
     } = req.body;
     const product = await productService.createProduct({
       name,
+      userId,
       productCategory,
       brand,
       condition,
@@ -150,7 +157,9 @@ export const updateProduct = async (
     const { id } = req.params;
     const data = req.body;
     const updatedProduct = await productService.updateProduct(id, data);
-    res.status(200).json({ data: updatedProduct });
+    res
+      .status(200)
+      .json({ message: "Product updated successfully", data: updatedProduct });
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
@@ -165,6 +174,7 @@ export const deleteProduct = async (
     const deletedProduct = await productService.deleteProduct(id);
     res.status(200).json({
       message: `Product ${deletedProduct.name} deleted successfully`,
+      data: deletedProduct,
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

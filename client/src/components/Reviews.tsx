@@ -1,8 +1,15 @@
 import { sellerReviews } from "@/constants/Reviews";
+import { Review } from "@/types/pages/Reviews";
 import { Rating } from "@mui/material";
 import React from "react";
 
-const Reviews = () => {
+const Reviews = ({
+  reviews,
+  userId,
+}: {
+  reviews: Review[];
+  userId: string;
+}) => {
   return (
     <>
       <div className="flex flex-wrap items-center gap-5 mt-5">
@@ -12,32 +19,30 @@ const Reviews = () => {
       </div>
 
       <div className="mt-5 space-y-7">
-        {sellerReviews.map((review) => (
-          <article
-            key={`${review.reviewer}-${review.comment}`}
-            className="space-y-2"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
-                {review.avatarLabel}
+        {reviews
+          ?.filter((review) => review.userId === userId)
+          ?.map((review) => (
+            <article
+              key={`${review.reviewId}-${review.comment}`}
+              className="space-y-2"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
+                  {review.reviewerName.charAt(0)}
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-900">
+                    {review.reviewerName}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-gray-900">{review.reviewer}</p>
-                <span className="text-gray-400">•</span>
-                <p className="text-sm text-gray-500">
-                  {review.monthsAgo
-                    ? `${review.monthsAgo} months ago`
-                    : `${review.yearsAgo} years ago`}
-                </p>
-              </div>
-            </div>
 
-            <div className="pl-14">
-              <Rating value={5} readOnly size="small" />
-              <p className="mt-1 text-gray-700">{review.comment}</p>
-            </div>
-          </article>
-        ))}
+              <div className="pl-14">
+                <Rating value={review.rating} readOnly size="small" />
+                <p className="mt-1 text-gray-700">{review.comment}</p>
+              </div>
+            </article>
+          ))}
       </div>
 
       <button

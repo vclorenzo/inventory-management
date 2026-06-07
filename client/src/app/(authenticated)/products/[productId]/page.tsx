@@ -8,7 +8,14 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { useProductById } from "@/hooks/useProducts";
 import { ProductFormValues } from "@/types/pages/Products";
 import { productToFormValues } from "@/utils/productForm";
-import { ChevronLeft, ExternalLink, MapPin, Package, Pen } from "lucide-react";
+import {
+  ChevronLeft,
+  ExternalLink,
+  MapPin,
+  Package,
+  Pen,
+  Pencil,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import "swiper/css";
@@ -24,7 +31,7 @@ const productImageUrls = (length: number) => {
   const images = [];
   for (let i = 0; i < length; i++) {
     images.push({
-      src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/products${
+      src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
         Math.floor(Math.random() * 3) + 1
       }.png`,
     });
@@ -155,25 +162,29 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <Swiper
+            className="pb-11 [&_.swiper-button-next]:text-gray-700 [&_.swiper-button-prev]:text-gray-700 [&_.swiper-pagination-bullet-active]:bg-gray-900 [&_.swiper-slide]:h-auto"
             modules={[Navigation, Pagination, A11y]}
-            spaceBetween={24}
+            spaceBetween={16}
             slidesPerView={1}
             navigation
             pagination={{ clickable: true }}
-            // scrollbar={{ hide: true }}
           >
-            {images.map((image, idx) => (
-              <SwiperSlide key={product.productId}>
-                <div className="flex flex-row items-center gap-3 justify-center">
-                  <Image
-                    src={image.src}
-                    alt={product.name}
-                    width={150}
-                    height={150}
-                    className="h-72 w-72 rounded-2xl object-contain sm:h-[420px] sm:w-[420px]"
-                  />
+            {images.map((image: any, idx: number) => (
+              <SwiperSlide key={`${product.productId}-gallery-${idx}`}>
+                <div className="flex min-h-[280px] items-center justify-center p-6 sm:min-h-[360px] sm:p-8">
+                  <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.9),transparent_55%)]" />
+                  <div className="relative mx-auto flex aspect-square w-full max-w-[320px] items-center justify-center sm:max-w-[360px]">
+                    <Image
+                      src={image.src}
+                      alt={`${product.name}`}
+                      width={150}
+                      height={150}
+                      priority={idx === 0}
+                      className="h-full w-full rounded-2xl object-contain drop-shadow-md"
+                    />
+                  </div>
                 </div>
               </SwiperSlide>
             ))}
@@ -266,7 +277,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
               onClick={() => setIsModalOpen(true)}
               className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
             >
-              <Pen />
+              <Pencil />
             </button>
           </div>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row justify-center">
@@ -277,7 +288,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
               }
               className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Delete
+              Unlist
             </button>
           </div>
         </div>

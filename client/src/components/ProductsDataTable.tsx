@@ -1,7 +1,10 @@
 "use client";
 
-import { Product } from "@/types/pages/Products";
-import { useDeleteProductMutation } from "@/state/internal/productsApi";
+import { Product, ProductFormValues } from "@/types/pages/Products";
+import {
+  useDeleteProductMutation,
+  useUpdateProductMutation,
+} from "@/state/internal/productsApi";
 import {
   ChevronDown,
   ChevronLeft,
@@ -11,7 +14,9 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import ProductModal from "@/app/(authenticated)/products/ProductModal";
+import { productToFormValues } from "@/utils/productForm";
 
 export type ProductTableSortKey =
   | "productId"
@@ -98,12 +103,36 @@ export type ProductsDataTableProps = {
 };
 
 export function ProductsDataTable({ products }: ProductsDataTableProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<PageSizeOption>(5);
   const [sortKey, setSortKey] = useState<ProductTableSortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [deleteProduct, { isLoading: isDeleteLoading }] =
     useDeleteProductMutation();
+  const [updateProduct, updateProductState] = useUpdateProductMutation();
+
+  const modalDefaultValues = useMemo(
+    () => (editingProduct ? productToFormValues(editingProduct) : undefined),
+    [editingProduct],
+  );
+
+  async function handleUpdateProduct(productData: ProductFormValues) {
+    if (!editingProduct) return;
+    try {
+      await updateProduct({
+        productId: editingProduct.productId,
+        ...productData,
+      }).unwrap();
+      setIsModalOpen(false);
+      setEditingProduct(null);
+    } catch {
+      window.alert("Could not update this product. Please try again.");
+    }
+  }
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const selectAllRef = useRef<HTMLInputElement>(null);
 
   const sorted = useMemo(() => {
     const copy = [...products];
@@ -122,6 +151,34 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
     const start = (page - 1) * pageSize;
     return sorted.slice(start, start + pageSize);
   }, [sorted, page, pageSize]);
+
+  useEffect(() => {
+    const valid = new Set(products.map((p) => p.productId));
+    setSelectedIds((prev) => {
+      let pruned = false;
+      const next = new Set<string>();
+      prev.forEach((id) => {
+        if (valid.has(id)) next.add(id);
+        else pruned = true;
+      });
+      return pruned ? next : prev;
+    });
+  }, [products]);
+
+  const selectedOnListCount = useMemo(() => {
+    let n = 0;
+    for (const p of sorted) {
+      if (selectedIds.has(p.productId)) n += 1;
+    }
+    return n;
+  }, [sorted, selectedIds]);
+
+  useEffect(() => {
+    const el = selectAllRef.current;
+    if (!el) return;
+    const n = sorted.length;
+    el.indeterminate = selectedOnListCount > 0 && selectedOnListCount < n;
+  }, [sorted.length, selectedOnListCount]);
 
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = total === 0 ? 0 : Math.min(page * pageSize, total);
@@ -153,10 +210,37 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
     if (!ok) return;
     try {
       await deleteProduct(p.productId).unwrap();
+      setSelectedIds((prev) => {
+        if (!prev.has(p.productId)) return prev;
+        const next = new Set(prev);
+        next.delete(p.productId);
+        return next;
+      });
     } catch {
       window.alert("Could not delete this product. Please try again.");
     }
   }
+
+  function handleToggleRow(productId: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(productId)) next.delete(productId);
+      else next.add(productId);
+      return next;
+    });
+  }
+
+  function handleToggleSelectAll() {
+    setSelectedIds((prev) => {
+      const allSelected =
+        sorted.length > 0 && sorted.every((p) => prev.has(p.productId));
+      if (allSelected) return new Set();
+      return new Set(sorted.map((p) => p.productId));
+    });
+  }
+
+  const allOnListSelected =
+    sorted.length > 0 && selectedOnListCount === sorted.length;
 
   return (
     <div className="mt-5">
@@ -165,6 +249,21 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
           <table className="min-w-full divide-y divide-gray-200 text-left text-sm">
             <thead className="bg-gray-50">
               <tr>
+                <th
+                  scope="col"
+                  className="w-10 whitespace-nowrap px-3 py-3 text-center"
+                >
+                  <input
+                    ref={selectAllRef}
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    checked={allOnListSelected}
+                    onChange={handleToggleSelectAll}
+                    disabled={sorted.length === 0}
+                    aria-label="Select all products"
+                    title="Select all products"
+                  />
+                </th>
                 {COLUMNS.map((col) => (
                   <th
                     key={col.key}
@@ -215,7 +314,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
               {pageItems.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={COLUMNS.length + 1}
+                    colSpan={COLUMNS.length + 2}
                     className="px-3 py-8 text-center text-gray-500"
                   >
                     No products to display.
@@ -225,10 +324,30 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                 pageItems.map((p, i) => (
                   <tr
                     key={p.productId}
-                    className={i % 2 === 0 ? "bg-white" : "bg-gray-50/80"}
+                    className={`${
+                      selectedIds.has(p.productId)
+                        ? "bg-blue-50/90"
+                        : i % 2 === 0
+                          ? "bg-white"
+                          : "bg-gray-50/80"
+                    }`}
                   >
+                    <td className="w-10 whitespace-nowrap px-3 py-2 text-center">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        checked={selectedIds.has(p.productId)}
+                        onChange={() => handleToggleRow(p.productId)}
+                        aria-label={`Select ${p.name}`}
+                      />
+                    </td>
                     <td className="max-w-[10rem] truncate px-3 py-2 text-gray-800">
-                      {p.name}
+                      <Link
+                        href={`/products/${p.productId}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {p.name}
+                      </Link>
                     </td>
                     <td className="max-w-[8rem] truncate px-3 py-2 text-gray-800">
                       {p.productCategory}
@@ -266,20 +385,25 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     </td>
                     <td className="whitespace-nowrap px-3 py-2 text-right">
                       <div className="inline-flex items-center justify-end gap-1">
-                        <Link
-                          href={`/products/${p.productId}`}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                        <button
+                          type="button"
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={`Edit ${p.name}`}
                           title="Edit"
+                          disabled={updateProductState.isLoading}
+                          onClick={() => {
+                            setEditingProduct(p);
+                            setIsModalOpen(true);
+                          }}
                         >
                           <Pencil className="h-4 w-4" aria-hidden />
-                        </Link>
+                        </button>
                         <button
                           type="button"
                           className="inline-flex h-9 w-9 items-center justify-center rounded-full text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={`Delete ${p.name}`}
                           title="Delete"
-                          disabled={isDeleteLoading}
+                          disabled={isDeleteLoading || p.status !== "Unlisted"}
                           onClick={() => void handleDeleteRow(p)}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />
@@ -351,6 +475,16 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
           </div>
         </div>
       </div>
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingProduct(null);
+        }}
+        onSend={handleUpdateProduct}
+        isProductLoading={updateProductState.isLoading}
+        defaultValues={modalDefaultValues}
+      />
     </div>
   );
 }

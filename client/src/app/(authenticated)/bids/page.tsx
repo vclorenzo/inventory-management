@@ -2,6 +2,7 @@
 import Header from "@/components/Header";
 import { useGetProductsQuery } from "@/state/internal/productsApi";
 import { CircularProgress } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 
 type Props = {};
 
@@ -51,13 +52,13 @@ const Bids = (props: Props) => {
   return (
     <div className="flex flex-col">
       <Header name="Bids" />
-      <DataGrid
+      {/* <DataGrid
         rows={products}
         columns={columns}
         getRowId={(row) => row.productId}
         checkboxSelection
         className="bg-white shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
-      />
+      /> */}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { CircularProgress } from "@mui/material";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import ProductModal from "../app/(authenticated)/products/ProductModal";
+import { useMe } from "@/hooks/useMe";
 
 type Props = {};
 
@@ -180,6 +181,8 @@ const ProductsCatalog = (props: Props) => {
     statusFilters,
   ]);
 
+  const { me } = useMe();
+  const userId = me?.data.userId ?? "";
   const {
     products,
     createProduct,
@@ -360,7 +363,7 @@ const ProductsCatalog = (props: Props) => {
                 <CircularProgress />
               </>
             ) : (
-              <Cards products={products} />
+              <Cards products={products} userId={userId} isOwnCatalog={true} />
             )}
           </div>
         </div>

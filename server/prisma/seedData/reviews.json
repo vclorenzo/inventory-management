@@ -1,0 +1,51 @@
+[
+	{
+		"reviewId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+		"reviewerId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+		"rating": 5,
+		"comment": "easy to talk to. great to transact with!"
+	},
+	{
+		"reviewId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+		"userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+		"reviewerId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+		"rating": 5,
+		"comment": "fast and smooth transaction. thank you!"
+	},
+	{
+		"reviewId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+		"userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+		"reviewerId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+		"rating": 5,
+		"comment": "Approachable seller who responded quickly to my queries! Transaction went off without a hitch. :^)"
+	},
+	{
+		"reviewId": "d4e5f6a7-b8c9-0123-def0-234567890123",
+		"userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+		"reviewerId": "22c29051-d301-4cc2-86dd-c19695408adb",
+		"rating": 4,
+		"comment": "Item matched the listing. Would buy again."
+	},
+	{
+		"reviewId": "e5f6a7b8-c9d0-1234-ef01-345678901234",
+		"userId": "d9d323fa-5c98-4222-a352-120e1f5e2798",
+		"reviewerId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+		"rating": 5,
+		"comment": "Reliable buyer, payment was prompt."
+	},
+	{
+		"reviewId": "f6a7b8c9-d0e1-2345-f012-456789012345",
+		"userId": "9e2895ae-4afe-4ff2-b3b3-be15cf1c82d6",
+		"reviewerId": "6ac28937-bc05-4c0a-be7e-1a332e2de312",
+		"rating": 4,
+		"comment": "Good communication throughout the deal."
+	},
+	{
+		"reviewId": "a7b8c9d0-e1f2-3456-0123-567890123456",
+		"userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+		"reviewerId": "22c29051-d301-4cc2-86dd-c19695408adb",
+		"rating": 5,
+		"comment": "Packaged well and shipped on time."
+	}
+]

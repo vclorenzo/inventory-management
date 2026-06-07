@@ -13,7 +13,7 @@ import { useState } from "react";
 
 type Props = {};
 
-const Marketplace = (props: Props) => {
+const Auctions = (props: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -22,7 +22,6 @@ const Marketplace = (props: Props) => {
     isLoading,
     isError,
   } = useGetProductsQuery(searchTerm);
-
   const { me } = useMe();
   const userId = me?.data.userId ?? "";
 
@@ -88,4 +87,4 @@ const Marketplace = (props: Props) => {
   );
 };
 
-export default Marketplace;
+export default Auctions;
