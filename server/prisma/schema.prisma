@@ -24,6 +24,7 @@ model Users {
 
   profile Profile?
   products Products[]
+  cartItems CartItems[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
 }
@@ -62,6 +63,23 @@ model Products {
   owner            Users       @relation(fields: [userId], references: [userId])
   Sales            Sales[]
   Purchases        Purchases[]
+  cartItems        CartItems[]
+}
+
+model CartItems {
+  cartItemId String   @id @default(uuid())
+  userId     String
+  productId  String
+  quantity   Int      @default(1)
+  currency   String   @default("₱")
+
+  user    Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  product Products @relation(fields: [productId], references: [productId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([userId, productId])
 }
 
 model Sales {

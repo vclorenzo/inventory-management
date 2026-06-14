@@ -13,6 +13,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
+import AddToCartButton from "@/components/AddToCartButton";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Bookmark } from "lucide-react";
 import { breadcrumbItems } from "@/app/(authenticated)/constants/User";
@@ -211,12 +212,10 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
-            <Link
-              href="/"
-              className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800"
-            >
-              Add to Cart
-            </Link>
+            <AddToCartButton
+              productId={product.productId}
+              disabled={!inStock}
+            />
             <Link
               href="/products"
               className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"

@@ -6,7 +6,7 @@ import {
   ChevronDown,
   ChevronUp,
   CircleDollarSign,
-  Clipboard,
+  History,
   KeyRound,
   Layout,
   LucideIcon,
@@ -220,9 +220,9 @@ const Sidebar = () => {
               ]}
             />
             <SidebarLink
-              href="/expenses"
-              icon={CircleDollarSign}
-              label="Expenses"
+              href="/history"
+              icon={History}
+              label="history"
               isCollapsed={isSidebarCollapsed}
             />
           </>

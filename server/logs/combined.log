@@ -1091,3 +1091,181 @@
 {"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-07T13:58:42.960Z"}
 {"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-06-07T14:01:55.314Z"}
 {"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-07T14:01:55.321Z"}
+{"level":"info","message":"Profile test2@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-07T14:09:52.183Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-07T14:10:01.972Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-07T14:10:07.684Z"}
+{"level":"info","message":"Profile test2@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-07T14:11:01.299Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T02:21:34.764Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-12T02:21:34.777Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-06-12T02:21:45.606Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-06-12T02:21:48.822Z"}
+{"level":"info","message":"User test1@gmail.com created successfully","service":"acquisitions-api","timestamp":"2026-06-12T02:22:23.413Z"}
+{"level":"info","message":"User registered successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T02:22:23.415Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T02:22:31.661Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:22:31.668Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:23:36.966Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T02:45:01.970Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:45:01.977Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:46:15.629Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:50:42.250Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T02:52:01.658Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-12T02:54:09.747Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-12T03:21:15.803Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T03:26:55.827Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T03:26:55.835Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T03:32:27.198Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T05:31:15.262Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T05:31:15.273Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T16:05:58.753Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:05:58.766Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:18:30.973Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T16:25:25.275Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:25:25.284Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:40:24.617Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T16:44:17.994Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:44:18.003Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:48:22.127Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T16:56:01.365Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-12T17:05:10.389Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T17:05:10.399Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-12T17:09:21.882Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-06-13T02:26:42.482Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:26:45.912Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:27:55.451Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:40:01.258Z"}
+{"level":"info","message":"User signed in successfully: test2@gmail.com","service":"acquisitions-api","timestamp":"2026-06-13T02:48:04.103Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:48:08.113Z"}
+{"level":"info","message":"All Users retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-13T02:48:08.152Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-13T02:49:03.388Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T02:49:03.397Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T02:49:29.718Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:50:25.227Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:50:34.813Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:51:43.046Z"}
+{"level":"info","message":"User authenticated test2@gmail.com (user)","service":"acquisitions-api","timestamp":"2026-06-13T02:52:15.101Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-13T03:37:18.824Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T03:37:18.834Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-13T03:39:54.607Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T03:39:54.616Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T03:41:46.203Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-13T03:43:38.242Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-14T06:18:45.188Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:18:45.203Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:04.807Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:19.419Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:19.496Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:38.210Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:38.292Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:56.712Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:56.731Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:57.992Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:19:58.002Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:20:07.425Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:20:07.458Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:20:23.208Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:20:23.277Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:04.976Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:05.033Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:05.620Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:05.630Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.190Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.200Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.598Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.609Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.787Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.798Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.967Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:06.979Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.138Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.147Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.313Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.325Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.493Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.503Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.662Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.672Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.818Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.829Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:07.999Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:08.010Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:08.182Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:08.192Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.291Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.303Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.487Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.498Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.646Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.655Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.824Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.834Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.987Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:09.996Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:10.174Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T06:30:10.184Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-14T07:12:38.953Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:38.964Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:43.571Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:49.970Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:49.988Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:59.170Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:12:59.181Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:13.607Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:13.638Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:16.394Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:16.406Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.048Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.061Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.481Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.493Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.636Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.648Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.805Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:17.816Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:33.029Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:33.040Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:33.770Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:33.781Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.224Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.234Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.512Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.523Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.684Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.696Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.864Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:34.876Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:35.038Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:35.047Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:35.216Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:13:35.227Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:14:39.083Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:19:17.173Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:19:17.292Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-14T07:28:30.197Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:28:30.204Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:28:32.464Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:30:09.900Z"}
+{"level":"info","message":"User test1@gmail.com updated successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:30:11.997Z"}
+{"level":"info","message":"Profile omar updated successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:30:12.000Z"}
+{"level":"info","message":"Profile test1@gmail.com updated successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:30:12.001Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:30:12.010Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:31:44.368Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:33:07.330Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:35:14.765Z"}
+{"level":"info","message":"User signed out successfully","service":"acquisitions-api","timestamp":"2026-06-14T07:40:49.163Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-14T07:40:51.271Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:40:51.280Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:41:35.915Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-06-14T07:59:15.612Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:15.621Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:18.060Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:34.429Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:34.481Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:39.943Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T07:59:39.971Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:00:08.210Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:00:08.230Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:06:26.163Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:06:52.550Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:08:39.211Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:08:39.258Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-06-14T08:08:49.849Z"}

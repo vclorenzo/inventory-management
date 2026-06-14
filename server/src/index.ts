@@ -13,6 +13,7 @@ import productRoutes from "./routes/product.routes";
 import userRoutes from "./routes/user.routes";
 import profileRoutes from "./routes/profile.routes";
 import reviewRoutes from "./routes/review.routes ";
+import cartRoutes from "./routes/cart.routes";
 // import { botBlocker } from '#middleware/botBlocker.ts';
 import securityMiddleware from "#middleware/security.middeware.ts";
 
@@ -47,6 +48,7 @@ app.use("/profile", profileRoutes);
 app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/cart", cartRoutes);
 
 // Error Handler
 app.use(errorHandler);
