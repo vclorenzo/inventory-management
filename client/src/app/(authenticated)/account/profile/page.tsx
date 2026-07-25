@@ -1,36 +1,45 @@
 "use client";
+
+import AddressModal from "@/components/AddressModal";
+import AddressLine from "@/components/AddressLine";
 import Header from "@/components/Header";
 import ReactHookForm from "@/components/forms/ReactHookForm";
-import { useAdressDropdowns } from "@/hooks/useAddressDropdown";
+import { buildProfileDetailsFields } from "@/constants/ProfileForm";
 import { useMe } from "@/hooks/useMe";
 import { useProfile } from "@/hooks/useProfile";
-import { useUpdateProfileMutation } from "@/state/internal/profileApi";
-import { SelectOption } from "@/types/components/ReactHookForm";
-import { UserFormValues } from "@/types/pages/User";
 import {
-  buildProfileAddressFields,
-  buildProfileDetailsFields,
-} from "@/constants/ProfileForm";
+  useCreateAddressMutation,
+  useDeleteAddressMutation,
+  useUpdateAddressMutation,
+  useUpdateProfileMutation,
+} from "@/state/internal/profileApi";
+import { Address, AddressRequest } from "@/types/pages/Profile";
+import { UserFormValues } from "@/types/pages/User";
 import { CircularProgress } from "@mui/material";
-import { Lock } from "lucide-react";
+import { Lock, MapPin, Pencil, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 const SectionCard = ({
   title,
   description,
+  action,
   children,
 }: {
   title: string;
   description?: React.ReactNode;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) => (
   <section className="rounded-sm border border-[#ebebeb] bg-white shadow-sm">
-    <div className="border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
-      <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
-      {description ? (
-        <div className="mt-1 text-xs text-gray-500">{description}</div>
-      ) : null}
+    <div className="flex items-start justify-between gap-3 border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
+      <div>
+        <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+        {description ? (
+          <div className="mt-1 text-xs text-gray-500">{description}</div>
+        ) : null}
+      </div>
+      {action}
     </div>
     <div className="p-4">{children}</div>
   </section>
@@ -39,6 +48,13 @@ const SectionCard = ({
 const Profile = () => {
   const [updateProfile, { isLoading: isUpdateLoading }] =
     useUpdateProfileMutation();
+  const [createAddress, { isLoading: isCreateAddressLoading }] =
+    useCreateAddressMutation();
+  const [updateAddress, { isLoading: isUpdateAddressLoading }] =
+    useUpdateAddressMutation();
+  const [deleteAddress, { isLoading: isDeleteAddressLoading }] =
+    useDeleteAddressMutation();
+
   const { me, isLoading: isMeLoading } = useMe();
   const userId = me?.data.userId;
 
@@ -48,152 +64,75 @@ const Profile = () => {
     error: hasProfileError,
   } = useProfile(userId ?? "");
 
-  const [region, setRegion] = useState<string>();
-  const [province, setProvince] = useState<string>();
-  const [city, setCity] = useState<string>();
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<Address | null>(null);
 
-  //=================================================================================
-  const handleChangeRegion = useMemo(
-    () => (e: any) => {
-      const value = e.target.value || undefined;
-      setRegion(value);
-      setProvince(undefined);
-      setCity(undefined);
-      setValue?.("province", "");
-      setValue?.("city", "");
-      setValue?.("barangay", "");
-    },
-    [],
-  );
-
-  const handleChangeProvince = useMemo(
-    () => (e: any) => {
-      const value = e.target.value || undefined;
-      setProvince(value);
-      setCity(undefined);
-      setValue?.("city", "");
-      setValue?.("barangay", "");
-    },
-    [],
-  );
-
-  const handleChangeCity = useMemo(
-    () => (e: any) => {
-      const value = e.target.value || undefined;
-      setCity(value);
-      setValue?.("barangay", "");
-    },
-    [],
-  );
-
-  // RHF
   const form = useForm<UserFormValues>();
-  const { setValue, reset, watch, handleSubmit } = form;
+  const { reset, handleSubmit } = form;
 
   useEffect(() => {
     if (!profile) return;
-    const r = profile.region ?? "";
-    const p = profile.province ?? "";
-    const c = profile.city ?? "";
-    const b = profile.barangay ?? "";
-    setRegion(r || undefined);
-    setProvince(p || undefined);
-    setCity(c || undefined);
     reset({
       name: profile.name ?? "",
       email: profile.email ?? "",
       gender: (profile.gender as UserFormValues["gender"]) ?? "",
       contactNumber: profile.contactNumber ?? "",
-      birthday: profile.birthday
-        ? profile.birthday.slice(0, 10)
-        : "",
-      region: r,
-      province: p,
-      city: c,
-      barangay: b,
+      birthday: profile.birthday ? profile.birthday.slice(0, 10) : "",
     });
   }, [profile, reset]);
 
-  const onSubmit = (data: UserFormValues) => {
+  const detailsFields = useMemo(() => buildProfileDetailsFields(), []);
+  const addresses = profile?.addresses ?? [];
+  const isAddressBusy =
+    isCreateAddressLoading ||
+    isUpdateAddressLoading ||
+    isDeleteAddressLoading;
+
+  const onSubmitProfile = (data: UserFormValues) => {
     if (!userId) return;
     const { email: _email, ...payload } = data;
     updateProfile({ userId, ...payload });
   };
 
-  const {
-    regions,
-    provinces,
-    cities,
-    barangays,
-    isLoading: isAddressLoading,
-    error: hasAddressError,
-  } = useAdressDropdowns({
-    regionCode: region,
-    provinceCode: province,
-    cityCode: city,
-  });
+  const openCreateAddress = () => {
+    setEditingAddress(null);
+    setIsAddressModalOpen(true);
+  };
 
-  const regionValue = watch("region");
-  const provinceValue = watch("province");
-  const cityValue = watch("city");
+  const openEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setIsAddressModalOpen(true);
+  };
 
-  const regionOptions: SelectOption[] = useMemo(
-    () => regions.data?.map((r) => ({ value: r.code, label: r.name })) ?? [],
-    [regions.data],
-  );
+  const closeAddressModal = () => {
+    setIsAddressModalOpen(false);
+    setEditingAddress(null);
+  };
 
-  const provinceOptions: SelectOption[] = useMemo(
-    () => provinces.data?.map((p) => ({ value: p.code, label: p.name })) ?? [],
-    [provinces.data],
-  );
+  const handleAddressSubmit = async (payload: AddressRequest) => {
+    if (!userId) return;
 
-  const cityOptions: SelectOption[] = useMemo(
-    () => cities.data?.map((c) => ({ value: c.code, label: c.name })) ?? [],
-    [cities.data],
-  );
+    if (editingAddress) {
+      await updateAddress({
+        userId,
+        addressId: editingAddress.addressId,
+        ...payload,
+      }).unwrap();
+    } else {
+      await createAddress({ userId, ...payload }).unwrap();
+    }
 
-  const barangayOptions: SelectOption[] = useMemo(
-    () => barangays.data?.map((b) => ({ value: b.code, label: b.name })) ?? [],
-    [barangays.data],
-  );
+    closeAddressModal();
+  };
 
-  const detailsFields = useMemo(() => buildProfileDetailsFields(), []);
+  const handleDeleteAddress = async (addressId: string) => {
+    if (!userId) return;
+    const confirmed = window.confirm("Delete this address?");
+    if (!confirmed) return;
+    await deleteAddress({ userId, addressId });
+  };
 
-  const addressFields = useMemo(
-    () =>
-      buildProfileAddressFields({
-        regionOptions,
-        provinceOptions,
-        cityOptions,
-        barangayOptions,
-        isRegionSelected: Boolean(region),
-        isProvinceSelected: Boolean(province),
-        isCitySelected: Boolean(city),
-        regionValue,
-        provinceValue,
-        cityValue,
-        handleChangeRegion,
-        handleChangeProvince,
-        handleChangeCity,
-      }),
-    [
-      barangayOptions,
-      city,
-      cityOptions,
-      cityValue,
-      handleChangeCity,
-      handleChangeProvince,
-      handleChangeRegion,
-      province,
-      provinceOptions,
-      provinceValue,
-      region,
-      regionOptions,
-      regionValue,
-    ],
-  );
-
-  if (isMeLoading || isProfileLoading || isAddressLoading || isUpdateLoading) {
+  if (isMeLoading || isProfileLoading || isUpdateLoading) {
     return (
       <div className="py-4">
         <CircularProgress />
@@ -201,10 +140,10 @@ const Profile = () => {
     );
   }
 
-  if (hasProfileError || hasAddressError) {
+  if (hasProfileError) {
     return (
-      <div className="text-center text-red-500 py-4">
-        Failed to fetch products
+      <div className="py-4 text-center text-red-500">
+        Failed to fetch profile
       </div>
     );
   }
@@ -215,7 +154,7 @@ const Profile = () => {
 
       <form
         className="flex max-w-2xl flex-col gap-4"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmitProfile)}
       >
         <SectionCard
           title="Private Information"
@@ -230,18 +169,7 @@ const Profile = () => {
           <ReactHookForm
             form={form}
             fields={detailsFields}
-            onSubmit={onSubmit}
-            renderAs="div"
-            showSubmit={false}
-            className="flex flex-col gap-4"
-          />
-        </SectionCard>
-
-        <SectionCard title="Address">
-          <ReactHookForm
-            form={form}
-            fields={addressFields}
-            onSubmit={onSubmit}
+            onSubmit={onSubmitProfile}
             renderAs="div"
             showSubmit={false}
             className="flex flex-col gap-4"
@@ -251,7 +179,7 @@ const Profile = () => {
         <button
           type="submit"
           disabled={isUpdateLoading}
-          className={`mt-2 h-[50px] w-[150px] rounded px-4 py-2 ${
+          className={`h-[50px] w-[150px] rounded px-4 py-2 ${
             isUpdateLoading
               ? "cursor-not-allowed bg-blue-300 text-white"
               : "bg-blue-500 text-white hover:bg-blue-700"
@@ -260,6 +188,87 @@ const Profile = () => {
           Save
         </button>
       </form>
+
+      <div className="max-w-2xl">
+        <SectionCard
+          title="Addresses"
+          description="Manage multiple delivery addresses and label them as you wish."
+          action={
+            <button
+              type="button"
+              onClick={openCreateAddress}
+              className="inline-flex items-center gap-1 rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:border-gray-400"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              New Address
+            </button>
+          }
+        >
+          {addresses.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-8 text-center">
+              <MapPin className="h-8 w-8 text-gray-300" />
+              <p className="text-sm text-gray-500">No addresses saved yet.</p>
+              <button
+                type="button"
+                onClick={openCreateAddress}
+                className="text-sm text-orange-600 hover:underline"
+              >
+                Add your first address
+              </button>
+            </div>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {addresses.map((address) => (
+                <li
+                  key={address.addressId}
+                  className="flex items-start justify-between gap-3 rounded border border-[#ebebeb] p-3"
+                >
+                  <div className="min-w-0">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {address.label}
+                      </span>
+                      {address.isDefault ? (
+                        <span className="rounded bg-orange-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-orange-700">
+                          Default
+                        </span>
+                      ) : null}
+                    </div>
+                    <AddressLine address={address} />
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditAddress(address)}
+                      className="rounded p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                      aria-label={`Edit ${address.label}`}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteAddress(address.addressId)}
+                      disabled={isAddressBusy}
+                      className="rounded p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                      aria-label={`Delete ${address.label}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </SectionCard>
+      </div>
+
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={closeAddressModal}
+        onSubmit={handleAddressSubmit}
+        isSubmitting={isAddressBusy}
+        initialValues={editingAddress}
+      />
     </div>
   );
 };

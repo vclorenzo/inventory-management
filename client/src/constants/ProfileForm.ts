@@ -2,6 +2,7 @@ import type {
   ReusableFieldConfig,
   SelectOption,
 } from "@/types/components/ReactHookForm";
+import type { AddressFormValues } from "@/types/pages/Profile";
 import type { UserFormValues } from "@/types/pages/User";
 import type { ChangeEvent } from "react";
 
@@ -11,6 +12,8 @@ export const GENDER_OPTIONS: SelectOption[] = [
   { value: "other", label: "Other" },
   { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
+
+export const ADDRESS_LABEL_PRESETS = ["Home", "Work"] as const;
 
 type AddressArgs = {
   regionOptions: SelectOption[];
@@ -87,7 +90,7 @@ export function buildProfileDetailsFields(): ReusableFieldConfig<UserFormValues>
   ];
 }
 
-export function buildProfileAddressFields({
+export function buildAddressLocationFields({
   regionOptions,
   provinceOptions,
   cityOptions,
@@ -101,7 +104,7 @@ export function buildProfileAddressFields({
   handleChangeRegion,
   handleChangeProvince,
   handleChangeCity,
-}: AddressArgs): ReusableFieldConfig<UserFormValues>[] {
+}: AddressArgs): ReusableFieldConfig<AddressFormValues>[] {
   return [
     {
       name: "region",
@@ -110,6 +113,7 @@ export function buildProfileAddressFields({
       placeholder: "Select Region",
       options: regionOptions,
       onChange: handleChangeRegion,
+      rules: { required: "Region is required" },
     },
     {
       name: "province",
@@ -119,9 +123,11 @@ export function buildProfileAddressFields({
       options: provinceOptions,
       disabled: !isRegionSelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!regionValue) return true;
-          return v ? true : "Province is required when a region is selected";
+          return typeof v === "string" && v
+            ? true
+            : "Province is required when a region is selected";
         },
       },
       onChange: handleChangeProvince,
@@ -134,9 +140,11 @@ export function buildProfileAddressFields({
       options: cityOptions,
       disabled: !isProvinceSelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!provinceValue) return true;
-          return v ? true : "City is required when a province is selected";
+          return typeof v === "string" && v
+            ? true
+            : "City is required when a province is selected";
         },
       },
       onChange: handleChangeCity,
@@ -149,11 +157,24 @@ export function buildProfileAddressFields({
       options: barangayOptions,
       disabled: !isCitySelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!cityValue) return true;
-          return v ? true : "Barangay is required when a city is selected";
+          return typeof v === "string" && v
+            ? true
+            : "Barangay is required when a city is selected";
         },
       },
     },
   ];
 }
+
+export const EMPTY_ADDRESS_FORM: AddressFormValues = {
+  label: "Home",
+  streetName: "",
+  postalCode: "",
+  region: "",
+  province: "",
+  city: "",
+  barangay: "",
+  isDefault: false,
+};

@@ -121,10 +121,14 @@ const Checkout = () => {
   useEffect(() => {
     if (!profile) return;
 
-    const r = profile.region ?? "";
-    const p = profile.province ?? "";
-    const c = profile.city ?? "";
-    const b = profile.barangay ?? "";
+    const defaultAddress =
+      profile.addresses?.find((address) => address.isDefault) ??
+      profile.addresses?.[0];
+
+    const r = defaultAddress?.regionCode ?? "";
+    const p = defaultAddress?.provinceCode ?? "";
+    const c = defaultAddress?.cityCode ?? "";
+    const b = defaultAddress?.barangayCode ?? "";
 
     setRegion(r || undefined);
     setProvince(p || undefined);
@@ -132,13 +136,13 @@ const Checkout = () => {
 
     reset({
       name: profile.name ?? "",
-      phone: "",
-      streetAddress: "",
+      phone: profile.contactNumber ?? "",
+      streetAddress: defaultAddress?.streetName ?? "",
       region: r,
       province: p,
       city: c,
       barangay: b,
-      postalCode: "",
+      postalCode: defaultAddress?.postalCode ?? "",
       paymentMethod: "cod",
     });
   }, [profile, reset]);

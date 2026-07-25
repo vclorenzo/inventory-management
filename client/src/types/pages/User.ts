@@ -23,10 +23,6 @@ export type UserFormValues = {
   gender: GenderOption;
   contactNumber: string;
   birthday: string;
-  region: string;
-  province: string;
-  city: string;
-  barangay: string;
 };
 
 export type ChangePasswordFormValues = {

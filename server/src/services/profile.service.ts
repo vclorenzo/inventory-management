@@ -9,12 +9,11 @@ const prisma = new PrismaClient();
 export const getProfileById = async (id: string) => {
   const existingUser = await userService.getUserById(id);
   if (!existingUser) {
-    throw new AppError("User not found");
+    throw new AppError("User not found", 404);
   }
-  const profile = await prisma.users.findUnique({
-    where: {
-      userId: id,
-    },
+
+  const user = await prisma.users.findUnique({
+    where: { userId: id },
     select: {
       name: true,
       email: true,
@@ -23,21 +22,32 @@ export const getProfileById = async (id: string) => {
           gender: true,
           contactNumber: true,
           birthday: true,
-          region: true,
-          province: true,
-          city: true,
-          barangay: true,
+          addresses: {
+            orderBy: [{ isDefault: "desc" }, { created_at: "asc" }],
+          },
         },
       },
     },
   });
-  return { email: existingUser.email, ...profile };
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  return {
+    name: user.name,
+    email: user.email,
+    gender: user.profile?.gender ?? null,
+    contactNumber: user.profile?.contactNumber ?? null,
+    birthday: user.profile?.birthday ?? null,
+    addresses: user.profile?.addresses ?? [],
+  };
 };
 
 export const updateProfile = async (id: string, data: UpdateProfileInput) => {
   const existingUser = await userService.getUserById(id);
   if (!existingUser) {
-    throw new AppError("User not found");
+    throw new AppError("User not found", 404);
   }
 
   let updatedUser = existingUser;
@@ -53,12 +63,18 @@ export const updateProfile = async (id: string, data: UpdateProfileInput) => {
         ? { contactNumber: data.contactNumber }
         : {}),
       ...(data.birthday !== undefined ? { birthday: data.birthday } : {}),
-      ...(data.region !== undefined ? { region: data.region } : {}),
-      ...(data.province !== undefined ? { province: data.province } : {}),
-      ...(data.city !== undefined ? { city: data.city } : {}),
-      ...(data.barangay !== undefined ? { barangay: data.barangay } : {}),
+    },
+    include: {
+      addresses: {
+        orderBy: [{ isDefault: "desc" }, { created_at: "asc" }],
+      },
     },
   });
+
   logger.info(`Profile ${updatedUser.name} updated successfully`);
-  return { email: existingUser.email, updatedProfile };
+  return {
+    email: existingUser.email,
+    name: updatedUser.name,
+    updatedProfile,
+  };
 };
