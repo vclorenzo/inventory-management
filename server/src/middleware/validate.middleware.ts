@@ -6,7 +6,7 @@ export const validate =
 	(schema: ZodType<any>) =>
 	(req: Request, res: Response, next: NextFunction) => {
 		try {
-			schema.parse(req.body);
+			req.body = schema.parse(req.body);
 			next();
 		} catch (error: any) {
 			res.status(400).json({

@@ -5,15 +5,36 @@ import { useAdressDropdowns } from "@/hooks/useAddressDropdown";
 import { useMe } from "@/hooks/useMe";
 import { useProfile } from "@/hooks/useProfile";
 import { useUpdateProfileMutation } from "@/state/internal/profileApi";
-import {
-  ReusableFieldConfig,
-  SelectOption,
-} from "@/types/components/ReactHookForm";
+import { SelectOption } from "@/types/components/ReactHookForm";
 import { UserFormValues } from "@/types/pages/User";
-import { buildProfileFields } from "@/constants/ProfileForm";
+import {
+  buildProfileAddressFields,
+  buildProfileDetailsFields,
+} from "@/constants/ProfileForm";
 import { CircularProgress } from "@mui/material";
+import { Lock } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+
+const SectionCard = ({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <section className="rounded-sm border border-[#ebebeb] bg-white shadow-sm">
+    <div className="border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
+      <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+      {description ? (
+        <div className="mt-1 text-xs text-gray-500">{description}</div>
+      ) : null}
+    </div>
+    <div className="p-4">{children}</div>
+  </section>
+);
 
 const Profile = () => {
   const [updateProfile, { isLoading: isUpdateLoading }] =
@@ -67,7 +88,7 @@ const Profile = () => {
 
   // RHF
   const form = useForm<UserFormValues>();
-  const { setValue, reset, watch } = form;
+  const { setValue, reset, watch, handleSubmit } = form;
 
   useEffect(() => {
     if (!profile) return;
@@ -81,6 +102,11 @@ const Profile = () => {
     reset({
       name: profile.name ?? "",
       email: profile.email ?? "",
+      gender: (profile.gender as UserFormValues["gender"]) ?? "",
+      contactNumber: profile.contactNumber ?? "",
+      birthday: profile.birthday
+        ? profile.birthday.slice(0, 10)
+        : "",
       region: r,
       province: p,
       city: c,
@@ -90,7 +116,8 @@ const Profile = () => {
 
   const onSubmit = (data: UserFormValues) => {
     if (!userId) return;
-    updateProfile({ userId, ...data });
+    const { email: _email, ...payload } = data;
+    updateProfile({ userId, ...payload });
   };
 
   const {
@@ -130,9 +157,11 @@ const Profile = () => {
     [barangays.data],
   );
 
-  const fields: ReusableFieldConfig<UserFormValues>[] = useMemo(
+  const detailsFields = useMemo(() => buildProfileDetailsFields(), []);
+
+  const addressFields = useMemo(
     () =>
-      buildProfileFields({
+      buildProfileAddressFields({
         regionOptions,
         provinceOptions,
         cityOptions,
@@ -181,30 +210,56 @@ const Profile = () => {
   }
 
   return (
-    <div className="w-full">
+    <div className="flex w-full flex-col gap-4">
       <Header name="Profile" />
-      <table className="min-w-full bg-white rounded-lg">
-        <thead className="bg-gray-800 text-white">
-          <tr>
-            <th className="text-left py-3 px-4 uppercase font-semibold text-sm">
-              Profile Details
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <div className="overflow-x-auto mt-5 shadow-md">
-            <div className="p-10 w-[fit-content]">
-              <ReactHookForm
-                form={form}
-                fields={fields}
-                onSubmit={onSubmit}
-                submitLabel="Save"
-                isSubmitting={isUpdateLoading}
-              />
-            </div>
-          </div>
-        </tbody>
-      </table>
+
+      <form
+        className="flex max-w-2xl flex-col gap-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <SectionCard
+          title="Private Information"
+          description={
+            <span className="flex items-center gap-1.5">
+              <Lock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+              We do not share this information with other users unless explicit
+              permission is given by you.
+            </span>
+          }
+        >
+          <ReactHookForm
+            form={form}
+            fields={detailsFields}
+            onSubmit={onSubmit}
+            renderAs="div"
+            showSubmit={false}
+            className="flex flex-col gap-4"
+          />
+        </SectionCard>
+
+        <SectionCard title="Address">
+          <ReactHookForm
+            form={form}
+            fields={addressFields}
+            onSubmit={onSubmit}
+            renderAs="div"
+            showSubmit={false}
+            className="flex flex-col gap-4"
+          />
+        </SectionCard>
+
+        <button
+          type="submit"
+          disabled={isUpdateLoading}
+          className={`mt-2 h-[50px] w-[150px] rounded px-4 py-2 ${
+            isUpdateLoading
+              ? "cursor-not-allowed bg-blue-300 text-white"
+              : "bg-blue-500 text-white hover:bg-blue-700"
+          }`}
+        >
+          Save
+        </button>
+      </form>
     </div>
   );
 };

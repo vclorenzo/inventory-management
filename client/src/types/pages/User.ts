@@ -10,9 +10,19 @@ export type UserSetting = {
   type: "text" | "toggle";
 };
 
+export type GenderOption =
+  | "male"
+  | "female"
+  | "other"
+  | "prefer_not_to_say"
+  | "";
+
 export type UserFormValues = {
   name: string;
   email: string;
+  gender: GenderOption;
+  contactNumber: string;
+  birthday: string;
   region: string;
   province: string;
   city: string;

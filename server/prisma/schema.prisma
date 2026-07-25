@@ -31,13 +31,17 @@ model Users {
 
 
 model Profile {
-  profileId String  @id @default(uuid())
-  userId    String  @unique
+  profileId      String    @id @default(uuid())
+  userId         String    @unique
 
-  region    String?
-  province  String?
-  city      String?
-  barangay  String?
+  gender         String?
+  contactNumber  String?
+  birthday       DateTime?
+
+  region         String?
+  province       String?
+  city           String?
+  barangay       String?
 
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
 

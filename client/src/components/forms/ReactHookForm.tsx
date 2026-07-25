@@ -19,6 +19,8 @@ type Props<TFormValues extends FieldValues> = {
   link?: string;
   linkText?: string;
   children?: ReactNode;
+  renderAs?: "form" | "div";
+  showSubmit?: boolean;
 };
 
 function getErrorMessage(err: unknown) {
@@ -38,6 +40,8 @@ const ReactHookForm = <TFormValues extends FieldValues>({
   link,
   linkText,
   children,
+  renderAs = "form",
+  showSubmit = true,
 }: Props<TFormValues>) => {
   const {
     register,
@@ -45,10 +49,14 @@ const ReactHookForm = <TFormValues extends FieldValues>({
     formState: { errors },
   } = form;
 
+  const Wrapper = renderAs === "form" ? "form" : "div";
+
   return (
-    <form
+    <Wrapper
       className={className ?? "flex flex-col gap-3"}
-      onSubmit={handleSubmit(onSubmit)}
+      {...(renderAs === "form"
+        ? { onSubmit: handleSubmit(onSubmit) }
+        : {})}
     >
       {fields.map((field) => {
         const fieldError = getErrorMessage(errors[field.name]);
@@ -160,17 +168,19 @@ const ReactHookForm = <TFormValues extends FieldValues>({
 
       {children}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className={`mt-2 px-4 py-2 rounded w-[150px] h-[50px] ${
-          isSubmitting
-            ? "bg-blue-300 text-white cursor-not-allowed"
-            : "bg-blue-500 text-white hover:bg-blue-700"
-        }`}
-      >
-        {submitLabel}
-      </button>
+      {showSubmit ? (
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`mt-2 px-4 py-2 rounded w-[150px] h-[50px] ${
+            isSubmitting
+              ? "bg-blue-300 text-white cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-700"
+          }`}
+        >
+          {submitLabel}
+        </button>
+      ) : null}
       {link && linkText && (
         <p className="text-xs text-gray-500">
           {linkText}{" "}
@@ -179,7 +189,7 @@ const ReactHookForm = <TFormValues extends FieldValues>({
           </Link>
         </p>
       )}
-    </form>
+    </Wrapper>
   );
 };
 

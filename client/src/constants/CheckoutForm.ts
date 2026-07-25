@@ -2,17 +2,10 @@ import type {
   ReusableFieldConfig,
   SelectOption,
 } from "@/types/components/ReactHookForm";
-import type { UserFormValues } from "@/types/pages/User";
+import type { CheckoutFormValues } from "@/types/pages/Checkout";
 import type { ChangeEvent } from "react";
 
-export const GENDER_OPTIONS: SelectOption[] = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-  { value: "other", label: "Other" },
-  { value: "prefer_not_to_say", label: "Prefer not to say" },
-];
-
-type AddressArgs = {
+type Args = {
   regionOptions: SelectOption[];
   provinceOptions: SelectOption[];
   cityOptions: SelectOption[];
@@ -34,60 +27,7 @@ type AddressArgs = {
   ) => void;
 };
 
-export function buildProfileDetailsFields(): ReusableFieldConfig<UserFormValues>[] {
-  return [
-    {
-      name: "name",
-      label: "Name",
-      type: "text",
-      rules: {
-        required: "Name is required",
-        minLength: { value: 2, message: "Name must be at least 2 characters" },
-      },
-    },
-    {
-      name: "email",
-      label: "Email",
-      type: "email",
-      autoComplete: "email",
-      disabled: true,
-      rules: {
-        required: "Email is required",
-        pattern: {
-          value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-          message: "Enter a valid email address",
-        },
-      },
-    },
-    {
-      name: "contactNumber",
-      label: "Contact Number",
-      type: "text",
-      autoComplete: "tel",
-      placeholder: "09XX XXX XXXX",
-      rules: {
-        pattern: {
-          value: /^$|^09\d{9}$/,
-          message: "Enter a valid Philippine mobile number",
-        },
-      },
-    },
-    {
-      name: "gender",
-      label: "Gender",
-      type: "select",
-      placeholder: "Select Gender",
-      options: GENDER_OPTIONS,
-    },
-    {
-      name: "birthday",
-      label: "Birthday",
-      type: "date",
-    },
-  ];
-}
-
-export function buildProfileAddressFields({
+export function buildCheckoutShippingFields({
   regionOptions,
   provinceOptions,
   cityOptions,
@@ -101,14 +41,55 @@ export function buildProfileAddressFields({
   handleChangeRegion,
   handleChangeProvince,
   handleChangeCity,
-}: AddressArgs): ReusableFieldConfig<UserFormValues>[] {
+}: Args): ReusableFieldConfig<CheckoutFormValues>[] {
   return [
+    {
+      name: "name",
+      label: "Full Name",
+      type: "text",
+      autoComplete: "name",
+      rules: {
+        required: "Full name is required",
+        minLength: {
+          value: 2,
+          message: "Name must be at least 2 characters",
+        },
+      },
+    },
+    {
+      name: "phone",
+      label: "Phone Number",
+      type: "text",
+      autoComplete: "tel",
+      placeholder: "09XX XXX XXXX",
+      rules: {
+        required: "Phone number is required",
+        pattern: {
+          value: /^09\d{9}$/,
+          message: "Enter a valid Philippine mobile number",
+        },
+      },
+    },
+    {
+      name: "streetAddress",
+      label: "Street Address",
+      type: "textarea",
+      placeholder: "House no., street, subdivision",
+      rules: {
+        required: "Street address is required",
+        minLength: {
+          value: 5,
+          message: "Please provide a complete street address",
+        },
+      },
+    },
     {
       name: "region",
       label: "Region",
       type: "select",
       placeholder: "Select Region",
       options: regionOptions,
+      rules: { required: "Region is required" },
       onChange: handleChangeRegion,
     },
     {
@@ -121,14 +102,14 @@ export function buildProfileAddressFields({
       rules: {
         validate: (v: string) => {
           if (!regionValue) return true;
-          return v ? true : "Province is required when a region is selected";
+          return v ? true : "Province is required";
         },
       },
       onChange: handleChangeProvince,
     },
     {
       name: "city",
-      label: "City",
+      label: "City / Municipality",
       type: "select",
       placeholder: "Select City",
       options: cityOptions,
@@ -136,7 +117,7 @@ export function buildProfileAddressFields({
       rules: {
         validate: (v: string) => {
           if (!provinceValue) return true;
-          return v ? true : "City is required when a province is selected";
+          return v ? true : "City is required";
         },
       },
       onChange: handleChangeCity,
@@ -151,9 +132,38 @@ export function buildProfileAddressFields({
       rules: {
         validate: (v: string) => {
           if (!cityValue) return true;
-          return v ? true : "Barangay is required when a city is selected";
+          return v ? true : "Barangay is required";
         },
       },
     },
+    {
+      name: "postalCode",
+      label: "Postal Code",
+      type: "text",
+      placeholder: "Optional",
+    },
   ];
 }
+
+export const PAYMENT_METHOD_OPTIONS = [
+  {
+    value: "cod",
+    label: "Cash on Delivery",
+    description: "Pay when your order arrives",
+  },
+  {
+    value: "gcash",
+    label: "GCash",
+    description: "Pay via GCash e-wallet",
+  },
+  {
+    value: "card",
+    label: "Credit / Debit Card",
+    description: "Visa, Mastercard, and other major cards",
+  },
+  {
+    value: "bank",
+    label: "Bank Transfer",
+    description: "Direct transfer to our bank account",
+  },
+] as const;
