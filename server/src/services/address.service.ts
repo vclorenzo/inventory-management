@@ -41,7 +41,9 @@ const clearOtherDefaults = async (
   });
 };
 
-const addressDataFromInput = (data: CreateAddressInput | UpdateAddressInput) => ({
+const addressDataFromInput = (
+  data: CreateAddressInput | UpdateAddressInput,
+) => ({
   ...(data.label !== undefined ? { label: data.label } : {}),
   ...(data.streetName !== undefined ? { streetName: data.streetName } : {}),
   ...(data.postalCode !== undefined ? { postalCode: data.postalCode } : {}),

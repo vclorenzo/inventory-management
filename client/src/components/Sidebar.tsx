@@ -10,6 +10,7 @@ import {
   KeyRound,
   Layout,
   LucideIcon,
+  MapPin,
   Menu,
   SlidersHorizontal,
   UserRound,
@@ -208,6 +209,11 @@ const Sidebar = () => {
                   label: "Profile",
                 },
                 {
+                  href: "/account/address",
+                  subLinkIcon: MapPin,
+                  label: "Address",
+                },
+                {
                   href: "/account/changePassword",
                   subLinkIcon: KeyRound,
                   label: "Change Password",
@@ -222,7 +228,7 @@ const Sidebar = () => {
             <SidebarLink
               href="/history"
               icon={History}
-              label="history"
+              label="History"
               isCollapsed={isSidebarCollapsed}
             />
           </>

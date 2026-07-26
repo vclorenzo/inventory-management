@@ -1,5 +1,6 @@
 "use client";
 
+import AddressLine from "@/components/AddressLine";
 import Header from "@/components/Header";
 import ReactHookForm from "@/components/forms/ReactHookForm";
 import {
@@ -12,6 +13,8 @@ import { useMe } from "@/hooks/useMe";
 import { useProfile } from "@/hooks/useProfile";
 import { SelectOption } from "@/types/components/ReactHookForm";
 import { CheckoutFormValues } from "@/types/pages/Checkout";
+import type { Address } from "@/types/pages/Profile";
+import { loadCheckoutSelectedIds } from "@/utils/checkout";
 import { CircularProgress } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,16 +26,22 @@ const SHIPPING_FEE = 50;
 const formatPrice = (amount: number, currency: string) =>
   `${currency}${amount.toLocaleString("en-PH")}`;
 
+const getDefaultAddress = (addresses: Address[]) =>
+  addresses.find((address) => address.isDefault) ?? addresses[0];
+
 const SectionCard = ({
   title,
+  action,
   children,
 }: {
   title: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) => (
   <section className="rounded-sm border border-[#ebebeb] bg-white shadow-sm">
-    <div className="border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
+    <div className="flex items-start justify-between gap-3 border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
       <h2 className="text-sm font-semibold text-gray-800">{title}</h2>
+      {action}
     </div>
     <div className="p-4">{children}</div>
   </section>
@@ -48,6 +57,10 @@ const Checkout = () => {
   const [province, setProvince] = useState<string>();
   const [city, setCity] = useState<string>();
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[] | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    null,
+  );
 
   const form = useForm<CheckoutFormValues>({
     defaultValues: {
@@ -63,27 +76,78 @@ const Checkout = () => {
     },
   });
 
-  const { setValue, reset, watch, register, handleSubmit } = form;
+  const { setValue, reset, watch, register, handleSubmit, getValues } = form;
   const selectedPayment = watch("paymentMethod");
   const paymentError = form.formState.errors.paymentMethod?.message;
+  const addresses = profile?.addresses ?? [];
+  const hasAddresses = addresses.length > 0;
 
-  const allItems = useMemo(
-    () => cartGroups.flatMap((group) => group.items),
-    [cartGroups],
+  useEffect(() => {
+    setSelectedIds(loadCheckoutSelectedIds());
+  }, []);
+
+  const selectedGroups = useMemo(() => {
+    if (!selectedIds) return [];
+
+    const idSet = new Set(selectedIds);
+    return cartGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => idSet.has(item.id)),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [cartGroups, selectedIds]);
+
+  const selectedItems = useMemo(
+    () => selectedGroups.flatMap((group) => group.items),
+    [selectedGroups],
   );
 
   const subtotal = useMemo(
     () =>
-      allItems.reduce(
+      selectedItems.reduce(
         (sum, item) => sum + item.unitPrice * item.quantity,
         0,
       ),
-    [allItems],
+    [selectedItems],
   );
 
-  const currency = allItems[0]?.currency ?? "₱";
-  const total = subtotal + (allItems.length > 0 ? SHIPPING_FEE : 0);
-  const itemCount = allItems.reduce((sum, item) => sum + item.quantity, 0);
+  const currency = selectedItems[0]?.currency ?? "₱";
+  const total = subtotal + (selectedItems.length > 0 ? SHIPPING_FEE : 0);
+  const itemCount = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const applyAddressToForm = (
+    address: Address | undefined,
+    options?: { keepPayment?: boolean },
+  ) => {
+    const r = address?.regionCode ?? "";
+    const p = address?.provinceCode ?? "";
+    const c = address?.cityCode ?? "";
+    const b = address?.barangayCode ?? "";
+
+    setRegion(r || undefined);
+    setProvince(p || undefined);
+    setCity(c || undefined);
+
+    reset({
+      name: profile?.name ?? "",
+      phone: profile?.contactNumber ?? "",
+      streetAddress: address?.streetName ?? "",
+      region: r,
+      province: p,
+      city: c,
+      barangay: b,
+      postalCode: address?.postalCode ?? "",
+      paymentMethod: options?.keepPayment
+        ? getValues("paymentMethod") || "cod"
+        : "cod",
+    });
+  };
+
+  const handleSelectAddress = (address: Address) => {
+    setSelectedAddressId(address.addressId);
+    applyAddressToForm(address, { keepPayment: true });
+  };
 
   const handleChangeRegion = useMemo(
     () => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -121,9 +185,8 @@ const Checkout = () => {
   useEffect(() => {
     if (!profile) return;
 
-    const defaultAddress =
-      profile.addresses?.find((address) => address.isDefault) ??
-      profile.addresses?.[0];
+    const defaultAddress = getDefaultAddress(profile.addresses ?? []);
+    setSelectedAddressId(defaultAddress?.addressId ?? null);
 
     const r = defaultAddress?.regionCode ?? "";
     const p = defaultAddress?.provinceCode ?? "";
@@ -184,46 +247,57 @@ const Checkout = () => {
     [barangays.data],
   );
 
-  const shippingFields = useMemo(
-    () =>
-      buildCheckoutShippingFields({
-        regionOptions,
-        provinceOptions,
-        cityOptions,
-        barangayOptions,
-        isRegionSelected: Boolean(region),
-        isProvinceSelected: Boolean(province),
-        isCitySelected: Boolean(city),
-        regionValue,
-        provinceValue,
-        cityValue,
-        handleChangeRegion,
-        handleChangeProvince,
-        handleChangeCity,
-      }),
-    [
-      barangayOptions,
-      city,
-      cityOptions,
-      cityValue,
-      handleChangeCity,
-      handleChangeProvince,
-      handleChangeRegion,
-      province,
-      provinceOptions,
-      provinceValue,
-      region,
+  const shippingFields = useMemo(() => {
+    const fields = buildCheckoutShippingFields({
       regionOptions,
+      provinceOptions,
+      cityOptions,
+      barangayOptions,
+      isRegionSelected: Boolean(region),
+      isProvinceSelected: Boolean(province),
+      isCitySelected: Boolean(city),
       regionValue,
-    ],
-  );
+      provinceValue,
+      cityValue,
+      handleChangeRegion,
+      handleChangeProvince,
+      handleChangeCity,
+    });
+
+    if (!hasAddresses) return fields;
+
+    return fields.filter(
+      (field) => field.name === "name" || field.name === "phone",
+    );
+  }, [
+    barangayOptions,
+    city,
+    cityOptions,
+    cityValue,
+    handleChangeCity,
+    handleChangeProvince,
+    handleChangeRegion,
+    hasAddresses,
+    province,
+    provinceOptions,
+    provinceValue,
+    region,
+    regionOptions,
+    regionValue,
+  ]);
 
   const onSubmit = (data: CheckoutFormValues) => {
     setOrderPlaced(true);
-    console.log("Order placed:", { ...data, items: allItems, total });
+    console.log("Order placed:", { ...data, items: selectedItems, total });
   };
 
-  if (isLoading || isMeLoading || isProfileLoading || isAddressLoading) {
+  if (
+    isLoading ||
+    isMeLoading ||
+    isProfileLoading ||
+    (!hasAddresses && isAddressLoading) ||
+    selectedIds === null
+  ) {
     return (
       <div className="flex flex-col gap-4">
         <Header name="Checkout" />
@@ -245,12 +319,14 @@ const Checkout = () => {
     );
   }
 
-  if (allItems.length === 0) {
+  if (selectedItems.length === 0) {
     return (
       <div className="flex flex-col gap-4">
         <Header name="Checkout" />
         <div className="rounded-sm border border-[#ebebeb] bg-white p-8 text-center">
-          <p className="text-sm text-gray-500">Your cart is empty.</p>
+          <p className="text-sm text-gray-500">
+            No items selected for checkout.
+          </p>
           <Link
             href="/cart"
             className="mt-4 inline-block text-sm text-blue-600 hover:underline"
@@ -293,15 +369,82 @@ const Checkout = () => {
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className="flex flex-col gap-4">
-          <SectionCard title="Shipping Details">
-            <ReactHookForm
-              form={form}
-              fields={shippingFields}
-              onSubmit={onSubmit}
-              renderAs="div"
-              showSubmit={false}
-              className="flex flex-col gap-4"
-            />
+          <SectionCard
+            title="Shipping Details"
+            action={
+              <Link
+                href="/account/address"
+                className="text-xs font-medium text-blue-600 hover:underline"
+              >
+                Manage addresses
+              </Link>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              {hasAddresses ? (
+                <fieldset className="flex flex-col gap-3">
+                  <legend className="sr-only">Delivery address</legend>
+                  {addresses.map((address) => {
+                    const isSelected = selectedAddressId === address.addressId;
+
+                    return (
+                      <label
+                        key={address.addressId}
+                        className={`flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors ${
+                          isSelected
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-[#ebebeb] hover:border-gray-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="selectedAddress"
+                          value={address.addressId}
+                          checked={isSelected}
+                          onChange={() => handleSelectAddress(address)}
+                          className="mt-1 accent-primary"
+                        />
+                        <span className="flex min-w-0 flex-col gap-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">
+                              {address.label}
+                            </span>
+                            {address.isDefault ? (
+                              <span className="rounded bg-orange-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-orange-700">
+                                Default
+                              </span>
+                            ) : null}
+                          </span>
+                          <AddressLine address={address} />
+                        </span>
+                      </label>
+                    );
+                  })}
+                </fieldset>
+              ) : (
+                <div className="rounded-sm border border-dashed border-[#ebebeb] bg-gray-50 p-4 text-center">
+                  <p className="text-sm text-gray-500">
+                    No saved addresses yet. Enter shipping details below or{" "}
+                    <Link
+                      href="/account/address"
+                      className="text-blue-600 hover:underline"
+                    >
+                      add an address
+                    </Link>
+                    .
+                  </p>
+                </div>
+              )}
+
+              <ReactHookForm
+                form={form}
+                fields={shippingFields}
+                onSubmit={onSubmit}
+                renderAs="div"
+                showSubmit={false}
+                className="flex flex-col gap-4"
+              />
+            </div>
           </SectionCard>
 
           <SectionCard title="Payment Details">
@@ -351,7 +494,7 @@ const Checkout = () => {
         <aside className="flex h-fit flex-col gap-4 lg:sticky lg:top-4">
           <SectionCard title="Order Details">
             <div className="flex flex-col gap-4">
-              {cartGroups.map((group) => (
+              {selectedGroups.map((group) => (
                 <div key={group.shop.name} className="flex flex-col gap-3">
                   <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
                     {group.shop.name}

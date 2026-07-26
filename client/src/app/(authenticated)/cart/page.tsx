@@ -3,6 +3,7 @@
 import Header from "@/components/Header";
 import { useCart } from "@/hooks/useCart";
 import { CartGroup, CartItem } from "@/types/pages/Cart";
+import { saveCheckoutSelectedIds } from "@/utils/checkout";
 import { CircularProgress } from "@mui/material";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
@@ -33,27 +34,25 @@ const Cart = () => {
   );
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [shopCheckedByName, setShopCheckedByName] = useState<
-    Record<string, boolean>
-  >({});
 
   useEffect(() => {
     setSelectedIds(allItems.map((item) => item.id));
-    setShopCheckedByName(
-      Object.fromEntries(cartGroups.map((group) => [group.shop.name, true])),
-    );
-  }, [allItems, cartGroups]);
+  }, [allItems]);
 
   const allItemIds = allItems.map((item) => item.id);
   const allSelected =
     allItemIds.length > 0 && allItemIds.every((id) => selectedIds.includes(id));
 
-  const toggleSelectAll = () => {
-    const next = !allSelected;
-    setSelectedIds(next ? allItemIds : []);
-    setShopCheckedByName(
-      Object.fromEntries(cartGroups.map((group) => [group.shop.name, next])),
+  const isShopFullySelected = (group: CartGroup) => {
+    const groupItemIds = group.items.map((item) => item.id);
+    return (
+      groupItemIds.length > 0 &&
+      groupItemIds.every((id) => selectedIds.includes(id))
     );
+  };
+
+  const toggleSelectAll = () => {
+    setSelectedIds(allSelected ? [] : allItemIds);
   };
 
   const toggleItem = (id: string) => {
@@ -64,13 +63,7 @@ const Cart = () => {
 
   const toggleShop = (group: CartGroup) => {
     const groupItemIds = group.items.map((item) => item.id);
-    const isChecked = shopCheckedByName[group.shop.name] ?? true;
-    const next = !isChecked;
-
-    setShopCheckedByName((prev) => ({
-      ...prev,
-      [group.shop.name]: next,
-    }));
+    const next = !isShopFullySelected(group);
 
     setSelectedIds((prev) => {
       if (next) {
@@ -81,6 +74,7 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
+    saveCheckoutSelectedIds(selectedIds);
     router.push("/checkout");
   };
 
@@ -121,8 +115,6 @@ const Cart = () => {
     );
   }
 
-  console.log("ITOG", selectedIds);
-
   return (
     <div className="flex flex-col gap-4">
       <Header name="Cart" />
@@ -157,7 +149,7 @@ const Cart = () => {
               <div className="flex items-center gap-3 border-b border-[#ebebeb] px-4 py-3">
                 <input
                   type="checkbox"
-                  checked={shopCheckedByName[group.shop.name] ?? true}
+                  checked={isShopFullySelected(group)}
                   onChange={() => toggleShop(group)}
                   className="mx-3 h-[18px] w-[18px] accent-primary"
                 />

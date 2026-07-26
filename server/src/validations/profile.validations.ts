@@ -24,17 +24,11 @@ export const updateProfileSchema = z
         .nullable()
         .optional(),
     ),
-    birthday: z.preprocess(
-      emptyToNull,
-      z.coerce.date().nullable().optional(),
-    ),
+    birthday: z.preprocess(emptyToNull, z.coerce.date().nullable().optional()),
   })
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    {
-      message: "At least one field must be provided for update",
-    },
-  );
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    message: "At least one field must be provided for update",
+  });
 
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
@@ -95,12 +89,9 @@ export const updateAddressSchema = z
     barangayCode: nullableString(20),
     isDefault: z.boolean().optional(),
   })
-  .refine(
-    (data) => Object.values(data).some((value) => value !== undefined),
-    {
-      message: "At least one field must be provided for update",
-    },
-  );
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    message: "At least one field must be provided for update",
+  });
 
 export type CreateAddressInput = z.infer<typeof createAddressSchema>;
 export type UpdateAddressInput = z.infer<typeof updateAddressSchema>;
