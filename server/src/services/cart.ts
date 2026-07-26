@@ -56,7 +56,7 @@ const formatCartGroups = (
 
     groups.get(shopKey)!.items.push({
       id: item.cartItemId,
-      image: item.image ?? DEFAULT_PRODUCT_IMAGE,
+      image: DEFAULT_PRODUCT_IMAGE,
       title: item.product.name,
       unitPrice: item.product.price,
       quantity: item.quantity,

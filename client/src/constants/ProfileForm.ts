@@ -2,10 +2,20 @@ import type {
   ReusableFieldConfig,
   SelectOption,
 } from "@/types/components/ReactHookForm";
+import type { AddressFormValues } from "@/types/pages/Profile";
 import type { UserFormValues } from "@/types/pages/User";
 import type { ChangeEvent } from "react";
 
-type Args = {
+export const GENDER_OPTIONS: SelectOption[] = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
+];
+
+export const ADDRESS_LABEL_PRESETS = ["Home", "Work"] as const;
+
+type AddressArgs = {
   regionOptions: SelectOption[];
   provinceOptions: SelectOption[];
   cityOptions: SelectOption[];
@@ -27,21 +37,7 @@ type Args = {
   ) => void;
 };
 
-export function buildProfileFields({
-  regionOptions,
-  provinceOptions,
-  cityOptions,
-  barangayOptions,
-  isRegionSelected,
-  isProvinceSelected,
-  isCitySelected,
-  regionValue,
-  provinceValue,
-  cityValue,
-  handleChangeRegion,
-  handleChangeProvince,
-  handleChangeCity,
-}: Args): ReusableFieldConfig<UserFormValues>[] {
+export function buildProfileDetailsFields(): ReusableFieldConfig<UserFormValues>[] {
   return [
     {
       name: "name",
@@ -67,12 +63,57 @@ export function buildProfileFields({
       },
     },
     {
+      name: "contactNumber",
+      label: "Contact Number",
+      type: "text",
+      autoComplete: "tel",
+      placeholder: "09XX XXX XXXX",
+      rules: {
+        pattern: {
+          value: /^$|^09\d{9}$/,
+          message: "Enter a valid Philippine mobile number",
+        },
+      },
+    },
+    {
+      name: "gender",
+      label: "Gender",
+      type: "select",
+      placeholder: "Select Gender",
+      options: GENDER_OPTIONS,
+    },
+    {
+      name: "birthday",
+      label: "Birthday",
+      type: "date",
+    },
+  ];
+}
+
+export function buildAddressLocationFields({
+  regionOptions,
+  provinceOptions,
+  cityOptions,
+  barangayOptions,
+  isRegionSelected,
+  isProvinceSelected,
+  isCitySelected,
+  regionValue,
+  provinceValue,
+  cityValue,
+  handleChangeRegion,
+  handleChangeProvince,
+  handleChangeCity,
+}: AddressArgs): ReusableFieldConfig<AddressFormValues>[] {
+  return [
+    {
       name: "region",
       label: "Region",
       type: "select",
       placeholder: "Select Region",
       options: regionOptions,
       onChange: handleChangeRegion,
+      rules: { required: "Region is required" },
     },
     {
       name: "province",
@@ -82,9 +123,11 @@ export function buildProfileFields({
       options: provinceOptions,
       disabled: !isRegionSelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!regionValue) return true;
-          return v ? true : "Province is required when a region is selected";
+          return typeof v === "string" && v
+            ? true
+            : "Province is required when a region is selected";
         },
       },
       onChange: handleChangeProvince,
@@ -97,9 +140,11 @@ export function buildProfileFields({
       options: cityOptions,
       disabled: !isProvinceSelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!provinceValue) return true;
-          return v ? true : "City is required when a province is selected";
+          return typeof v === "string" && v
+            ? true
+            : "City is required when a province is selected";
         },
       },
       onChange: handleChangeCity,
@@ -112,11 +157,26 @@ export function buildProfileFields({
       options: barangayOptions,
       disabled: !isCitySelected,
       rules: {
-        validate: (v: string) => {
+        validate: (v) => {
           if (!cityValue) return true;
-          return v ? true : "Barangay is required when a city is selected";
+          return typeof v === "string" && v
+            ? true
+            : "Barangay is required when a city is selected";
         },
       },
     },
   ];
 }
+
+export const EMPTY_ADDRESS_FORM: AddressFormValues = {
+  label: "Home",
+  name: "",
+  contactNumber: "",
+  streetName: "",
+  postalCode: "",
+  region: "",
+  province: "",
+  city: "",
+  barangay: "",
+  isDefault: false,
+};

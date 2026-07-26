@@ -25,24 +25,52 @@ model Users {
   profile Profile?
   products Products[]
   cartItems CartItems[]
+  purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
 }
 
 
 model Profile {
-  profileId String  @id @default(uuid())
-  userId    String  @unique
+  profileId      String    @id @default(uuid())
+  userId         String    @unique
 
-  region    String?
-  province  String?
-  city      String?
-  barangay  String?
+  gender         String?
+  contactNumber  String?
+  birthday       DateTime?
 
-  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user      Users     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  addresses Address[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model Address {
+  addressId     String  @id @default(uuid())
+  profileId     String
+
+  label         String
+  name          String
+  contactNumber String?
+  streetName    String?
+  postalCode    String?
+  region        String?
+  province      String?
+  city          String?
+  barangay      String?
+  regionCode    String?
+  provinceCode  String?
+  cityCode      String?
+  barangayCode  String?
+  isDefault     Boolean @default(false)
+
+  profile Profile @relation(fields: [profileId], references: [profileId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([profileId])
 }
 
 model Products {
@@ -95,11 +123,17 @@ model Sales {
 model Purchases {
   purchaseId String   @id
   productId  String
+  userId     String?
+  orderId    String?
   timestamp  DateTime
   quantity   Int
   unitCost   Float
   totalCost  Float
   product    Products @relation(fields: [productId], references: [productId])
+  buyer      Users?   @relation(fields: [userId], references: [userId], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
 }
 
 model Expenses {
