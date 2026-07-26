@@ -23,15 +23,31 @@ type AddressModalProps = {
   onSubmit: (values: AddressRequest) => void | Promise<void>;
   isSubmitting?: boolean;
   initialValues?: Address | null;
+  defaultRecipient?: {
+    name?: string;
+    contactNumber?: string | null;
+  };
 };
 
 const findLabel = (options: SelectOption[], code?: string) =>
   options.find((option) => option.value === code)?.label;
 
-const toFormValues = (address?: Address | null): AddressFormValues => {
-  if (!address) return EMPTY_ADDRESS_FORM;
+const toFormValues = (
+  address?: Address | null,
+  defaultRecipient?: AddressModalProps["defaultRecipient"],
+): AddressFormValues => {
+  if (!address) {
+    return {
+      ...EMPTY_ADDRESS_FORM,
+      name: defaultRecipient?.name ?? "",
+      contactNumber: defaultRecipient?.contactNumber ?? "",
+    };
+  }
   return {
     label: address.label || "Home",
+    name: address.name || defaultRecipient?.name || "",
+    contactNumber:
+      address.contactNumber ?? defaultRecipient?.contactNumber ?? "",
     streetName: address.streetName ?? "",
     postalCode: address.postalCode ?? "",
     region: address.regionCode ?? "",
@@ -48,6 +64,7 @@ const AddressModal = ({
   onSubmit,
   isSubmitting,
   initialValues,
+  defaultRecipient,
 }: AddressModalProps) => {
   const [region, setRegion] = useState<string>();
   const [province, setProvince] = useState<string>();
@@ -64,14 +81,26 @@ const AddressModal = ({
   const cityValue = watch("city");
   const isDefault = watch("isDefault");
 
+  const defaultName = defaultRecipient?.name;
+  const defaultContactNumber = defaultRecipient?.contactNumber;
+
   useEffect(() => {
     if (!isOpen) return;
-    const values = toFormValues(initialValues);
+    const values = toFormValues(initialValues, {
+      name: defaultName,
+      contactNumber: defaultContactNumber,
+    });
     reset(values);
     setRegion(values.region || undefined);
     setProvince(values.province || undefined);
     setCity(values.city || undefined);
-  }, [isOpen, initialValues, reset]);
+  }, [
+    isOpen,
+    initialValues,
+    defaultName,
+    defaultContactNumber,
+    reset,
+  ]);
 
   const handleChangeRegion = useMemo(
     () => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -171,7 +200,7 @@ const AddressModal = ({
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
       <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 shadow-xl">
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-800">
@@ -192,6 +221,8 @@ const AddressModal = ({
           onSubmit={handleSubmit((values) =>
             onSubmit({
               label: values.label.trim(),
+              name: values.name.trim(),
+              contactNumber: values.contactNumber.trim() || undefined,
               streetName: values.streetName.trim(),
               postalCode: values.postalCode.trim() || undefined,
               region: findLabel(regionOptions, values.region),
@@ -206,6 +237,43 @@ const AddressModal = ({
             }),
           )}
         >
+          <div className="flex flex-col gap-3">
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="w-full rounded border border-gray-200 px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+              {...register("name", {
+                required: "Name is required",
+                minLength: {
+                  value: 2,
+                  message: "Name must be at least 2 characters",
+                },
+              })}
+            />
+            {form.formState.errors.name ? (
+              <p className="-mt-2 text-sm text-red-600">
+                {form.formState.errors.name.message}
+              </p>
+            ) : null}
+
+            <input
+              type="text"
+              placeholder="Contact Number (09XXXXXXXXX)"
+              className="w-full rounded border border-gray-200 px-3 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-gray-400 focus:outline-none"
+              {...register("contactNumber", {
+                pattern: {
+                  value: /^$|^09\d{9}$/,
+                  message: "Enter a valid Philippine mobile number",
+                },
+              })}
+            />
+            {form.formState.errors.contactNumber ? (
+              <p className="-mt-2 text-sm text-red-600">
+                {form.formState.errors.contactNumber.message}
+              </p>
+            ) : null}
+          </div>
+
           <input
             type="text"
             placeholder="Postal Code"

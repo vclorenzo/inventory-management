@@ -25,6 +25,7 @@ model Users {
   profile Profile?
   products Products[]
   cartItems CartItems[]
+  purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
 }
@@ -50,6 +51,8 @@ model Address {
   profileId     String
 
   label         String
+  name          String
+  contactNumber String?
   streetName    String?
   postalCode    String?
   region        String?
@@ -120,11 +123,17 @@ model Sales {
 model Purchases {
   purchaseId String   @id
   productId  String
+  userId     String?
+  orderId    String?
   timestamp  DateTime
   quantity   Int
   unitCost   Float
   totalCost  Float
   product    Products @relation(fields: [productId], references: [productId])
+  buyer      Users?   @relation(fields: [userId], references: [userId], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([orderId])
 }
 
 model Expenses {

@@ -14,6 +14,7 @@ import userRoutes from "./routes/user.routes";
 import profileRoutes from "./routes/profile.routes";
 import reviewRoutes from "./routes/review.routes ";
 import cartRoutes from "./routes/cart.routes";
+import purchaseRoutes from "./routes/purchase.routes";
 // import { botBlocker } from '#middleware/botBlocker.ts';
 import securityMiddleware from "#middleware/security.middeware.ts";
 
@@ -49,6 +50,7 @@ app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/cart", cartRoutes);
+app.use("/purchases", purchaseRoutes);
 
 // Error Handler
 app.use(errorHandler);

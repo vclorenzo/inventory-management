@@ -170,6 +170,8 @@ export function buildAddressLocationFields({
 
 export const EMPTY_ADDRESS_FORM: AddressFormValues = {
   label: "Home",
+  name: "",
+  contactNumber: "",
   streetName: "",
   postalCode: "",
   region: "",

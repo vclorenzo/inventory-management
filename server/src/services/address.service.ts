@@ -9,7 +9,7 @@ import * as userService from "./user.service";
 
 const prisma = new PrismaClient();
 
-const getProfileIdForUser = async (userId: string) => {
+const getProfileForUser = async (userId: string) => {
   const existingUser = await userService.getUserById(userId);
   if (!existingUser) {
     throw new AppError("User not found", 404);
@@ -17,13 +17,22 @@ const getProfileIdForUser = async (userId: string) => {
 
   const profile = await prisma.profile.findUnique({
     where: { userId },
-    select: { profileId: true },
+    select: { profileId: true, contactNumber: true },
   });
 
   if (!profile) {
     throw new AppError("Profile not found", 404);
   }
 
+  return {
+    profileId: profile.profileId,
+    name: existingUser.name,
+    contactNumber: profile.contactNumber,
+  };
+};
+
+const getProfileIdForUser = async (userId: string) => {
+  const profile = await getProfileForUser(userId);
   return profile.profileId;
 };
 
@@ -45,6 +54,10 @@ const addressDataFromInput = (
   data: CreateAddressInput | UpdateAddressInput,
 ) => ({
   ...(data.label !== undefined ? { label: data.label } : {}),
+  ...(data.name !== undefined ? { name: data.name } : {}),
+  ...(data.contactNumber !== undefined
+    ? { contactNumber: data.contactNumber }
+    : {}),
   ...(data.streetName !== undefined ? { streetName: data.streetName } : {}),
   ...(data.postalCode !== undefined ? { postalCode: data.postalCode } : {}),
   ...(data.region !== undefined ? { region: data.region } : {}),
@@ -74,7 +87,8 @@ export const createAddress = async (
   userId: string,
   data: CreateAddressInput,
 ) => {
-  const profileId = await getProfileIdForUser(userId);
+  const profile = await getProfileForUser(userId);
+  const { profileId } = profile;
   const existingCount = await prisma.address.count({ where: { profileId } });
   const isDefault = data.isDefault ?? existingCount === 0;
 
@@ -86,6 +100,8 @@ export const createAddress = async (
     data: {
       profileId,
       label: data.label,
+      name: data.name ?? profile.name,
+      contactNumber: data.contactNumber ?? profile.contactNumber,
       streetName: data.streetName ?? null,
       postalCode: data.postalCode ?? null,
       region: data.region ?? null,

@@ -2,6 +2,8 @@ export type Address = {
   addressId: string;
   profileId: string;
   label: string;
+  name: string;
+  contactNumber?: string | null;
   streetName?: string | null;
   postalCode?: string | null;
   region?: string | null;
@@ -19,6 +21,8 @@ export type Address = {
 
 export type AddressFormValues = {
   label: string;
+  name: string;
+  contactNumber: string;
   streetName: string;
   postalCode: string;
   region: string;
@@ -64,6 +68,8 @@ export type ProfileRequest = {
 
 export type AddressRequest = {
   label: string;
+  name: string;
+  contactNumber?: string;
   streetName?: string;
   postalCode?: string;
   region?: string;

@@ -35,8 +35,19 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 const nullableString = (max: number) =>
   z.preprocess(emptyToNull, z.string().trim().max(max).nullable().optional());
 
+const addressContactNumber = z.preprocess(
+  emptyToNull,
+  z
+    .string()
+    .regex(/^09\d{9}$/, "Enter a valid Philippine mobile number")
+    .nullable()
+    .optional(),
+);
+
 const addressFields = {
   label: z.string().trim().min(1, "Label is required").max(50),
+  name: z.string().trim().min(2).max(255).optional(),
+  contactNumber: addressContactNumber,
   streetName: z.preprocess(
     emptyToNull,
     z.string().trim().min(3).max(255).nullable().optional(),
@@ -66,6 +77,8 @@ export const createAddressSchema = z.object(addressFields);
 export const updateAddressSchema = z
   .object({
     label: z.string().trim().min(1).max(50).optional(),
+    name: z.string().trim().min(2).max(255).optional(),
+    contactNumber: addressContactNumber,
     streetName: z.preprocess(
       emptyToNull,
       z.string().trim().min(3).max(255).nullable().optional(),

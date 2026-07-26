@@ -1,4 +1,4 @@
-﻿-- AlterTable
+-- AlterTable
 ALTER TABLE "Profile" ADD COLUMN IF NOT EXISTS "gender" TEXT;
 ALTER TABLE "Profile" ADD COLUMN IF NOT EXISTS "contactNumber" TEXT;
 ALTER TABLE "Profile" ADD COLUMN IF NOT EXISTS "birthday" TIMESTAMP(3);
