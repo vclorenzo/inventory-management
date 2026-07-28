@@ -1,7 +1,6 @@
 "use client";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import Cards from "@/components/Cards";
-import { useMe } from "@/hooks/useMe";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
@@ -22,8 +21,6 @@ const Auctions = (props: Props) => {
     isLoading,
     isError,
   } = useGetProductsQuery(searchTerm);
-  const { me } = useMe();
-  const userId = me?.data.userId ?? "";
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
     useCreateProductMutation();
@@ -71,7 +68,7 @@ const Auctions = (props: Props) => {
             <CircularProgress />
           </>
         ) : (
-          <Cards products={products} userId={userId} isOwnCatalog={false} />
+          <Cards products={products} />
         )}
       </div>
       {/* MODAL */}

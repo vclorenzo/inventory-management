@@ -1,91 +1,94 @@
-"use client";
-import ProductModal from "@/app/(authenticated)/products/ProductModal";
-import Cards from "@/components/Cards";
-import { useMe } from "@/hooks/useMe";
+'use client'
+
+import ProductModal from '@/app/(authenticated)/products/ProductModal'
+import Cards from '@/components/Cards'
+import { useMe } from '@/hooks/useMe'
 import {
-  useCreateProductMutation,
-  useGetProductsQuery,
-} from "@/state/internal/productsApi";
-import { ProductFormValues } from "@/types/pages/Products";
-import { CircularProgress } from "@mui/material";
-import { SearchIcon } from "lucide-react";
-import { useState } from "react";
+	useCreateProductMutation,
+	useGetProductsQuery,
+} from '@/state/internal/productsApi'
+import { ProductFormValues } from '@/types/pages/Products'
+import { CircularProgress } from '@mui/material'
+import { SearchIcon } from 'lucide-react'
+import { useState } from 'react'
 
-type Props = {};
+function Marketplace() {
+	const [searchTerm, setSearchTerm] = useState('')
+	const [isModalOpen, setIsModalOpen] = useState(false)
 
-const Marketplace = (props: Props) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+	const { me } = useMe()
+	const userId = me?.data.userId ?? ''
 
-  const {
-    data: products,
-    isLoading,
-    isError,
-  } = useGetProductsQuery(searchTerm);
+	const {
+		data: products,
+		isLoading,
+		isError,
+	} = useGetProductsQuery({
+		search: searchTerm,
+		...(userId ? { excludeUserId: userId } : {}),
+	})
 
-  const { me } = useMe();
-  const userId = me?.data.userId ?? "";
+	const [createProduct, { isLoading: isCreateProductLoading }] =
+		useCreateProductMutation()
 
-  const [createProduct, { isLoading: isCreateProductLoading }] =
-    useCreateProductMutation();
-  const handleCreateProduct = async (productData: ProductFormValues) => {
-    await createProduct(productData);
-  };
+	const handleCreateProduct = async (productData: ProductFormValues) => {
+		await createProduct(productData)
+	}
 
-  if (isLoading) {
-    return (
-      <div className="py-4">
-        <CircularProgress />
-      </div>
-    );
-  }
+	if (isLoading) {
+		return (
+			<div className="py-4">
+				<CircularProgress />
+			</div>
+		)
+	}
 
-  if (isError || !products) {
-    return (
-      <div className="text-center text-red-500 py-4">
-        Failed to fetch products
-      </div>
-    );
-  }
+	if (isError || !products) {
+		return (
+			<div className="py-4 text-center text-red-500">
+				Failed to fetch products
+			</div>
+		)
+	}
 
-  return (
-    <div className="mx-auto pb-5 w-full">
-      {/* SEARCH BAR */}
-      <div className="mb-6">
-        <div className="flex items-center border-2 border-gray-200 rounded">
-          <SearchIcon className="w-5 h-5 text-gray-500 m-2" />
-          <input
-            type="text"
-            className="w-full py-2 px-4 rounded bg-white"
-            placeholder="Search Products..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-            }}
-          />
-        </div>
-      </div>
-      {/* PRODUCTS LIST */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 lg-grid-cols-5 gap-10 justify-between">
-        {isLoading ? (
-          <>
-            <CircularProgress />
-          </>
-        ) : (
-          <Cards products={products} userId={userId} isOwnCatalog={false} />
-        )}
-      </div>
-      {/* MODAL */}
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-        onSend={handleCreateProduct}
-        isProductLoading={isCreateProductLoading}
-      />
-    </div>
-  );
-};
+	return (
+		<div className="mx-auto w-full pb-5">
+			{/* SEARCH BAR */}
+			<div className="mb-6">
+				<div className="flex items-center rounded border-2 border-gray-200">
+					<SearchIcon className="m-2 h-5 w-5 text-gray-500" />
+					<input
+						type="text"
+						className="w-full rounded bg-white px-4 py-2"
+						placeholder="Search Products..."
+						value={searchTerm}
+						onChange={(e) => {
+							setSearchTerm(e.target.value)
+						}}
+					/>
+				</div>
+			</div>
+			{/* PRODUCTS LIST */}
+			<div className="lg-grid-cols-5 grid grid-cols-1 justify-between gap-10 sm:grid-cols-4">
+				{isLoading ? (
+					<>
+						<CircularProgress />
+					</>
+				) : (
+					<Cards products={products} />
+				)}
+			</div>
+			{/* MODAL */}
+			<ProductModal
+				isOpen={isModalOpen}
+				onClose={() => {
+					setIsModalOpen(false)
+				}}
+				onSend={handleCreateProduct}
+				isProductLoading={isCreateProductLoading}
+			/>
+		</div>
+	)
+}
 
-export default Marketplace;
+export default Marketplace

@@ -73,9 +73,7 @@ const Checkout = () => {
 	const addresses = profile?.addresses ?? []
 	const hasAddresses = addresses.length > 0
 	const canPlaceOrder =
-		hasAddresses &&
-		Boolean(selectedAddressId) &&
-		!placeOrderState.isLoading
+		hasAddresses && Boolean(selectedAddressId) && !placeOrderState.isLoading
 
 	useEffect(() => {
 		setSelectedIds(loadCheckoutSelectedIds())
@@ -93,39 +91,39 @@ const Checkout = () => {
 		})
 	}, [profile])
 
-  const selectedGroups = useMemo(() => {
-    if (!selectedIds) return [];
+	const selectedGroups = useMemo(() => {
+		if (!selectedIds) return []
 
-    const idSet = new Set(selectedIds);
-    return cartGroups
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => idSet.has(item.id)),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [cartGroups, selectedIds]);
+		const idSet = new Set(selectedIds)
+		return cartGroups
+			.map((group) => ({
+				...group,
+				items: group.items.filter((item) => idSet.has(item.id)),
+			}))
+			.filter((group) => group.items.length > 0)
+	}, [cartGroups, selectedIds])
 
-  const selectedItems = useMemo(
-    () => selectedGroups.flatMap((group) => group.items),
-    [selectedGroups],
-  );
+	const selectedItems = useMemo(
+		() => selectedGroups.flatMap((group) => group.items),
+		[selectedGroups],
+	)
 
-  const subtotal = useMemo(
-    () =>
-      selectedItems.reduce(
-        (sum, item) => sum + item.unitPrice * item.quantity,
-        0,
-      ),
-    [selectedItems],
-  );
+	const subtotal = useMemo(
+		() =>
+			selectedItems.reduce(
+				(sum, item) => sum + item.unitPrice * item.quantity,
+				0,
+			),
+		[selectedItems],
+	)
 
-  const currency = selectedItems[0]?.currency ?? "₱";
-  const total = subtotal + (selectedItems.length > 0 ? SHIPPING_FEE : 0);
-  const itemCount = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+	const currency = selectedItems[0]?.currency ?? '₱'
+	const total = subtotal + (selectedItems.length > 0 ? SHIPPING_FEE : 0)
+	const itemCount = selectedItems.reduce((sum, item) => sum + item.quantity, 0)
 
-  const handleSelectAddress = (address: Address) => {
-    setSelectedAddressId(address.addressId);
-  };
+	const handleSelectAddress = (address: Address) => {
+		setSelectedAddressId(address.addressId)
+	}
 
 	const onSubmit = async (data: CheckoutFormValues) => {
 		if (!canPlaceOrder || !selectedAddressId || !selectedIds?.length) {
@@ -158,137 +156,137 @@ const Checkout = () => {
 		}
 	}
 
-  if (isLoading || isMeLoading || isProfileLoading || selectedIds === null) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Header name="Checkout" />
-        <div className="flex min-h-[240px] items-center justify-center rounded-sm border border-[#ebebeb] bg-white">
-          <CircularProgress />
-        </div>
-      </div>
-    );
-  }
+	if (isLoading || isMeLoading || isProfileLoading || selectedIds === null) {
+		return (
+			<div className="flex flex-col gap-4">
+				<Header name="Checkout" />
+				<div className="flex min-h-[240px] items-center justify-center rounded-sm border border-[#ebebeb] bg-white">
+					<CircularProgress />
+				</div>
+			</div>
+		)
+	}
 
-  if (isError) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Header name="Checkout" />
-        <div className="rounded-sm border border-red-200 bg-red-50 p-6 text-sm text-red-800">
-          We couldn&apos;t load checkout details. Please try again.
-        </div>
-      </div>
-    );
-  }
+	if (isError) {
+		return (
+			<div className="flex flex-col gap-4">
+				<Header name="Checkout" />
+				<div className="rounded-sm border border-red-200 bg-red-50 p-6 text-sm text-red-800">
+					We couldn&apos;t load checkout details. Please try again.
+				</div>
+			</div>
+		)
+	}
 
-  if (selectedItems.length === 0) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Header name="Checkout" />
-        <div className="rounded-sm border border-[#ebebeb] bg-white p-8 text-center">
-          <p className="text-sm text-gray-500">
-            No items selected for checkout.
-          </p>
-          <Link
-            href="/cart"
-            className="mt-4 inline-block text-sm text-blue-600 hover:underline"
-          >
-            Go back to cart
-          </Link>
-        </div>
-      </div>
-    );
-  }
+	if (selectedItems.length === 0) {
+		return (
+			<div className="flex flex-col gap-4">
+				<Header name="Checkout" />
+				<div className="rounded-sm border border-[#ebebeb] bg-white p-8 text-center">
+					<p className="text-sm text-gray-500">
+						No items selected for checkout.
+					</p>
+					<Link
+						href="/cart"
+						className="mt-4 inline-block text-sm text-blue-600 hover:underline"
+					>
+						Go back to cart
+					</Link>
+				</div>
+			</div>
+		)
+	}
 
-  if (orderPlaced) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Header name="Checkout" />
-        <div className="rounded-sm border border-green-200 bg-green-50 p-8 text-center">
-          <p className="text-base font-medium text-green-800">
-            Order placed successfully!
-          </p>
-          <p className="mt-2 text-sm text-green-700">
-            Thank you for your purchase. You will receive a confirmation soon.
-          </p>
-          <Link
-            href="/cart"
-            className="mt-4 inline-block text-sm text-blue-600 hover:underline"
-          >
-            Return to cart
-          </Link>
-        </div>
-      </div>
-    );
-  }
+	if (orderPlaced) {
+		return (
+			<div className="flex flex-col gap-4">
+				<Header name="Checkout" />
+				<div className="rounded-sm border border-green-200 bg-green-50 p-8 text-center">
+					<p className="text-base font-medium text-green-800">
+						Order placed successfully!
+					</p>
+					<p className="mt-2 text-sm text-green-700">
+						Thank you for your purchase. You will receive a confirmation soon.
+					</p>
+					<Link
+						href="/cart"
+						className="mt-4 inline-block text-sm text-blue-600 hover:underline"
+					>
+						Return to cart
+					</Link>
+				</div>
+			</div>
+		)
+	}
 
-  return (
-    <div className="flex flex-col gap-4">
-      <Header name="Checkout" />
+	return (
+		<div className="flex flex-col gap-4">
+			<Header name="Checkout" />
 
-      <form
-        className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <aside className="flex h-fit flex-col gap-4 lg:sticky lg:top-4">
-          <SectionCard title="Order Details">
-            <div className="flex flex-col gap-4">
-              {selectedGroups.map((group) => (
-                <div key={group.shop.name} className="flex flex-col gap-3">
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
-                    {group.shop.name}
-                  </p>
+			<form
+				className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]"
+				onSubmit={handleSubmit(onSubmit)}
+			>
+				<aside className="flex h-fit flex-col gap-4 lg:sticky lg:top-4">
+					<SectionCard title="Order Details">
+						<div className="flex flex-col gap-4">
+							{selectedGroups.map((group) => (
+								<div key={group.shop.name} className="flex flex-col gap-3">
+									<p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+										{group.shop.name}
+									</p>
 
-                  {group.items.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="relative h-14 w-14 shrink-0 overflow-hidden border border-[#ebebeb] bg-white">
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      </div>
+									{group.items.map((item) => (
+										<div key={item.id} className="flex gap-3">
+											<div className="relative h-14 w-14 shrink-0 overflow-hidden border border-[#ebebeb] bg-white">
+												<Image
+													src={item.image}
+													alt={item.title}
+													fill
+													className="object-cover"
+													sizes="56px"
+												/>
+											</div>
 
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <p className="line-clamp-2 text-sm text-gray-900">
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          x{item.quantity}
-                        </p>
-                        <p className="text-sm font-medium text-primary">
-                          {formatPrice(
-                            item.unitPrice * item.quantity,
-                            item.currency,
-                          )}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
+											<div className="flex min-w-0 flex-1 flex-col gap-1">
+												<p className="line-clamp-2 text-sm text-gray-900">
+													{item.title}
+												</p>
+												<p className="text-xs text-gray-500">
+													x{item.quantity}
+												</p>
+												<p className="text-primary text-sm font-medium">
+													{formatPrice(
+														item.unitPrice * item.quantity,
+														item.currency,
+													)}
+												</p>
+											</div>
+										</div>
+									))}
+								</div>
+							))}
 
-              <div className="border-t border-[#ebebeb] pt-4 text-sm">
-                <div className="flex justify-between text-gray-600">
-                  <span>
-                    Subtotal ({itemCount} {itemCount === 1 ? "item" : "items"})
-                  </span>
-                  <span>{formatPrice(subtotal, currency)}</span>
-                </div>
-                <div className="mt-2 flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>{formatPrice(SHIPPING_FEE, currency)}</span>
-                </div>
-                <div className="mt-3 flex justify-between border-t border-[#ebebeb] pt-3 text-base font-semibold text-gray-900">
-                  <span>Total</span>
-                  <span className="text-primary">
-                    {formatPrice(total, currency)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </SectionCard>
+							<div className="border-t border-[#ebebeb] pt-4 text-sm">
+								<div className="flex justify-between text-gray-600">
+									<span>
+										Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})
+									</span>
+									<span>{formatPrice(subtotal, currency)}</span>
+								</div>
+								<div className="mt-2 flex justify-between text-gray-600">
+									<span>Shipping</span>
+									<span>{formatPrice(SHIPPING_FEE, currency)}</span>
+								</div>
+								<div className="mt-3 flex justify-between border-t border-[#ebebeb] pt-3 text-base font-semibold text-gray-900">
+									<span>Total</span>
+									<span className="text-primary">
+										{formatPrice(total, currency)}
+									</span>
+								</div>
+							</div>
+						</div>
+					</SectionCard>
 
 					{placeOrderError ? (
 						<p className="text-sm text-red-600">{placeOrderError}</p>
@@ -297,12 +295,12 @@ const Checkout = () => {
 					<button
 						type="submit"
 						disabled={!canPlaceOrder}
-						className="hidden h-[50px] w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 lg:block"
+						className="hidden h-[50px] w-[180px] rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 lg:block"
 					>
 						{placeOrderState.isLoading ? 'Placing…' : 'Place Order'}
 					</button>
 				</aside>
-        <div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4">
 					<SectionCard
 						title="Shipping Details"
 						action={
@@ -319,8 +317,7 @@ const Checkout = () => {
 							<fieldset className="flex flex-col gap-3">
 								<legend className="sr-only">Delivery address</legend>
 								{addresses.map((address) => {
-									const isSelected =
-										selectedAddressId === address.addressId
+									const isSelected = selectedAddressId === address.addressId
 
 									return (
 										<label
@@ -337,7 +334,7 @@ const Checkout = () => {
 												value={address.addressId}
 												checked={isSelected}
 												onChange={() => handleSelectAddress(address)}
-												className="mt-1 accent-primary"
+												className="accent-primary mt-1"
 											/>
 											<span className="flex min-w-0 flex-col gap-1">
 												<span className="flex flex-wrap items-center gap-2">
@@ -378,46 +375,44 @@ const Checkout = () => {
 						)}
 					</SectionCard>
 
-          <SectionCard title="Payment Details">
-            <fieldset className="flex flex-col gap-3">
-              <legend className="sr-only">Payment method</legend>
-              {PAYMENT_METHOD_OPTIONS.map((method) => (
-                <label
-                  key={method.value}
-                  className={`flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors ${
-                    selectedPayment === method.value
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-[#ebebeb] hover:border-gray-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    value={method.value}
-                    className="mt-1 accent-primary"
-                    {...register("paymentMethod", {
-                      required: "Select a payment method",
-                    })}
-                  />
-                  <span className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium text-gray-900">
-                      {method.label}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {method.description}
-                    </span>
-                  </span>
-                </label>
-              ))}
-              {paymentError ? (
-                <p className="text-sm text-red-600">{paymentError}</p>
-              ) : null}
-            </fieldset>
-          </SectionCard>
+					<SectionCard title="Payment Details">
+						<fieldset className="flex flex-col gap-3">
+							<legend className="sr-only">Payment method</legend>
+							{PAYMENT_METHOD_OPTIONS.map((method) => (
+								<label
+									key={method.value}
+									className={`flex cursor-pointer items-start gap-3 rounded-sm border p-3 transition-colors ${
+										selectedPayment === method.value
+											? 'border-blue-500 bg-blue-50'
+											: 'border-[#ebebeb] hover:border-gray-300'
+									}`}
+								>
+									<input
+										type="radio"
+										value={method.value}
+										className="accent-primary mt-1"
+										{...register('paymentMethod', {
+											required: 'Select a payment method',
+										})}
+									/>
+									<span className="flex flex-col gap-0.5">
+										<span className="text-sm font-medium text-gray-900">
+											{method.label}
+										</span>
+										<span className="text-xs text-gray-500">
+											{method.description}
+										</span>
+									</span>
+								</label>
+							))}
+							{paymentError ? (
+								<p className="text-sm text-red-600">{paymentError}</p>
+							) : null}
+						</fieldset>
+					</SectionCard>
 
 					{placeOrderError ? (
-						<p className="text-sm text-red-600 lg:hidden">
-							{placeOrderError}
-						</p>
+						<p className="text-sm text-red-600 lg:hidden">{placeOrderError}</p>
 					) : null}
 
 					<button
@@ -447,4 +442,3 @@ const Checkout = () => {
 }
 
 export default Checkout
-

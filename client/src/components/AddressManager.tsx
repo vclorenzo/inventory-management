@@ -28,7 +28,7 @@ const AddressManager = ({
 	addresses,
 	defaultRecipient,
 	title = 'Addresses',
-	description = 'Manage multiple delivery addresses and label them as you wish.',
+	description,
 	className,
 }: AddressManagerProps) => {
 	const [createAddress, { isLoading: isCreateLoading }] =

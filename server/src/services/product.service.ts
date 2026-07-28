@@ -5,6 +5,8 @@ const prisma = new PrismaClient();
 
 export const getAllProducts = async ({
   search,
+  userId,
+  excludeUserId,
   category,
   brand,
   condition,
@@ -21,6 +23,8 @@ export const getAllProducts = async ({
   limit,
 }: {
   search?: string;
+  userId?: string;
+  excludeUserId?: string;
   category?: string[];
   brand?: string[];
   condition?: string[];
@@ -42,6 +46,14 @@ export const getAllProducts = async ({
     const hasSearch = Boolean(normalizedSearch);
     const safeSortOrder =
       sortOrder?.toLowerCase() === "asc" ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+
+    if (userId?.trim()) {
+      whereParts.push(Prisma.sql`p."userId" = ${userId.trim()}`);
+    }
+
+    if (excludeUserId?.trim()) {
+      whereParts.push(Prisma.sql`p."userId" <> ${excludeUserId.trim()}`);
+    }
 
     if (category?.length) {
       whereParts.push(
@@ -202,7 +214,7 @@ export const createProduct = async ({
   price: number;
   rating: number;
   stockQuantity: number;
-  status: string;
+  status?: string;
   description: string;
   paymentMethods?: string[];
   meetupLocations?: string[];
@@ -219,7 +231,7 @@ export const createProduct = async ({
         price,
         rating,
         stockQuantity,
-        status,
+        status: status?.trim() || "Available",
         description,
         paymentMethods,
         meetupLocations,
