@@ -1,62 +1,35 @@
 'use client'
 
-import { useGetPurchasesQuery } from '@/state/internal/purchasesApi'
+import LeaveReviewModal from '@/components/LeaveReviewModal'
+import { useCreateOrderReviewMutation } from '@/state/internal/reviewsApi'
 import { PurchaseOrderGroup } from '@/types/pages/Checkout'
-import {
-	formatPurchasePrice,
-	groupPurchasesByOrder,
-} from '@/utils/purchases'
+import { CreateOrderReviewRequest } from '@/types/pages/Reviews'
+import { formatPurchasePrice, groupPurchasesByOrder } from '@/utils/purchases'
 import { CircularProgress } from '@mui/material'
-import { MessageCircle, Store, Truck } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useGetPurchasesQuery } from '@/state/internal/purchasesApi'
 
-function PurchaseOrderCard({ order }: { order: PurchaseOrderGroup }) {
-	const orderedAt = new Date(order.timestamp).toLocaleDateString(
-		'en-PH',
-		{
-			year: 'numeric',
-			month: 'short',
-			day: 'numeric',
-		},
-	)
+function PurchaseOrderCard({
+	order,
+	onLeaveReview,
+}: {
+	order: PurchaseOrderGroup
+	onLeaveReview: (order: PurchaseOrderGroup) => void
+}) {
+	const canReview = Boolean(order.orderId) && !order.isReviewed
 
 	return (
 		<article className="overflow-hidden rounded-sm border border-[#ebebeb] bg-white shadow-sm">
 			<header className="flex flex-col gap-3 border-b border-[#ebebeb] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex flex-wrap items-center gap-2">
-					<span className="rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-orange-700">
-						Shop
-					</span>
-					<span className="text-sm font-medium text-gray-900">
+					<Link
+						href={`/account/${order.seller.userId}`}
+						className="text-sm font-medium text-gray-900"
+					>
 						{order.seller.name}
-					</span>
-					<button
-						type="button"
-						className="inline-flex items-center gap-1 rounded border border-orange-500 bg-orange-500 px-2 py-0.5 text-xs font-medium text-white transition-colors hover:bg-orange-600"
-					>
-						<MessageCircle className="h-3 w-3" />
-						Chat
-					</button>
-					<button
-						type="button"
-						className="inline-flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-					>
-						<Store className="h-3 w-3" />
-						View Shop
-					</button>
-				</div>
-
-				<div className="flex flex-wrap items-center gap-2 text-sm">
-					<span className="inline-flex items-center gap-1.5 text-emerald-600">
-						<Truck className="h-4 w-4" />
-						<span>Order placed on {orderedAt}</span>
-					</span>
-					<span className="hidden text-gray-300 sm:inline">|</span>
-					<span className="font-semibold uppercase tracking-wide text-orange-600">
-						Completed
-					</span>
+					</Link>
 				</div>
 			</header>
 
@@ -113,25 +86,22 @@ function PurchaseOrderCard({ order }: { order: PurchaseOrderGroup }) {
 				</p>
 			</div>
 
-			<footer className="flex flex-col gap-3 border-t border-[#ebebeb] bg-[#fafafa] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-				<p className="text-xs text-gray-500">
-					Your order has been completed. You can buy again anytime.
-				</p>
+			<footer className="flex flex-col gap-3 border-t border-[#ebebeb] bg-[#fafafa] px-4 py-3 sm:flex-row sm:items-center sm:justify-end">
 				<div className="flex flex-wrap justify-end gap-2">
-					{order.items[0] && (
-						<Link
-							href={`/marketplace/${order.items[0].productId}`}
-							className="rounded border border-orange-500 bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
+					{order.isReviewed ? (
+						<span className="rounded border border-gray-200 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500">
+							Reviewed
+						</span>
+					) : (
+						<button
+							type="button"
+							disabled={!canReview}
+							onClick={() => onLeaveReview(order)}
+							className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
 						>
-							Buy Again
-						</Link>
+							Leave a review
+						</button>
 					)}
-					<button
-						type="button"
-						className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-					>
-						Contact Seller
-					</button>
 				</div>
 			</footer>
 		</article>
@@ -139,16 +109,30 @@ function PurchaseOrderCard({ order }: { order: PurchaseOrderGroup }) {
 }
 
 export default function PurchasesHistory() {
-	const {
-		data: purchases = [],
-		isLoading,
-		isError,
-	} = useGetPurchasesQuery()
+	const { data: purchases = [], isLoading, isError } = useGetPurchasesQuery()
+	const [createOrderReview, { isLoading: isSubmitting }] =
+		useCreateOrderReviewMutation()
+	const [selectedOrder, setSelectedOrder] =
+		useState<PurchaseOrderGroup | null>(null)
 
-	const orders = useMemo(
-		() => groupPurchasesByOrder(purchases),
-		[purchases],
-	)
+	const orders = useMemo(() => groupPurchasesByOrder(purchases), [purchases])
+
+	const handleSubmitReview = async (payload: CreateOrderReviewRequest) => {
+		try {
+			await createOrderReview(payload).unwrap()
+			setSelectedOrder(null)
+		} catch (error) {
+			const apiError = error as {
+				data?: { message?: string }
+				message?: string
+			}
+			throw new Error(
+				apiError?.data?.message ??
+					apiError?.message ??
+					'Failed to submit review',
+			)
+		}
+	}
 
 	if (isLoading) {
 		return (
@@ -175,10 +159,24 @@ export default function PurchasesHistory() {
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
-			{orders.map((order) => (
-				<PurchaseOrderCard key={order.key} order={order} />
-			))}
-		</div>
+		<>
+			<div className="flex flex-col gap-4">
+				{orders.map((order) => (
+					<PurchaseOrderCard
+						key={order.key}
+						order={order}
+						onLeaveReview={setSelectedOrder}
+					/>
+				))}
+			</div>
+
+			<LeaveReviewModal
+				isOpen={Boolean(selectedOrder)}
+				order={selectedOrder}
+				isSubmitting={isSubmitting}
+				onClose={() => setSelectedOrder(null)}
+				onSubmit={handleSubmitReview}
+			/>
+		</>
 	)
 }

@@ -2,7 +2,14 @@ export interface User {
   userId: string;
   name: string;
   email: string;
+  role?: string;
+  created_at?: string;
 }
+
+export type GetUserByIdResponse = {
+  message: string;
+  user: User;
+};
 
 export type UserSetting = {
   label: string;

@@ -9,7 +9,9 @@ import { SearchIcon } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useMe } from "@/hooks/useMe";
 
-type Props = {};
+type Props = {
+  userId?: string;
+};
 
 type SortPreset = "recent" | "price_high" | "price_low";
 
@@ -145,7 +147,7 @@ function FilterCheckboxSection({
   );
 }
 
-const ProductsCatalog = (props: Props) => {
+const ProductsCatalog = ({ userId: userIdProp }: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [brandFilters, setBrandFilters] = useState<string[]>([]);
@@ -156,7 +158,7 @@ const ProductsCatalog = (props: Props) => {
   const [maxPrice, setMaxPrice] = useState("");
 
   const { me } = useMe();
-  const userId = me?.data.userId ?? "";
+  const userId = userIdProp ?? me?.data.userId ?? "";
 
   const queryParams = useMemo(() => {
     const sortBy: ProductQueryParams["sortBy"] =

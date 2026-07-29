@@ -36,6 +36,7 @@ export type PurchaseItem = {
 	unitCost: number
 	totalCost: number
 	timestamp: string
+	isReviewed: boolean
 	seller: {
 		userId: string
 		name: string
@@ -52,6 +53,7 @@ export type PurchaseOrderGroup = {
 	timestamp: string
 	items: PurchaseItem[]
 	orderTotal: number
+	isReviewed: boolean
 }
 
 export type PlaceOrderResult = {

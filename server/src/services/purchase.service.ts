@@ -64,6 +64,7 @@ export type PurchaseItem = {
 	unitCost: number
 	totalCost: number
 	timestamp: string
+	isReviewed: boolean
 	seller: {
 		userId: string
 		name: string
@@ -92,23 +93,59 @@ export const getPurchasesByUserId = async (
 		orderBy: { timestamp: 'desc' },
 	})
 
-	return purchases.map((purchase) => ({
-		purchaseId: purchase.purchaseId,
-		orderId: purchase.orderId,
-		productId: purchase.productId,
-		productName: purchase.product.name,
-		image: DEFAULT_PRODUCT_IMAGE,
-		brand: purchase.product.brand,
-		condition: purchase.product.condition,
-		quantity: purchase.quantity,
-		unitCost: purchase.unitCost,
-		totalCost: purchase.totalCost,
-		timestamp: purchase.timestamp.toISOString(),
-		seller: {
-			userId: purchase.product.owner.userId,
-			name: purchase.product.owner.name,
-		},
-	}))
+	const orderIds = [
+		...new Set(
+			purchases
+				.map((purchase) => purchase.orderId)
+				.filter((orderId): orderId is string => Boolean(orderId)),
+		),
+	]
+
+	const reviewedOrders =
+		orderIds.length === 0
+			? []
+			: await prisma.reviews.findMany({
+					where: {
+						reviewerId: userId,
+						orderId: { in: orderIds },
+					},
+					select: {
+						orderId: true,
+						userId: true,
+					},
+				})
+
+	const reviewedKeys = new Set(
+		reviewedOrders.map(
+			(review) => `${review.orderId}:${review.userId}`,
+		),
+	)
+
+	return purchases.map((purchase) => {
+		const sellerId = purchase.product.owner.userId
+		const isReviewed = purchase.orderId
+			? reviewedKeys.has(`${purchase.orderId}:${sellerId}`)
+			: false
+
+		return {
+			purchaseId: purchase.purchaseId,
+			orderId: purchase.orderId,
+			productId: purchase.productId,
+			productName: purchase.product.name,
+			image: DEFAULT_PRODUCT_IMAGE,
+			brand: purchase.product.brand,
+			condition: purchase.product.condition,
+			quantity: purchase.quantity,
+			unitCost: purchase.unitCost,
+			totalCost: purchase.totalCost,
+			timestamp: purchase.timestamp.toISOString(),
+			isReviewed,
+			seller: {
+				userId: sellerId,
+				name: purchase.product.owner.name,
+			},
+		}
+	})
 }
 
 export const placeOrder = async ({
