@@ -183,8 +183,9 @@ const Checkout = () => {
 			<div className="flex flex-col gap-4">
 				<Header name="Checkout" />
 				<div className="rounded-sm border border-[#ebebeb] bg-white p-8 text-center">
+					<p className="m-3 text-sm text-gray-500">Transaction Completed!</p>
 					<p className="text-sm text-gray-500">
-						No items selected for checkout.
+						Thank you for your purchase. You will receive a confirmation soon.
 					</p>
 					<Link
 						href="/cart"

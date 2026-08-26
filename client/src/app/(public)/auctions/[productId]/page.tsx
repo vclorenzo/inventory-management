@@ -1,6 +1,6 @@
 "use client";
 import { useGetProductByIdQuery } from "@/state/internal/productsApi";
-import { CircularProgress, Rating } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 import React from "react";
@@ -15,6 +15,7 @@ import "swiper/css/scrollbar";
 
 import AddToCartButton from "@/components/AddToCartButton";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ProductRating from "@/components/ProductRating";
 import { Bookmark } from "lucide-react";
 import { breadcrumbItems } from "@/app/(authenticated)/constants/User";
 
@@ -163,16 +164,10 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
             </div>
 
             <div className="flex flex-col items-end gap-1">
-              {typeof product.rating === "number" ? (
-                <div className="flex items-center gap-2">
-                  <Rating value={product.rating} precision={0.5} readOnly />
-                  <span className="text-sm font-medium text-gray-800">
-                    {product.rating.toFixed(1)}
-                  </span>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-600">Not rated</div>
-              )}
+              <ProductRating
+                rating={product.rating}
+                reviewCount={product.reviewCount}
+              />
             </div>
           </div>
 

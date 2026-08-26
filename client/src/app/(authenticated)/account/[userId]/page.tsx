@@ -5,7 +5,6 @@ import Tabs from '@/components/Tabs'
 import { CircularProgress } from '@mui/material'
 import ProductsCatalog from '@/components/ProductsCatalog'
 import Reviews from '@/components/Reviews'
-import { useReviews } from '@/hooks/useReviews'
 import ProfileBanner from '@/components/ProfileBanner'
 import { useUser } from '@/hooks/useUser'
 import { useParams } from 'next/navigation'
@@ -16,12 +15,6 @@ function SellerAccount() {
 
 	const { user, isLoading: isUserLoading, isError: hasUserError } =
 		useUser(userId)
-
-	const {
-		reviews,
-		isLoading: isReviewsLoading,
-		isError: hasReviewsError,
-	} = useReviews(userId)
 
 	if (!userId) {
 		return (
@@ -68,18 +61,7 @@ function SellerAccount() {
 							label: 'Reviews',
 							content: (
 								<div className="filter-panel mb-24">
-									{isReviewsLoading ? (
-										<CircularProgress />
-									) : hasReviewsError ? (
-										<div className="py-4 text-center text-red-500">
-											Failed to fetch reviews
-										</div>
-									) : (
-										<Reviews
-											reviews={reviews ?? []}
-											userId={userId}
-										/>
-									)}
+									<Reviews userId={userId} />
 								</div>
 							),
 						},

@@ -181,11 +181,33 @@ export const getAllProducts = async ({
 
 export const getProductById = async (id: string) => {
   try {
-    return await prisma.products.findFirst({
+    const product = await prisma.products.findFirst({
       where: {
         productId: id,
       },
+      include: {
+        productReviews: {
+          select: { rating: true },
+        },
+      },
     });
+
+    if (!product) return null;
+
+    const ratings = product.productReviews.map((review) => review.rating);
+    const reviewCount = ratings.length;
+    const rating =
+      reviewCount === 0
+        ? null
+        : ratings.reduce((sum, value) => sum + value, 0) / reviewCount;
+
+    const { productReviews: _productReviews, ...productData } = product;
+
+    return {
+      ...productData,
+      rating,
+      reviewCount,
+    };
   } catch (error) {
     throw error;
   }

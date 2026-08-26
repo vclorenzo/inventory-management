@@ -191,29 +191,52 @@ export const deleteReview = async (id: string) => {
 	}
 }
 
-export const getProductReviews = async (productId: string) => {
-	const reviews = await prisma.productReviews.findMany({
-		where: { productId },
-		include: {
-			reviewer: {
-				select: {
-					name: true,
+export const getProductReviews = async ({
+	productId,
+	sortOrder = 'desc',
+	page = 1,
+	limit,
+}: {
+	productId: string
+	sortOrder?: 'asc' | 'desc'
+	page?: number
+	limit?: number
+}) => {
+	const where = { productId }
+	const skip =
+		limit !== undefined ? Math.max(page - 1, 0) * limit : undefined
+
+	const [totalCount, reviews] = await prisma.$transaction([
+		prisma.productReviews.count({ where }),
+		prisma.productReviews.findMany({
+			where,
+			include: {
+				reviewer: {
+					select: {
+						name: true,
+					},
 				},
 			},
-		},
-		orderBy: { created_at: 'desc' },
-	})
+			orderBy: { created_at: sortOrder },
+			...(skip !== undefined ? { skip } : {}),
+			...(limit !== undefined ? { take: limit } : {}),
+		}),
+	])
 
-	return reviews.map((review) => ({
-		productReviewId: review.productReviewId,
-		productId: review.productId,
-		reviewerId: review.reviewerId,
-		reviewerName: review.reviewer.name,
-		orderId: review.orderId,
-		rating: review.rating,
-		comment: review.comment,
-		createdAt: review.created_at.toISOString(),
-	}))
+	return {
+		reviews: reviews.map((review) => ({
+			reviewId: review.productReviewId,
+			userId: review.productId,
+			productId: review.productId,
+			reviewerId: review.reviewerId,
+			reviewerName: review.reviewer.name,
+			orderId: review.orderId,
+			rating: review.rating,
+			comment: review.comment,
+			createdAt: review.created_at.toISOString(),
+		})),
+		totalCount,
+	}
 }
 
 export const createOrderReview = async (data: OrderReviewInput) => {

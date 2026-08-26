@@ -1,5 +1,5 @@
 "use client";
-import { CircularProgress, Rating } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { useMemo, useState } from "react";
 import { A11y, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -26,6 +26,7 @@ import { breadcrumbItems } from "../../constants/User";
 import ProductModal from "../ProductModal";
 import Reviews from "@/components/Reviews";
 import ProfileBanner from "@/components/ProfileBanner";
+import ProductRating from "@/components/ProductRating";
 
 const productImageUrls = (length: number) => {
   const images = [];
@@ -212,16 +213,10 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             </div>
 
             <div className="flex flex-col items-end gap-1">
-              {typeof product.rating === "number" ? (
-                <div className="flex items-center gap-2">
-                  <Rating value={product.rating} precision={0.5} readOnly />
-                  <span className="text-sm font-medium text-gray-800">
-                    {product.rating.toFixed(1)}
-                  </span>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-600">Not rated</div>
-              )}
+              <ProductRating
+                rating={product.rating}
+                reviewCount={product.reviewCount}
+              />
             </div>
           </div>
 
@@ -347,9 +342,16 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
           </div>
         </div>
       </div>
-      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <ProfileBanner />
-        <Reviews />
+      <div className="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+        <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <Reviews productId={product.productId} />
+        </div>
+        <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <ProfileBanner userId={product.userId} />
+          <div className="mt-6 flex min-h-0 flex-1 flex-col">
+            <Reviews userId={product.userId} />
+          </div>
+        </div>
       </div>
       <ProductModal
         isOpen={isModalOpen}

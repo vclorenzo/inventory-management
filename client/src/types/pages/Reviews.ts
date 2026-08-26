@@ -8,6 +8,14 @@ export interface Review {
 	comment: string
 }
 
+export interface PaginatedReviews {
+	reviews: Review[]
+	page: number
+	limit?: number
+	totalPages: number
+	totalCount: number
+}
+
 export interface NewReview {
 	reviewId?: string
 	userId: string

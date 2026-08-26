@@ -8,6 +8,10 @@ declare global {
 				role: string;
 				[key: string]: unknown;
 			};
+			pagination?: {
+				page: number;
+				limit?: number;
+			};
 		}
 	}
 }
