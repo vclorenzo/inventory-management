@@ -1,58 +1,44 @@
-import { Product } from "@/types/pages/Products";
-import { Rating } from "@mui/material";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React from "react";
+import { Product } from '@/types/pages/Products'
+import { Rating } from '@mui/material'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
-const Cards = ({
-  products,
-  userId,
-  isOwnCatalog = false,
-}: {
-  products: Product[];
-  userId: string;
-  isOwnCatalog: boolean;
-}) => {
-  const pathname = usePathname();
-  return products
-    ?.filter((product) =>
-      isOwnCatalog ? product.userId === userId : product.userId !== userId,
-    )
-    .map((product) => (
-      <div
-        key={product.productId}
-        className="border shadow rounded-md p-4 max-w-full w-full mx-auto"
-      >
-        <Link
-          href={`/${pathname.includes("marketplace") ? "marketplace" : "products"}/${product.productId}`}
-          className="flex flex-col items-center"
-        >
-          <Image
-            src={`https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
-              Math.floor(Math.random() * 3) + 1
-            }.png`}
-            alt={product.name}
-            width={150}
-            height={150}
-            className="mb-3 rounded-2xl w-36 h-36"
-          />
+function Cards({ products }: { products: Product[] }) {
+	const pathname = usePathname()
 
-          <h3 className="text-lg text-gray-900 font-semibold">
-            {product.name}
-          </h3>
-          <p className="text-gray-800">${product.price.toFixed(2)}</p>
-          <div className="text-sm text-gray-600 mt-1">
-            Stock: {product.stockQuantity}
-          </div>
-          {product.rating && (
-            <div className="flex items-center mt-2">
-              <Rating value={product.rating || 0} precision={0.5} readOnly />
-            </div>
-          )}
-        </Link>
-      </div>
-    ));
-};
+	return products?.map((product) => (
+		<div
+			key={product.productId}
+			className="mx-auto w-full max-w-full rounded-md border p-4 shadow"
+		>
+			<Link
+				href={`/${pathname.includes('marketplace') ? 'marketplace' : 'products'}/${product.productId}`}
+				className="flex flex-col items-center"
+			>
+				<Image
+					src={`https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
+						Math.floor(Math.random() * 3) + 1
+					}.png`}
+					alt={product.name}
+					width={150}
+					height={150}
+					className="mb-3 h-36 w-36 rounded-2xl"
+				/>
 
-export default Cards;
+				<h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
+				<p className="text-gray-800">${product.price.toFixed(2)}</p>
+				<div className="mt-1 text-sm text-gray-600">
+					Stock: {product.stockQuantity}
+				</div>
+				{product.rating && (
+					<div className="mt-2 flex items-center">
+						<Rating value={product.rating || 0} precision={0.5} readOnly />
+					</div>
+				)}
+			</Link>
+		</div>
+	))
+}
+
+export default Cards

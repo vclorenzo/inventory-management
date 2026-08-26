@@ -3,14 +3,15 @@ import Cards from "@/components/Cards";
 import Header from "@/components/Header";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductQueryParams } from "@/state/internal/productsApi";
-import { Product, ProductFormValues } from "@/types/pages/Products";
+import { Product } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
-import { PlusCircleIcon, SearchIcon } from "lucide-react";
-import { useMemo, useState } from "react";
-import ProductModal from "../app/(authenticated)/products/ProductModal";
+import { SearchIcon } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { useMe } from "@/hooks/useMe";
 
-type Props = {};
+type Props = {
+  userId?: string;
+};
 
 type SortPreset = "recent" | "price_high" | "price_low";
 
@@ -32,6 +33,29 @@ function uniqueSortedFromProducts(
   return Array.from(set).sort((a, b) =>
     a.localeCompare(b, undefined, { sensitivity: "base" }),
   );
+}
+
+type FacetField = "condition" | "status" | "productCategory" | "brand";
+
+/**
+ * Facet options that only grow across refetches, so filtering / loading
+ * empty results does not wipe checkboxes from the panel.
+ */
+function useAccumulatedFacetOptions(
+  products: Product[],
+  selectedValues: string[],
+  field: FacetField,
+): string[] {
+  const knownRef = useRef<string[]>([]);
+  return useMemo(() => {
+    const next = uniqueSortedFromProducts(
+      products,
+      [...knownRef.current, ...selectedValues],
+      (p) => p[field],
+    );
+    knownRef.current = next;
+    return next;
+  }, [products, selectedValues, field]);
 }
 
 function normFilterList(values: string[]): string[] {
@@ -123,7 +147,7 @@ function FilterCheckboxSection({
   );
 }
 
-const ProductsCatalog = (props: Props) => {
+const ProductsCatalog = ({ userId: userIdProp }: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [brandFilters, setBrandFilters] = useState<string[]>([]);
@@ -132,7 +156,9 @@ const ProductsCatalog = (props: Props) => {
   const [sortPreset, setSortPreset] = useState<SortPreset>("recent");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { me } = useMe();
+  const userId = userIdProp ?? me?.data.userId ?? "";
 
   const queryParams = useMemo(() => {
     const sortBy: ProductQueryParams["sortBy"] =
@@ -147,6 +173,7 @@ const ProductsCatalog = (props: Props) => {
 
     const params: ProductQueryParams = {
       search: searchTerm,
+      userId: userId || undefined,
       category: categories.length ? categories : undefined,
       brand: brands.length ? brands : undefined,
       status: statuses.length ? statuses : undefined,
@@ -179,63 +206,39 @@ const ProductsCatalog = (props: Props) => {
     searchTerm,
     sortPreset,
     statusFilters,
+    userId,
   ]);
 
-  const { me } = useMe();
-  const userId = me?.data.userId ?? "";
   const {
     products,
-    createProduct,
-    createProductState,
     isLoading: isGetProductsLoading,
+    isFetching: isGetProductsFetching,
     isError: hasGetProductsError,
   } = useProducts(queryParams);
 
-  const conditionOptions = useMemo(
-    () =>
-      uniqueSortedFromProducts(products, conditionFilters, (p) => p.condition),
-    [products, conditionFilters],
+  const conditionOptions = useAccumulatedFacetOptions(
+    products,
+    conditionFilters,
+    "condition",
+  );
+  const statusOptions = useAccumulatedFacetOptions(
+    products,
+    statusFilters,
+    "status",
+  );
+  const categoryOptions = useAccumulatedFacetOptions(
+    products,
+    categoryFilters,
+    "productCategory",
+  );
+  const brandOptions = useAccumulatedFacetOptions(
+    products,
+    brandFilters,
+    "brand",
   );
 
-  const statusOptions = useMemo(
-    () => uniqueSortedFromProducts(products, statusFilters, (p) => p.status),
-    [products, statusFilters],
-  );
-
-  const categoryOptions = useMemo(
-    () =>
-      uniqueSortedFromProducts(
-        products,
-        categoryFilters,
-        (p) => p.productCategory,
-      ),
-    [products, categoryFilters],
-  );
-
-  const brandOptions = useMemo(
-    () => uniqueSortedFromProducts(products, brandFilters, (p) => p.brand),
-    [products, brandFilters],
-  );
-
-  const handleCreateProduct = async (productData: ProductFormValues) => {
-    await createProduct(productData).unwrap();
-  };
-
-  if (isGetProductsLoading) {
-    return (
-      <div className="py-4">
-        <CircularProgress />
-      </div>
-    );
-  }
-
-  if (hasGetProductsError || !products) {
-    return (
-      <div className="text-center text-red-500 py-4">
-        Failed to fetch products
-      </div>
-    );
-  }
+  const showProductsLoading =
+    isGetProductsLoading || (isGetProductsFetching && products.length === 0);
 
   return (
     <div className="mx-auto w-full pb-5">
@@ -345,38 +348,25 @@ const ProductsCatalog = (props: Props) => {
           </div>
         </aside>
         <div className="min-w-0 flex-1">
-          {/* HEADER BAR */}
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-6">
             <Header name="Products" />
-            <button
-              className="flex items-center justify-center rounded bg-blue-500 px-4 py-2 font-bold text-gray-200 hover:bg-blue-700 sm:shrink-0"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <PlusCircleIcon className="mr-2 h-5 w-5 !text-gray-200" />
-              Create Product
-            </button>
           </div>
           {/* PRODUCTS LIST */}
           <div className="grid grid-cols-1 justify-between gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {isGetProductsLoading ? (
-              <>
+            {hasGetProductsError ? (
+              <div className="col-span-full text-center text-red-500 py-4">
+                Failed to fetch products
+              </div>
+            ) : showProductsLoading ? (
+              <div className="col-span-full flex justify-center py-8">
                 <CircularProgress />
-              </>
+              </div>
             ) : (
-              <Cards products={products} userId={userId} isOwnCatalog={true} />
+              <Cards products={products} />
             )}
           </div>
         </div>
       </div>
-      {/* MODAL */}
-      <ProductModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-        }}
-        onSend={handleCreateProduct}
-        isProductLoading={createProductState.isLoading}
-      />
     </div>
   );
 };

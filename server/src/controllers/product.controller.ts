@@ -42,6 +42,8 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const search = req.query.search?.toString();
+    const userId = req.query.userId?.toString();
+    const excludeUserId = req.query.excludeUserId?.toString();
     const category = parseCsv(req.query.category?.toString());
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
@@ -72,6 +74,8 @@ export const getAllProducts = async (
 
     const { products, totalCount } = await productService.getAllProducts({
       search,
+      userId,
+      excludeUserId,
       category,
       brand,
       condition,

@@ -28,6 +28,7 @@ model Users {
   purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
+  productReviewsWritten ProductReviews[] @relation("ProductReviewer")
 }
 
 
@@ -92,6 +93,7 @@ model Products {
   Sales            Sales[]
   Purchases        Purchases[]
   cartItems        CartItems[]
+  productReviews   ProductReviews[]
 }
 
 model CartItems {
@@ -174,12 +176,39 @@ model ExpenseByCategory {
 }
 
 model Reviews {
-  reviewId     String @id @default(uuid())
+  reviewId     String  @id @default(uuid())
   userId       String
   reviewerId   String
+  orderId      String?
   rating       Int
   comment      String
 
   reviewedUser Users @relation("ReviewedUser", fields: [userId], references: [userId])
   reviewer     Users @relation("Reviewer", fields: [reviewerId], references: [userId])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([userId, reviewerId, orderId])
+  @@index([userId])
+  @@index([orderId])
+}
+
+model ProductReviews {
+  productReviewId String  @id @default(uuid())
+  productId       String
+  reviewerId      String
+  orderId         String?
+  rating          Int
+  comment         String  @default("")
+
+  product  Products @relation(fields: [productId], references: [productId], onDelete: Cascade)
+  reviewer Users    @relation("ProductReviewer", fields: [reviewerId], references: [userId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([productId, reviewerId, orderId])
+  @@index([productId])
+  @@index([orderId])
 }

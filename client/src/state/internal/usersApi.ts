@@ -1,4 +1,9 @@
-import { User, UserRequest, UserResponse } from "@/types/pages/User";
+import {
+  GetUserByIdResponse,
+  User,
+  UserRequest,
+  UserResponse,
+} from "@/types/pages/User";
 import { api } from "../api";
 
 export const usersApi = api.injectEndpoints({
@@ -8,6 +13,14 @@ export const usersApi = api.injectEndpoints({
         url: "/users",
         method: "GET",
       }),
+      providesTags: ["Users"],
+    }),
+    getUserById: builder.query<User, string>({
+      query: (userId) => ({
+        url: `/users/${userId}`,
+        method: "GET",
+      }),
+      transformResponse: (response: GetUserByIdResponse) => response.user,
       providesTags: ["Users"],
     }),
     updateUser: builder.mutation<
@@ -24,4 +37,8 @@ export const usersApi = api.injectEndpoints({
   }),
 });
 
-export const { useGetAllUsersQuery, useUpdateUserMutation } = usersApi;
+export const {
+  useGetAllUsersQuery,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} = usersApi;

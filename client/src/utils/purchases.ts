@@ -21,6 +21,8 @@ export const groupPurchasesByOrder = (
 		if (existing) {
 			existing.items.push(purchase)
 			existing.orderTotal += purchase.totalCost
+			existing.isReviewed =
+				existing.isReviewed || purchase.isReviewed
 			continue
 		}
 
@@ -31,6 +33,7 @@ export const groupPurchasesByOrder = (
 			timestamp: purchase.timestamp,
 			items: [purchase],
 			orderTotal: purchase.totalCost,
+			isReviewed: purchase.isReviewed,
 		})
 	}
 

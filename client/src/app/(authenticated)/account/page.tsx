@@ -12,6 +12,7 @@ import { MapPin } from "lucide-react";
 import Reviews from "@/components/Reviews";
 import { useReviews } from "@/hooks/useReviews";
 import { useMe } from "@/hooks/useMe";
+import ProfileBanner from "@/components/ProfileBanner";
 
 const Account = () => {
   const [userSettings, setUserSettings] =
@@ -54,7 +55,7 @@ const Account = () => {
       <div className="overflow-x-auto mt-5 shadow-md">
         <table className="min-w-full bg-white rounded-lg">
           <tbody>
-            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
+            {/* <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex flex-col justify-center">
               <article className="space-y-2">
                 <div className="flex  justify-center items-center gap-3">
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-200 text-sm font-semibold uppercase text-gray-700">
@@ -76,7 +77,8 @@ const Account = () => {
                   <span>Pateros</span>
                 </div>
               </div>
-            </div>
+            </div> */}
+            <ProfileBanner />
           </tbody>
         </table>
         <Tabs

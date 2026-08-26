@@ -1,5 +1,6 @@
 import {
   ReviewQueryParams,
+  useCreateOrderReviewMutation,
   useCreateReviewMutation,
   useGetReviewByIdQuery,
   useGetReviewsQuery,
@@ -7,8 +8,12 @@ import {
 } from "@/state/internal/reviewsApi";
 
 export const useReviews = (params?: string | ReviewQueryParams) => {
-  const query = useGetReviewsQuery(params);
+  const query = useGetReviewsQuery(params, {
+    skip: typeof params === "string" && !params,
+  });
   const [createReview, createReviewState] = useCreateReviewMutation();
+  const [createOrderReview, createOrderReviewState] =
+    useCreateOrderReviewMutation();
 
   return {
     reviews: query.data ?? [],
@@ -19,6 +24,8 @@ export const useReviews = (params?: string | ReviewQueryParams) => {
     refetch: query.refetch,
     createReview,
     createReviewState,
+    createOrderReview,
+    createOrderReviewState,
   };
 };
 
