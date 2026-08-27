@@ -28,12 +28,8 @@ export const getAllReviews = async (req: Request, res: Response) => {
 		| 'asc'
 		| 'desc'
 		| undefined
-	const page = Math.max(Number(req.query.page) || 1, 1)
-	const parsedLimit = Number(req.query.limit)
-	const limit =
-		req.query.limit !== undefined && !Number.isNaN(parsedLimit)
-			? Math.max(parsedLimit, 1)
-			: undefined
+	const page = req.pagination?.page ?? 1
+	const limit = req.pagination?.limit
 	const userId = req.query.userId?.toString()
 
 	try {
@@ -64,10 +60,27 @@ export const getAllReviews = async (req: Request, res: Response) => {
 export const getProductReviews = async (req: Request, res: Response) => {
 	try {
 		const { productId } = req.params
-		const reviews = await reviewService.getProductReviews(productId)
+		const sortOrder = req.query.sortOrder?.toString() as
+			| 'asc'
+			| 'desc'
+			| undefined
+		const page = req.pagination?.page ?? 1
+		const limit = req.pagination?.limit
+		const { reviews, totalCount } = await reviewService.getProductReviews({
+			productId,
+			sortOrder,
+			page,
+			limit,
+		})
+		const totalPages =
+			limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1
 		res.status(200).json({
 			message: 'Product reviews retrieved successfully',
 			data: reviews,
+			page,
+			limit,
+			totalPages,
+			totalCount,
 		})
 	} catch (error) {
 		if (error instanceof AppError) {

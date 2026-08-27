@@ -1,11 +1,20 @@
 export interface Review {
 	reviewId?: string
-	userId: string
+	userId?: string
+	productId?: string
 	reviewerId: string
 	reviewerName: string
 	orderId?: string | null
 	rating: number
 	comment: string
+}
+
+export interface PaginatedReviews {
+	reviews: Review[]
+	page: number
+	limit?: number
+	totalPages: number
+	totalCount: number
 }
 
 export interface NewReview {

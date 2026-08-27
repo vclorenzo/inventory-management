@@ -7,7 +7,8 @@ export interface Product {
 	brand: string
 	condition: string
 	price: number
-	rating: number
+	rating: number | null
+	reviewCount?: number
 	stockQuantity: number
 	status: string
 	description: string

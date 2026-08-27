@@ -10,7 +10,6 @@ import { CircularProgress, Rating } from "@mui/material";
 import ProductsCatalog from "@/components/ProductsCatalog";
 import { MapPin } from "lucide-react";
 import Reviews from "@/components/Reviews";
-import { useReviews } from "@/hooks/useReviews";
 import { useMe } from "@/hooks/useMe";
 import ProfileBanner from "@/components/ProfileBanner";
 
@@ -28,12 +27,6 @@ const Account = () => {
 
   const { me, isLoading: isMeLoading } = useMe();
   const userId = me?.data.userId;
-
-  const {
-    reviews,
-    isLoading: isReviewsLoading,
-    error: hasReviewsError,
-  } = useReviews(userId ?? "");
 
   const handleToggleChange = (index: number) => {
     const settingsCopy = [...userSettings];
@@ -101,7 +94,11 @@ const Account = () => {
               label: "Reviews",
               content: (
                 <div className={`filter-panel mb-24`}>
-                  <Reviews reviews={reviews ?? []} userId={userId ?? ""} />
+                  {isMeLoading ? (
+                    <CircularProgress />
+                  ) : (
+                    userId && <Reviews userId={userId} />
+                  )}
                 </div>
               ),
             },

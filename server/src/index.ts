@@ -15,6 +15,7 @@ import profileRoutes from "./routes/profile.routes";
 import reviewRoutes from "./routes/review.routes ";
 import cartRoutes from "./routes/cart.routes";
 import purchaseRoutes from "./routes/purchase.routes";
+import { parseReviewPagination } from "#middleware/pagination.middleware.ts";
 // import { botBlocker } from '#middleware/botBlocker.ts';
 import securityMiddleware from "#middleware/security.middeware.ts";
 
@@ -48,7 +49,7 @@ app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
 app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
-app.use("/reviews", reviewRoutes);
+app.use("/reviews", parseReviewPagination, reviewRoutes);
 app.use("/cart", cartRoutes);
 app.use("/purchases", purchaseRoutes);
 
