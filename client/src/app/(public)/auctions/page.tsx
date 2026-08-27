@@ -15,18 +15,21 @@ function Auctions() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { me } = useMe();
+  const { me, isLoading: isMeLoading } = useMe();
   const userId = me?.data.userId ?? "";
 
   const {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsQuery({
-    search: searchTerm,
-    listingType: "auction",
-    ...(userId ? { excludeUserId: userId } : {}),
-  });
+  } = useGetProductsQuery(
+    {
+      search: searchTerm,
+      listingType: "auction",
+      ...(userId ? { excludeUserId: userId } : {}),
+    },
+    { skip: isMeLoading },
+  );
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
     useCreateProductMutation();
@@ -34,7 +37,7 @@ function Auctions() {
     await createProduct({ ...productData, listingType: "auction" });
   };
 
-  if (isLoading) {
+  if (isLoading || isMeLoading) {
     return (
       <div className="py-4">
         <CircularProgress />

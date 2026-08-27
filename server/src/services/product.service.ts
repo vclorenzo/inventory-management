@@ -75,14 +75,18 @@ export const getAllProducts = async ({
       whereParts.push(Prisma.sql`p."status" IN (${Prisma.join(status)})`);
     }
 
-    const listingTypes = listingType?.filter(
-      (type): type is ListingType =>
-        type === "marketplace" || type === "auction",
-    );
-    if (listingTypes?.length) {
-      whereParts.push(
-        Prisma.sql`p."listingType"::text IN (${Prisma.join(listingTypes)})`,
+    if (listingType !== undefined) {
+      const listingTypes = listingType.filter(
+        (type): type is ListingType =>
+          type === "marketplace" || type === "auction",
       );
+      if (listingTypes.length) {
+        whereParts.push(
+          Prisma.sql`p."listingType"::text IN (${Prisma.join(listingTypes)})`,
+        );
+      } else {
+        whereParts.push(Prisma.sql`1=0`);
+      }
     }
 
     if (typeof minPrice === "number") {

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
+import { AppError } from "#error/AppError.ts";
 import { listingTypeSchema } from "#validations/products.validation.ts";
 
 const parseCsv = (value?: string): string[] | undefined => {
@@ -12,10 +13,19 @@ const parseCsv = (value?: string): string[] | undefined => {
 };
 
 const parseListingType = (value?: string): string[] | undefined => {
-  const parsed = parseCsv(value)?.filter(
+  const raw = parseCsv(value);
+  if (!raw) return undefined;
+
+  const parsed = raw.filter(
     (type) => listingTypeSchema.safeParse(type).success,
   );
-  return parsed?.length ? parsed : undefined;
+  if (!parsed.length) {
+    throw new AppError(
+      "Invalid listingType. Allowed values: marketplace, auction.",
+      400,
+    );
+  }
+  return parsed;
 };
 
 const parseNumber = (value: unknown): number | undefined => {
@@ -113,6 +123,10 @@ export const getAllProducts = async (
       totalCount,
     });
   } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: "Error retrieving products" });
   }
 };
