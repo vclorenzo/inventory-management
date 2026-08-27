@@ -3,7 +3,7 @@ import Cards from "@/components/Cards";
 import Header from "@/components/Header";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductQueryParams } from "@/state/internal/productsApi";
-import { Product } from "@/types/pages/Products";
+import { ListingType, Product } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
@@ -11,6 +11,9 @@ import { useMe } from "@/hooks/useMe";
 
 type Props = {
   userId?: string;
+  excludeUserId?: string;
+  listingType?: ListingType;
+  heading?: string;
 };
 
 type SortPreset = "recent" | "price_high" | "price_low";
@@ -147,7 +150,12 @@ function FilterCheckboxSection({
   );
 }
 
-const ProductsCatalog = ({ userId: userIdProp }: Props) => {
+const ProductsCatalog = ({
+  userId: userIdProp,
+  excludeUserId,
+  listingType,
+  heading = "Products",
+}: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [brandFilters, setBrandFilters] = useState<string[]>([]);
@@ -158,7 +166,12 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
   const [maxPrice, setMaxPrice] = useState("");
 
   const { me } = useMe();
-  const userId = userIdProp ?? me?.data.userId ?? "";
+  const fieldId = listingType ?? "catalog";
+  // Public listing pages pass listingType and should not be scoped to the
+  // current user; account pages still default to the signed-in seller.
+  const userId = listingType
+    ? userIdProp ?? ""
+    : userIdProp ?? me?.data.userId ?? "";
 
   const queryParams = useMemo(() => {
     const sortBy: ProductQueryParams["sortBy"] =
@@ -174,6 +187,8 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
     const params: ProductQueryParams = {
       search: searchTerm,
       userId: userId || undefined,
+      excludeUserId: excludeUserId || undefined,
+      listingType,
       category: categories.length ? categories : undefined,
       brand: brands.length ? brands : undefined,
       status: statuses.length ? statuses : undefined,
@@ -201,6 +216,8 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
     brandFilters,
     categoryFilters,
     conditionFilters,
+    excludeUserId,
+    listingType,
     maxPrice,
     minPrice,
     searchTerm,
@@ -243,7 +260,7 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
   return (
     <div className="mx-auto w-full pb-5">
       <div className="filter-panel mb-6">
-        <label className="form-section-label" htmlFor="catalog-search">
+        <label className="form-section-label" htmlFor={`${fieldId}-search`}>
           Search
         </label>
         <div className="relative mt-2">
@@ -252,7 +269,7 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
             aria-hidden
           />
           <input
-            id="catalog-search"
+            id={`${fieldId}-search`}
             type="search"
             enterKeyHint="search"
             className="form-control placeholder:text-gray-400 py-2.5 pl-9"
@@ -268,11 +285,11 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
         <aside className="w-full shrink-0 lg:w-[300px] filter-panel">
           <div className="space-y-5">
             <div>
-              <label className="form-section-label" htmlFor="catalog-sort">
+              <label className="form-section-label" htmlFor={`${fieldId}-sort`}>
                 Sort
               </label>
               <select
-                id="catalog-sort"
+                id={`${fieldId}-sort`}
                 className="form-control mt-2"
                 value={sortPreset}
                 onChange={(e) => {
@@ -349,7 +366,7 @@ const ProductsCatalog = ({ userId: userIdProp }: Props) => {
         </aside>
         <div className="min-w-0 flex-1">
           <div className="mb-6">
-            <Header name="Products" />
+            <Header name={heading} />
           </div>
           {/* PRODUCTS LIST */}
           <div className="grid grid-cols-1 justify-between gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

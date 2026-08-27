@@ -3,7 +3,7 @@
 import { useCart } from "@/hooks/useCart";
 import { useMe } from "@/hooks/useMe";
 import { CircularProgress } from "@mui/material";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 type AddToCartButtonProps = {
@@ -18,10 +18,13 @@ function AddToCartButton({
   className = "inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60",
 }: AddToCartButtonProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isAuction = pathname.startsWith("/auctions");
   const { me } = useMe();
   const { addCartItem, addCartItemState } = useCart();
   const isLoading = addCartItemState.isLoading;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const label = isAuction ? "Make Offer" : "Add to Cart";
 
   const handleAddToCart = async () => {
     if (!me) {
@@ -74,7 +77,7 @@ function AddToCartButton({
             Adding…
           </span>
         ) : (
-          "Add to Cart"
+          label
         )}
       </button>
       {errorMessage && (
