@@ -94,7 +94,11 @@ const Account = () => {
               label: "Reviews",
               content: (
                 <div className={`filter-panel mb-24`}>
-                  <Reviews userId={userId ?? ""} />
+                  {isMeLoading ? (
+                    <CircularProgress />
+                  ) : (
+                    userId && <Reviews userId={userId} />
+                  )}
                 </div>
               ),
             },

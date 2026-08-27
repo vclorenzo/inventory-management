@@ -226,7 +226,6 @@ export const getProductReviews = async ({
 	return {
 		reviews: reviews.map((review) => ({
 			reviewId: review.productReviewId,
-			userId: review.productId,
 			productId: review.productId,
 			reviewerId: review.reviewerId,
 			reviewerName: review.reviewer.name,

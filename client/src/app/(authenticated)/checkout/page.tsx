@@ -17,6 +17,7 @@ import {
 import { CircularProgress } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
@@ -179,23 +180,7 @@ const Checkout = () => {
 	}
 
 	if (selectedItems.length === 0) {
-		return (
-			<div className="flex flex-col gap-4">
-				<Header name="Checkout" />
-				<div className="rounded-sm border border-[#ebebeb] bg-white p-8 text-center">
-					<p className="m-3 text-sm text-gray-500">Transaction Completed!</p>
-					<p className="text-sm text-gray-500">
-						Thank you for your purchase. You will receive a confirmation soon.
-					</p>
-					<Link
-						href="/cart"
-						className="mt-4 inline-block text-sm text-blue-600 hover:underline"
-					>
-						Go back to cart
-					</Link>
-				</div>
-			</div>
-		)
+		redirect('/cart')
 	}
 
 	if (orderPlaced) {

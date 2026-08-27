@@ -1,6 +1,7 @@
 export interface Review {
 	reviewId?: string
-	userId: string
+	userId?: string
+	productId?: string
 	reviewerId: string
 	reviewerName: string
 	orderId?: string | null

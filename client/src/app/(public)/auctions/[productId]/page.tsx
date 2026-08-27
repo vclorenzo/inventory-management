@@ -15,6 +15,8 @@ import "swiper/css/scrollbar";
 
 import AddToCartButton from "@/components/AddToCartButton";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import ProfileBanner from "@/components/ProfileBanner";
+import Reviews from "@/components/Reviews";
 import ProductRating from "@/components/ProductRating";
 import { Bookmark } from "lucide-react";
 import { breadcrumbItems } from "@/app/(authenticated)/constants/User";
@@ -225,6 +227,17 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
             >
               Browse more products
             </Link>
+          </div>
+        </div>
+      </div>
+      <div className="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+        <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <Reviews productId={product.productId} />
+        </div>
+        <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <ProfileBanner userId={product.userId} />
+          <div className="mt-6 flex min-h-0 flex-1 flex-col">
+            <Reviews userId={product.userId} />
           </div>
         </div>
       </div>

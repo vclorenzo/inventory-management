@@ -74,7 +74,18 @@ function Reviews({ userId, productId, title }: ReviewsProps) {
 		setPage(1)
 	}
 
-	if (!entityId || isLoading) {
+	if (!entityId) {
+		return (
+			<div className="flex h-full min-h-0 flex-1 flex-col">
+				<h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+					{heading}
+				</h2>
+				<p className="mt-5 text-gray-500">Unable to load reviews.</p>
+			</div>
+		)
+	}
+
+	if (isLoading) {
 		return (
 			<div className="flex h-full min-h-0 flex-1 flex-col">
 				<h2 className="text-2xl font-semibold tracking-tight text-gray-900">
