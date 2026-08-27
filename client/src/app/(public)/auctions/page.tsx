@@ -1,6 +1,7 @@
 "use client";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import Cards from "@/components/Cards";
+import { useMe } from "@/hooks/useMe";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
@@ -10,20 +11,25 @@ import { CircularProgress } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
-type Props = {};
-
-const Auctions = (props: Props) => {
+function Auctions() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { me, isLoading: isMeLoading } = useMe();
+  const userId = me?.data.userId ?? "";
 
   const {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsQuery({
-    search: searchTerm,
-    listingType: "auction",
-  });
+  } = useGetProductsQuery(
+    {
+      search: searchTerm,
+      listingType: "auction",
+      ...(userId ? { excludeUserId: userId } : {}),
+    },
+    { skip: isMeLoading },
+  );
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
     useCreateProductMutation();
@@ -31,7 +37,7 @@ const Auctions = (props: Props) => {
     await createProduct({ ...productData, listingType: "auction" });
   };
 
-  if (isLoading) {
+  if (isLoading || isMeLoading) {
     return (
       <div className="py-4">
         <CircularProgress />
@@ -84,7 +90,7 @@ const Auctions = (props: Props) => {
         isProductLoading={isCreateProductLoading}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Auctions;
+export default Auctions

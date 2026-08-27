@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
+import { AppError } from "#error/AppError.ts";
+import { listingTypeSchema } from "#validations/products.validation.ts";
 
 const parseCsv = (value?: string): string[] | undefined => {
   if (!value) return undefined;
@@ -8,6 +10,22 @@ const parseCsv = (value?: string): string[] | undefined => {
     .map((item) => item.trim())
     .filter(Boolean);
   return parsed.length ? parsed : undefined;
+};
+
+const parseListingType = (value?: string): string[] | undefined => {
+  const raw = parseCsv(value);
+  if (!raw) return undefined;
+
+  const parsed = raw.filter(
+    (type) => listingTypeSchema.safeParse(type).success,
+  );
+  if (!parsed.length) {
+    throw new AppError(
+      "Invalid listingType. Allowed values: marketplace, auction.",
+      400,
+    );
+  }
+  return parsed;
 };
 
 const parseNumber = (value: unknown): number | undefined => {
@@ -48,7 +66,7 @@ export const getAllProducts = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
-    const listingType = parseCsv(req.query.listingType?.toString());
+    const listingType = parseListingType(req.query.listingType?.toString());
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
     const minRating = parseNumber(req.query.minRating);
@@ -105,6 +123,10 @@ export const getAllProducts = async (
       totalCount,
     });
   } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: "Error retrieving products" });
   }
 };
