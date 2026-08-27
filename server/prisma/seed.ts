@@ -15,6 +15,14 @@ function pickProductOwnerId(productId: string, userIds: string[]): string {
 	return userIds[hash % userIds.length];
 }
 
+function pickListingType(productId: string): 'marketplace' | 'auction' {
+	let hash = 0;
+	for (let i = 0; i < productId.length; i++) {
+		hash = (hash * 31 + productId.charCodeAt(i)) >>> 0;
+	}
+	return hash % 3 === 0 ? 'auction' : 'marketplace';
+}
+
 const MODEL_ID_FIELD: Record<string, string> = {
 	users: 'userId',
 	products: 'productId',
@@ -69,6 +77,9 @@ async function main() {
 
 			if (modelName === 'products' && data.productId) {
 				data.userId = pickProductOwnerId(data.productId, userIds);
+				if (data.listingType !== 'marketplace' && data.listingType !== 'auction') {
+					data.listingType = pickListingType(data.productId);
+				}
 			}
 
 			if (idField && idField in data && typeof model.upsert === 'function') {

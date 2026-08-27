@@ -1,4 +1,4 @@
-import { Product, NewProduct } from '@/types/pages/Products'
+import { Product, NewProduct, ListingType } from '@/types/pages/Products'
 import { api } from '../api'
 
 export type ProductSortBy =
@@ -14,6 +14,7 @@ export interface ProductQueryParams {
 	brand?: string[]
 	condition?: string[]
 	status?: string[]
+	listingType?: ListingType | ListingType[]
 	minPrice?: number
 	maxPrice?: number
 	minRating?: number
@@ -45,6 +46,11 @@ const normalizeQueryParams = (
 	if (params.brand?.length) query.brand = params.brand.join(',')
 	if (params.condition?.length) query.condition = params.condition.join(',')
 	if (params.status?.length) query.status = params.status.join(',')
+	if (typeof params.listingType === 'string') {
+		query.listingType = params.listingType
+	} else if (params.listingType?.length) {
+		query.listingType = params.listingType.join(',')
+	}
 	if (typeof params.minPrice === 'number') query.minPrice = params.minPrice
 	if (typeof params.maxPrice === 'number') query.maxPrice = params.maxPrice
 	if (typeof params.minRating === 'number') query.minRating = params.minRating

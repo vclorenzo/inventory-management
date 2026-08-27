@@ -1,5 +1,5 @@
 import { AppError } from "#error/AppError.ts";
-import { Prisma, PrismaClient, Users } from "@prisma/client";
+import { ListingType, Prisma, PrismaClient, Users } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +11,7 @@ export const getAllProducts = async ({
   brand,
   condition,
   status,
+  listingType,
   minPrice,
   maxPrice,
   minRating,
@@ -29,6 +30,7 @@ export const getAllProducts = async ({
   brand?: string[];
   condition?: string[];
   status?: string[];
+  listingType?: string[];
   minPrice?: number;
   maxPrice?: number;
   minRating?: number;
@@ -71,6 +73,16 @@ export const getAllProducts = async ({
 
     if (status?.length) {
       whereParts.push(Prisma.sql`p."status" IN (${Prisma.join(status)})`);
+    }
+
+    const listingTypes = listingType?.filter(
+      (type): type is ListingType =>
+        type === "marketplace" || type === "auction",
+    );
+    if (listingTypes?.length) {
+      whereParts.push(
+        Prisma.sql`p."listingType"::text IN (${Prisma.join(listingTypes)})`,
+      );
     }
 
     if (typeof minPrice === "number") {
@@ -223,6 +235,7 @@ export const createProduct = async ({
   rating,
   stockQuantity,
   status,
+  listingType = "marketplace",
   description,
   paymentMethods = [],
   meetupLocations = [],
@@ -237,6 +250,7 @@ export const createProduct = async ({
   rating: number;
   stockQuantity: number;
   status?: string;
+  listingType?: ListingType;
   description: string;
   paymentMethods?: string[];
   meetupLocations?: string[];
@@ -254,6 +268,8 @@ export const createProduct = async ({
         rating,
         stockQuantity,
         status: status?.trim() || "Available",
+        listingType:
+          listingType === "auction" ? "auction" : "marketplace",
         description,
         paymentMethods,
         meetupLocations,
@@ -275,6 +291,7 @@ type ProductUpdatePayload = {
   rating?: number | null;
   stockQuantity?: number;
   status?: string;
+  listingType?: ListingType;
   paymentMethods?: string[];
   meetupLocations?: string[];
   shippingDetails?: string | null;
@@ -299,6 +316,10 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
         rating: data.rating,
         stockQuantity: data.stockQuantity,
         status: data.status,
+        listingType:
+          data.listingType === "auction" || data.listingType === "marketplace"
+            ? data.listingType
+            : undefined,
         paymentMethods: data.paymentMethods,
         meetupLocations: data.meetupLocations,
         shippingDetails: data.shippingDetails,

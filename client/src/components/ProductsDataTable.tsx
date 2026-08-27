@@ -28,6 +28,7 @@ export type ProductTableSortKey =
   | "rating"
   | "stockQuantity"
   | "status"
+  | "listingType"
   | "description";
 
 type SortDir = "asc" | "desc";
@@ -48,6 +49,7 @@ const COLUMNS: {
   { key: "price", label: "Price", align: "right" },
   { key: "rating", label: "Rating", align: "right" },
   { key: "stockQuantity", label: "Stock", align: "right" },
+  { key: "listingType", label: "Listing" },
   { key: "status", label: "Status" },
   { key: "description", label: "Description" },
 ];
@@ -366,6 +368,9 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     </td>
                     <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-gray-800">
                       {p.stockQuantity}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-gray-800 capitalize">
+                      {p.listingType}
                     </td>
                     <td className="whitespace-nowrap px-3 py-2">
                       <span

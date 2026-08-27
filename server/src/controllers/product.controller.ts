@@ -48,6 +48,7 @@ export const getAllProducts = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
+    const listingType = parseCsv(req.query.listingType?.toString());
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
     const minRating = parseNumber(req.query.minRating);
@@ -80,6 +81,7 @@ export const getAllProducts = async (
       brand,
       condition,
       status,
+      listingType,
       minPrice,
       maxPrice,
       minRating,
@@ -127,6 +129,7 @@ export const createProduct = async (
       rating,
       stockQuantity,
       status,
+      listingType,
       description,
       paymentMethods,
       meetupLocations,
@@ -142,6 +145,7 @@ export const createProduct = async (
       rating,
       stockQuantity,
       status,
+      listingType,
       description,
       paymentMethods,
       meetupLocations,

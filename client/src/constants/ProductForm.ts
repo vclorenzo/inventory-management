@@ -40,6 +40,18 @@ export function buildProductFormFields({
 			},
 		},
 		{
+			name: 'listingType',
+			label: 'Listing Type',
+			type: 'select',
+			options: [
+				{ value: 'marketplace', label: 'Marketplace' },
+				{ value: 'auction', label: 'Auction' },
+			],
+			rules: {
+				required: 'Listing type is required',
+			},
+		},
+		{
 			name: 'price',
 			label: 'Price',
 			type: 'number',

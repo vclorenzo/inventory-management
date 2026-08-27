@@ -5,6 +5,7 @@ import { useMe } from '@/hooks/useMe'
 import { useProfile } from '@/hooks/useProfile'
 import { useReviews } from '@/hooks/useReviews'
 import { useUser } from '@/hooks/useUser'
+import Link from 'next/link'
 
 type Props = {
 	userId?: string
@@ -53,9 +54,7 @@ const ProfileBanner = ({ userId }: Props) => {
 	) {
 		return (
 			<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-				<p className="text-center text-sm text-gray-500">
-					Loading profile...
-				</p>
+				<p className="text-center text-sm text-gray-500">Loading profile...</p>
 			</div>
 		)
 	}
@@ -63,20 +62,28 @@ const ProfileBanner = ({ userId }: Props) => {
 	const displayAverage = average ?? 0
 	const displayAverageLabel = average === null ? '—' : average.toFixed(1)
 
+	const identity = (
+		<article className="space-y-2">
+			<div className="flex flex-col items-center justify-center gap-2">
+				<div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-3xl font-semibold uppercase text-white">
+					{initials}
+				</div>
+				<div className="flex items-center gap-2">
+					<p className="text-xl font-semibold text-gray-900">
+						{name || 'Unknown seller'}
+					</p>
+				</div>
+			</div>
+		</article>
+	)
+
 	return (
 		<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-			<article className="space-y-2">
-				<div className="flex flex-col items-center justify-center gap-2">
-					<div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-3xl font-semibold uppercase text-white">
-						{initials}
-					</div>
-					<div className="flex items-center gap-2">
-						<p className="text-xl font-semibold text-gray-900">
-							{name || 'Unknown seller'}
-						</p>
-					</div>
-				</div>
-			</article>
+			{resolvedUserId ? (
+				<Link href={`/account/${resolvedUserId}`}>{identity}</Link>
+			) : (
+				identity
+			)}
 			<div className="mt-5 flex justify-center gap-5">
 				<div className="flex items-center gap-2">
 					<span className="text-gray-700">{displayAverageLabel}</span>
