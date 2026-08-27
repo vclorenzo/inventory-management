@@ -25,6 +25,7 @@ function Marketplace() {
 		isError,
 	} = useGetProductsQuery({
 		search: searchTerm,
+		listingType: 'marketplace',
 		...(userId ? { excludeUserId: userId } : {}),
 	})
 
@@ -32,7 +33,7 @@ function Marketplace() {
 		useCreateProductMutation()
 
 	const handleCreateProduct = async (productData: ProductFormValues) => {
-		await createProduct(productData)
+		await createProduct({ ...productData, listingType: 'marketplace' })
 	}
 
 	if (isLoading) {

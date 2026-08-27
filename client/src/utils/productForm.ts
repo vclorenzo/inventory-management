@@ -23,6 +23,8 @@ export function productToFormValues(product: Product): ProductFormValues {
     price: product.price,
     stockQuantity: product.stockQuantity,
     status: product.status,
+    listingType:
+      product.listingType === "auction" ? "auction" : "marketplace",
     rating: typeof product.rating === "number" ? product.rating : 0,
     description: product.description,
     paymentMethods: Array.isArray(product.paymentMethods)

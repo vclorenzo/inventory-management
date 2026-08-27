@@ -30,6 +30,7 @@ const EMPTY_PRODUCT_FORM: ProductFormValues = {
 	price: 0,
 	stockQuantity: 0,
 	status: 'Available',
+	listingType: 'marketplace',
 	description: '',
 	paymentMethods: [],
 	meetupLocations: [createMeetupLocation()],

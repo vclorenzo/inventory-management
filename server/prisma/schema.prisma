@@ -74,6 +74,11 @@ model Address {
   @@index([profileId])
 }
 
+enum ListingType {
+  marketplace
+  auction
+}
+
 model Products {
   productId        String      @id @default(uuid())
   userId           String
@@ -85,6 +90,7 @@ model Products {
   condition        String
   stockQuantity    Int
   status           String
+  listingType      ListingType @default(marketplace)
   description      String
   paymentMethods   String[]    @default([])
   meetupLocations  Json        @default(dbgenerated("'[]'::jsonb"))
@@ -94,6 +100,8 @@ model Products {
   Purchases        Purchases[]
   cartItems        CartItems[]
   productReviews   ProductReviews[]
+
+  @@index([listingType])
 }
 
 model CartItems {

@@ -13,7 +13,13 @@ function Cards({ products }: { products: Product[] }) {
 			className="mx-auto w-full max-w-full rounded-md border p-4 shadow"
 		>
 			<Link
-				href={`/${pathname.includes('marketplace') ? 'marketplace' : 'products'}/${product.productId}`}
+				href={`/${
+					pathname.includes('marketplace') || pathname.includes('auctions')
+						? product.listingType === 'auction'
+							? 'auctions'
+							: 'marketplace'
+						: 'products'
+				}/${product.productId}`}
 				className="flex flex-col items-center"
 			>
 				<Image

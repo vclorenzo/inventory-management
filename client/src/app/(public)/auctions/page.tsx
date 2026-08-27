@@ -20,12 +20,15 @@ const Auctions = (props: Props) => {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsQuery(searchTerm);
+  } = useGetProductsQuery({
+    search: searchTerm,
+    listingType: "auction",
+  });
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
     useCreateProductMutation();
   const handleCreateProduct = async (productData: ProductFormValues) => {
-    await createProduct(productData);
+    await createProduct({ ...productData, listingType: "auction" });
   };
 
   if (isLoading) {
