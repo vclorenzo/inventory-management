@@ -1,6 +1,7 @@
 "use client";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import Cards from "@/components/Cards";
+import { useMe } from "@/hooks/useMe";
 import {
   useCreateProductMutation,
   useGetProductsQuery,
@@ -10,11 +11,12 @@ import { CircularProgress } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 
-type Props = {};
-
-const Auctions = (props: Props) => {
+function Auctions() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { me } = useMe();
+  const userId = me?.data.userId ?? "";
 
   const {
     data: products,
@@ -23,6 +25,7 @@ const Auctions = (props: Props) => {
   } = useGetProductsQuery({
     search: searchTerm,
     listingType: "auction",
+    ...(userId ? { excludeUserId: userId } : {}),
   });
 
   const [createProduct, { isLoading: isCreateProductLoading }] =
@@ -84,7 +87,7 @@ const Auctions = (props: Props) => {
         isProductLoading={isCreateProductLoading}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Auctions;
+export default Auctions

@@ -50,3 +50,7 @@ export type ProductFormValues = {
 	meetupLocations: meetupLocations[]
 	shippingDetails: string | null
 }
+
+export type UpdateProduct = ProductFormValues & {
+	productId: string
+}

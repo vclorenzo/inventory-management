@@ -1,4 +1,9 @@
-import { Product, NewProduct, ListingType } from '@/types/pages/Products'
+import {
+	Product,
+	NewProduct,
+	UpdateProduct,
+	ListingType,
+} from '@/types/pages/Products'
 import { api } from '../api'
 
 export type ProductSortBy =
@@ -94,7 +99,7 @@ export const productsApi = api.injectEndpoints({
 			}),
 			invalidatesTags: ['Products'],
 		}),
-		updateProduct: builder.mutation<Product, Product>({
+		updateProduct: builder.mutation<Product, UpdateProduct>({
 			query: ({ productId, ...body }) => ({
 				url: `/products/${productId}`,
 				method: 'PUT',

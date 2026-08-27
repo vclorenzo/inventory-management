@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
+import { listingTypeSchema } from "#validations/products.validation.ts";
 
 const parseCsv = (value?: string): string[] | undefined => {
   if (!value) return undefined;
@@ -8,6 +9,13 @@ const parseCsv = (value?: string): string[] | undefined => {
     .map((item) => item.trim())
     .filter(Boolean);
   return parsed.length ? parsed : undefined;
+};
+
+const parseListingType = (value?: string): string[] | undefined => {
+  const parsed = parseCsv(value)?.filter(
+    (type) => listingTypeSchema.safeParse(type).success,
+  );
+  return parsed?.length ? parsed : undefined;
 };
 
 const parseNumber = (value: unknown): number | undefined => {
@@ -48,7 +56,7 @@ export const getAllProducts = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
-    const listingType = parseCsv(req.query.listingType?.toString());
+    const listingType = parseListingType(req.query.listingType?.toString());
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
     const minRating = parseNumber(req.query.minRating);
