@@ -9,6 +9,3 @@ END $$;
 -- AlterTable
 ALTER TABLE "Products"
 ADD COLUMN IF NOT EXISTS "listingType" "ListingType" NOT NULL DEFAULT 'marketplace';
-
--- CreateIndex
-CREATE INDEX IF NOT EXISTS "Products_listingType_idx" ON "Products"("listingType");
