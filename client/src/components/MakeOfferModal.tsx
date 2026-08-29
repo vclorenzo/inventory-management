@@ -63,6 +63,13 @@ function MakeOfferModal({
 			return
 		}
 
+		if (listingPrice != null && offerAmount < listingPrice) {
+			setValidationError(
+				`Offer must be at least the starting price of P${listingPrice.toFixed(2)}.`,
+			)
+			return
+		}
+
 		setValidationError(null)
 		await onConfirm(offerAmount)
 	}
@@ -118,7 +125,7 @@ function MakeOfferModal({
 							id={amountId}
 							type="number"
 							inputMode="decimal"
-							min="0.01"
+							min={listingPrice != null ? listingPrice : 0.01}
 							step="0.01"
 							autoFocus
 							value={amount}

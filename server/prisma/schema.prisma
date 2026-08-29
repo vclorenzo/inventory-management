@@ -25,6 +25,7 @@ model Users {
   profile Profile?
   products Products[]
   cartItems CartItems[]
+  bids Bids[]
   purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
@@ -99,6 +100,7 @@ model Products {
   Sales            Sales[]
   Purchases        Purchases[]
   cartItems        CartItems[]
+  bids             Bids[]
   productReviews   ProductReviews[]
 
   @@index([listingType])
@@ -118,6 +120,24 @@ model CartItems {
   updated_at DateTime @updatedAt
 
   @@unique([userId, productId])
+}
+
+model Bids {
+  bidId      String @id @default(uuid())
+  userId     String
+  productId  String
+  offerPrice Float
+  currency   String @default("₱")
+
+  user    Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  product Products @relation(fields: [productId], references: [productId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }
 
 model Sales {

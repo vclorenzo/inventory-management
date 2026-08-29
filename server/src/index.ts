@@ -14,6 +14,7 @@ import userRoutes from "./routes/user.routes";
 import profileRoutes from "./routes/profile.routes";
 import reviewRoutes from "./routes/review.routes ";
 import cartRoutes from "./routes/cart.routes";
+import bidRoutes from "./routes/bid.routes";
 import purchaseRoutes from "./routes/purchase.routes";
 import { parseReviewPagination } from "#middleware/pagination.middleware.ts";
 // import { botBlocker } from '#middleware/botBlocker.ts';
@@ -51,6 +52,7 @@ app.use("/auth", authRoutes);
 app.use("/expenses", expenseRoutes);
 app.use("/reviews", parseReviewPagination, reviewRoutes);
 app.use("/cart", cartRoutes);
+app.use("/bids", bidRoutes);
 app.use("/purchases", purchaseRoutes);
 
 // Error Handler

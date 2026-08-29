@@ -3,6 +3,7 @@
 import MakeOfferModal from '@/components/MakeOfferModal'
 import { useCart } from '@/hooks/useCart'
 import { useMe } from '@/hooks/useMe'
+import { useAddBidMutation } from '@/state/internal/bidsApi'
 import { CircularProgress } from '@mui/material'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -50,7 +51,10 @@ function AddToCartButton({
 	const isAuction = pathname.startsWith('/auctions')
 	const { me } = useMe()
 	const { addCartItem, addCartItemState } = useCart()
-	const isLoading = addCartItemState.isLoading
+	const [addBid, addBidState] = useAddBidMutation()
+	const isCartLoading = addCartItemState.isLoading
+	const isBidLoading = addBidState.isLoading
+	const isLoading = isAuction ? isBidLoading : isCartLoading
 	const [errorMessage, setErrorMessage] = useState<string | null>(null)
 	const [isOfferModalOpen, setIsOfferModalOpen] = useState(false)
 	const label = isAuction ? 'Make Offer' : 'Add to Cart'
@@ -60,8 +64,7 @@ function AddToCartButton({
 
 		try {
 			await addCartItem({ productId, quantity: 1 }).unwrap()
-			setIsOfferModalOpen(false)
-			router.push(isAuction ? '/bids' : '/cart')
+			router.push('/cart')
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
 				router.push('/login')
@@ -69,12 +72,26 @@ function AddToCartButton({
 			}
 
 			setErrorMessage(
-				getRequestErrorMessage(
-					error,
-					isAuction
-						? 'Could not submit your offer'
-						: 'Could not add item to cart',
-				),
+				getRequestErrorMessage(error, 'Could not add item to cart'),
+			)
+		}
+	}
+
+	const handleConfirmOffer = async (offerPrice: number) => {
+		setErrorMessage(null)
+
+		try {
+			await addBid({ productId, offerPrice }).unwrap()
+			setIsOfferModalOpen(false)
+			router.push('/bids')
+		} catch (error) {
+			if (isUnauthorizedError(error)) {
+				router.push('/login')
+				return
+			}
+
+			setErrorMessage(
+				getRequestErrorMessage(error, 'Could not submit your offer'),
 			)
 		}
 	}
@@ -108,7 +125,7 @@ function AddToCartButton({
 				disabled={disabled || isLoading}
 				className={className}
 			>
-				{isLoading && !isAuction ? (
+				{isCartLoading && !isAuction ? (
 					<span className="inline-flex items-center gap-2">
 						<CircularProgress size={18} color="inherit" />
 						Adding…
@@ -125,11 +142,11 @@ function AddToCartButton({
 			{isAuction && (
 				<MakeOfferModal
 					isOpen={isOfferModalOpen}
-					isSubmitting={isLoading}
+					isSubmitting={isBidLoading}
 					listingPrice={listingPrice}
 					errorMessage={errorMessage}
 					onClose={handleCloseOfferModal}
-					onConfirm={handleAddToCart}
+					onConfirm={handleConfirmOffer}
 				/>
 			)}
 		</div>
