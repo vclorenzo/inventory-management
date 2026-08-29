@@ -3,7 +3,12 @@ import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const getAllProducts = async ({
+const toDate = (value: Date | string | undefined) => {
+  if (value === undefined) return undefined;
+  return value instanceof Date ? value : new Date(value);
+};
+
+export const getAllAuctions = async ({
   search,
   userId,
   excludeUserId,
@@ -154,17 +159,17 @@ export const getAllProducts = async ({
         ? Prisma.sql`LIMIT ${limit} OFFSET ${(page - 1) * limit}`
         : Prisma.empty;
 
-    const [countRows, products] = await prisma.$transaction([
+    const [countRows, auctions] = await prisma.$transaction([
       prisma.$queryRaw<{ count: bigint }[]>`
         SELECT COUNT(*)::bigint AS count
-        FROM "Products" p
+        FROM "Auctions" p
         WHERE ${whereSql}
       `,
       prisma.$queryRaw<
-        (Prisma.ProductsGetPayload<object> & { userName: string })[]
+        (Prisma.AuctionsGetPayload<object> & { userName: string })[]
       >`
         SELECT p.*
-        FROM "Products" p
+        FROM "Auctions" p
         INNER JOIN "Users" u ON p."userId" = u."userId"
         WHERE ${whereSql}
         ORDER BY ${orderBySql}
@@ -173,47 +178,25 @@ export const getAllProducts = async ({
     ]);
 
     const totalCount = Number(countRows[0]?.count ?? BigInt(0));
-    return { products, totalCount };
+    return { auctions, totalCount };
   } catch (error) {
     throw error;
   }
 };
 
-export const getProductById = async (id: string) => {
+export const getAuctionById = async (id: string) => {
   try {
-    const product = await prisma.products.findFirst({
+    return await prisma.auctions.findFirst({
       where: {
         productId: id,
       },
-      include: {
-        productReviews: {
-          select: { rating: true },
-        },
-      },
     });
-
-    if (!product) return null;
-
-    const ratings = product.productReviews.map((review) => review.rating);
-    const reviewCount = ratings.length;
-    const rating =
-      reviewCount === 0
-        ? null
-        : ratings.reduce((sum, value) => sum + value, 0) / reviewCount;
-
-    const { productReviews: _productReviews, ...productData } = product;
-
-    return {
-      ...productData,
-      rating,
-      reviewCount,
-    };
   } catch (error) {
     throw error;
   }
 };
 
-export const createProduct = async ({
+export const createAuction = async ({
   name,
   userId,
   productCategory,
@@ -227,6 +210,7 @@ export const createProduct = async ({
   paymentMethods = [],
   meetupLocations = [],
   shippingDetails,
+  biddingEndsAt,
 }: {
   name: string;
   userId: string;
@@ -241,9 +225,18 @@ export const createProduct = async ({
   paymentMethods?: string[];
   meetupLocations?: Prisma.InputJsonValue;
   shippingDetails?: string | null;
+  biddingEndsAt: Date | string;
 }) => {
   try {
-    return await prisma.products.create({
+    const endsAt = toDate(biddingEndsAt);
+    if (!endsAt || Number.isNaN(endsAt.getTime())) {
+      throw new AppError("A valid bidding end date is required", 400);
+    }
+    if (endsAt.getTime() <= Date.now()) {
+      throw new AppError("Bidding end date must be in the future", 400);
+    }
+
+    return await prisma.auctions.create({
       data: {
         name,
         userId,
@@ -258,6 +251,8 @@ export const createProduct = async ({
         paymentMethods,
         meetupLocations,
         shippingDetails,
+        biddingEndsAt: endsAt,
+        bidCount: 0,
       },
     });
   } catch (error) {
@@ -265,7 +260,7 @@ export const createProduct = async ({
   }
 };
 
-type ProductUpdatePayload = {
+type AuctionUpdatePayload = {
   name?: string;
   productCategory?: string;
   brand?: string;
@@ -278,16 +273,19 @@ type ProductUpdatePayload = {
   paymentMethods?: string[];
   meetupLocations?: Prisma.InputJsonValue;
   shippingDetails?: string | null;
+  biddingEndsAt?: Date | string;
 };
 
-export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
+export const updateAuction = async (id: string, data: AuctionUpdatePayload) => {
   try {
-    const existingProduct = await getProductById(id);
-    if (!existingProduct) {
-      throw new AppError("Product does not exist");
+    const existingAuction = await getAuctionById(id);
+    if (!existingAuction) {
+      throw new AppError("Auction does not exist");
     }
 
-    return await prisma.products.update({
+    const biddingEndsAt = toDate(data.biddingEndsAt);
+
+    return await prisma.auctions.update({
       where: { productId: id },
       data: {
         name: data.name,
@@ -302,24 +300,22 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
         paymentMethods: data.paymentMethods,
         meetupLocations: data.meetupLocations,
         shippingDetails: data.shippingDetails,
+        biddingEndsAt,
       },
     });
   } catch (error) {
     throw error;
   }
 };
-export const deleteProduct = async (id: string) => {
+
+export const deleteAuction = async (id: string) => {
   try {
-    const existingProduct = await getProductById(id);
-    if (!existingProduct) {
-      throw new AppError("Product does not exist");
+    const existingAuction = await getAuctionById(id);
+    if (!existingAuction) {
+      throw new AppError("Auction does not exist");
     }
-    return await prisma.$transaction(async (tx) => {
-      await tx.sales.deleteMany({ where: { productId: id } });
-      await tx.purchases.deleteMany({ where: { productId: id } });
-      return tx.products.delete({
-        where: { productId: id },
-      });
+    return await prisma.auctions.delete({
+      where: { productId: id },
     });
   } catch (error) {
     throw error;

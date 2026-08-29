@@ -1,19 +1,19 @@
 import ReactHookForm from '@/components/forms/ReactHookForm'
 import Header from '@/components/Header'
-import { buildProductFormFields } from '@/constants/ProductForm'
+import { buildAuctionFormFields } from '@/constants/ProductForm'
 import { ReusableFieldConfig } from '@/types/components/ReactHookForm'
-import { ProductFormValues } from '@/types/pages/Products'
+import { AuctionFormValues } from '@/types/pages/Auctions'
+import { defaultBiddingEndsAt, biddingEndsAtToIso } from '@/utils/auctionForm'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Plus, Trash2, XCircleIcon } from 'lucide-react'
 
-type ProductModalProps = {
+type AuctionModalProps = {
 	isOpen: boolean
 	onClose: () => void
-	onSend: (formData: ProductFormValues) => void | Promise<void>
-	isProductLoading: boolean
-	/** When set (e.g. on product detail), the form opens with these values */
-	defaultValues?: ProductFormValues
+	onSend: (formData: AuctionFormValues) => void | Promise<void>
+	isAuctionLoading: boolean
+	defaultValues?: AuctionFormValues
 }
 
 const createMeetupLocation = () => ({
@@ -22,7 +22,7 @@ const createMeetupLocation = () => ({
 	mapLink: '',
 })
 
-const EMPTY_PRODUCT_FORM: ProductFormValues = {
+const EMPTY_AUCTION_FORM: AuctionFormValues = {
 	name: '',
 	productCategory: '',
 	brand: '',
@@ -34,18 +34,19 @@ const EMPTY_PRODUCT_FORM: ProductFormValues = {
 	paymentMethods: [],
 	meetupLocations: [createMeetupLocation()],
 	shippingDetails: '',
+	biddingEndsAt: defaultBiddingEndsAt(),
 }
 
-const ProductModal = ({
+const AuctionModal = ({
 	isOpen,
 	onClose,
 	onSend,
-	isProductLoading,
+	isAuctionLoading,
 	defaultValues,
-}: ProductModalProps) => {
+}: AuctionModalProps) => {
 	const [paymentMethodInput, setPaymentMethodInput] = useState('')
 
-	const form = useForm<ProductFormValues>()
+	const form = useForm<AuctionFormValues>()
 	const {
 		setValue,
 		reset,
@@ -60,7 +61,10 @@ const ProductModal = ({
 
 	useEffect(() => {
 		if (!isOpen) return
-		reset(defaultValues ?? EMPTY_PRODUCT_FORM)
+		reset(defaultValues ?? {
+			...EMPTY_AUCTION_FORM,
+			biddingEndsAt: defaultBiddingEndsAt(),
+		})
 		setPaymentMethodInput('')
 	}, [isOpen, defaultValues, reset])
 
@@ -83,9 +87,9 @@ const ProductModal = ({
 		})
 	}, [register])
 
-	const fields: ReusableFieldConfig<ProductFormValues>[] = useMemo(
+	const fields: ReusableFieldConfig<AuctionFormValues>[] = useMemo(
 		() =>
-			buildProductFormFields({
+			buildAuctionFormFields({
 				getValues,
 			}).filter(
 				(field) =>
@@ -163,8 +167,13 @@ const ProductModal = ({
 		)
 	}
 
-	const onSubmit = async (data: ProductFormValues) => {
-		await Promise.resolve(onSend(data))
+	const onSubmit = async (data: AuctionFormValues) => {
+		await Promise.resolve(
+			onSend({
+				...data,
+				biddingEndsAt: biddingEndsAtToIso(data.biddingEndsAt),
+			}),
+		)
 		onClose()
 	}
 
@@ -175,7 +184,7 @@ const ProductModal = ({
 			<div className="relative top-20 mx-auto w-[fit-content] rounded-md border bg-white p-5 shadow-lg">
 				<div className="flex flex-row items-center justify-between">
 					<Header
-						name={defaultValues ? 'Edit Product' : 'Create New Product'}
+						name={defaultValues ? 'Edit Auction' : 'Create New Auction'}
 					/>
 					<button onClick={onClose}>
 						<XCircleIcon />
@@ -186,7 +195,7 @@ const ProductModal = ({
 					fields={fields}
 					onSubmit={onSubmit}
 					submitLabel="Save"
-					isSubmitting={isProductLoading}
+					isSubmitting={isAuctionLoading}
 					className="flex flex-col gap-4"
 				>
 					<div className="mt-2 space-y-5">
@@ -356,4 +365,4 @@ const ProductModal = ({
 	)
 }
 
-export default ProductModal
+export default AuctionModal

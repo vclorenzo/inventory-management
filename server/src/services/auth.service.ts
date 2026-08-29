@@ -1,7 +1,7 @@
 import logger from "#config/logger.ts";
 import { AppError } from "#error/AppError.ts";
 import { jwtToken } from "#src/utils/jwt.ts";
-import { PrismaClient, Products } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();

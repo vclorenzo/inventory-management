@@ -7,7 +7,7 @@ import React from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronLeft, Package } from 'lucide-react'
+import { Bookmark, ChevronLeft, ExternalLink, MapPin, Package } from 'lucide-react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -18,7 +18,6 @@ import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
 import ProductRating from '@/components/ProductRating'
-import { Bookmark } from 'lucide-react'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
 
 const productImageUrls = (length: number) => {
@@ -97,6 +96,17 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 
 	const images = productImageUrls(3)
 	const inStock = product.stockQuantity > 0
+	const paymentMethods = Array.isArray(product.paymentMethods)
+		? product.paymentMethods
+		: []
+	const meetupLocations = Array.isArray(product.meetupLocations)
+		? product.meetupLocations
+		: []
+	const shippingDetails =
+		typeof product.shippingDetails === 'string' &&
+		product.shippingDetails.trim()
+			? product.shippingDetails
+			: null
 
 	return (
 		<div className="mx-auto w-full max-w-5xl pb-10">
@@ -231,6 +241,73 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 						>
 							Browse more products
 						</Link>
+					</div>
+				</div>
+			</div>
+			<div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+					<h2 className="text-2xl font-semibold text-gray-900">
+						Description
+					</h2>
+					<div className="mt-4 space-y-4 text-gray-700">
+						{product.description}
+					</div>
+				</div>
+				<div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+					<h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+						Transaction Details
+					</h2>
+					<div className="mt-6 space-y-5">
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">
+								Payment
+							</p>
+							{paymentMethods.length > 0 ? (
+								<ul className="mt-2 space-y-1 text-gray-700">
+									{paymentMethods.map((method) => (
+										<li key={method}>- {method}</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-gray-700">
+									No payment methods provided.
+								</p>
+							)}
+						</div>
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">
+								Meet-up
+							</p>
+							{meetupLocations.length > 0 ? (
+								<div className="mt-2 space-y-2 text-gray-700">
+									{meetupLocations.map((location) => (
+										<div
+											key={location.name}
+											className="flex items-center gap-2"
+										>
+											<MapPin className="h-4 w-4 text-gray-500" />
+											<Link href={location.mapLink}>
+												{location.name}
+											</Link>
+											<ExternalLink className="h-4 w-4 text-gray-500" />
+										</div>
+									))}
+								</div>
+							) : (
+								<p className="mt-1 text-gray-700">
+									No meet-up locations provided.
+								</p>
+							)}
+						</div>
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">
+								Shipping
+							</p>
+							<p className="mt-1 text-gray-700">
+								{shippingDetails ??
+									'No shipping details provided.'}
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>

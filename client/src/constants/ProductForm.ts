@@ -1,4 +1,5 @@
 import type { ReusableFieldConfig } from '@/types/components/ReactHookForm'
+import { AuctionFormValues } from '@/types/pages/Auctions'
 import { ProductFormValues } from '@/types/pages/Products'
 import type { UseFormGetValues } from 'react-hook-form'
 type Args = { getValues: UseFormGetValues<ProductFormValues> }
@@ -37,18 +38,6 @@ export function buildProductFormFields({
 			type: 'text',
 			rules: {
 				required: 'Condition is required',
-			},
-		},
-		{
-			name: 'listingType',
-			label: 'Listing Type',
-			type: 'select',
-			options: [
-				{ value: 'marketplace', label: 'Marketplace' },
-				{ value: 'auction', label: 'Auction' },
-			],
-			rules: {
-				required: 'Listing type is required',
 			},
 		},
 		{
@@ -92,6 +81,26 @@ export function buildProductFormFields({
 			type: 'text',
 			rules: {
 				required: 'Meetup locations are required',
+			},
+		},
+	]
+}
+
+export function buildAuctionFormFields({
+	getValues,
+}: {
+	getValues: UseFormGetValues<AuctionFormValues>
+}): ReusableFieldConfig<AuctionFormValues>[] {
+	return [
+		...(buildProductFormFields({
+			getValues: getValues as unknown as UseFormGetValues<ProductFormValues>,
+		}) as unknown as ReusableFieldConfig<AuctionFormValues>[]),
+		{
+			name: 'biddingEndsAt',
+			label: 'Bidding ends',
+			type: 'datetime-local',
+			rules: {
+				required: 'Bidding end date is required',
 			},
 		},
 	]

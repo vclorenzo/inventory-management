@@ -24,6 +24,7 @@ model Users {
 
   profile Profile?
   products Products[]
+  auctions Auctions[]
   cartItems CartItems[]
   bids Bids[]
   purchases Purchases[]
@@ -75,13 +76,8 @@ model Address {
   @@index([profileId])
 }
 
-enum ListingType {
-  marketplace
-  auction
-}
-
 model Products {
-  productId        String      @id @default(uuid())
+  productId        String   @id @default(uuid())
   userId           String
   name             String
   price            Float
@@ -91,19 +87,36 @@ model Products {
   condition        String
   stockQuantity    Int
   status           String
-  listingType      ListingType @default(marketplace)
   description      String
-  paymentMethods   String[]    @default([])
-  meetupLocations  Json        @default(dbgenerated("'[]'::jsonb"))
+  paymentMethods   String[] @default([])
+  meetupLocations  Json     @default(dbgenerated("'[]'::jsonb"))
   shippingDetails  String?
-  owner            Users       @relation(fields: [userId], references: [userId])
+  owner            Users    @relation(fields: [userId], references: [userId])
   Sales            Sales[]
   Purchases        Purchases[]
   cartItems        CartItems[]
-  bids             Bids[]
   productReviews   ProductReviews[]
+}
 
-  @@index([listingType])
+model Auctions {
+  productId        String   @id @default(uuid())
+  userId           String
+  name             String
+  price            Float
+  rating           Float?
+  productCategory  String
+  brand            String
+  condition        String
+  stockQuantity    Int
+  status           String
+  description      String
+  paymentMethods   String[] @default([])
+  meetupLocations  Json     @default(dbgenerated("'[]'::jsonb"))
+  shippingDetails  String?
+  biddingEndsAt    DateTime
+  bidCount         Int      @default(0)
+  owner            Users    @relation(fields: [userId], references: [userId])
+  bids             Bids[]
 }
 
 model CartItems {
@@ -130,7 +143,7 @@ model Bids {
   currency   String @default("₱")
 
   user    Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  product Products @relation(fields: [productId], references: [productId], onDelete: Cascade)
+  auction Auctions @relation(fields: [productId], references: [productId], onDelete: Cascade)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

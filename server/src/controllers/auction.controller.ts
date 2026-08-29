@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as productService from "../services/product.service";
+import * as auctionService from "../services/auction.service";
 import { AppError } from "#error/AppError.ts";
 
 const parseCsv = (value?: string): string[] | undefined => {
@@ -17,27 +17,27 @@ const parseNumber = (value: unknown): number | undefined => {
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 
-export const getProductById = async (
+export const getAuctionById = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const product = await productService.getProductById(id);
-    if (!product) {
-      res.status(404).json({ message: "Product not found" });
+    const auction = await auctionService.getAuctionById(id);
+    if (!auction) {
+      res.status(404).json({ message: "Auction not found" });
     } else {
       res.status(200).json({
-        message: "Product retrieved successfully",
-        data: product,
+        message: "Auction retrieved successfully",
+        data: auction,
       });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving product" });
+    res.status(500).json({ message: "Error retrieving auction" });
   }
 };
 
-export const getAllProducts = async (
+export const getAllAuctions = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -73,7 +73,7 @@ export const getAllProducts = async (
         ? Math.max(parsedLimit, 1)
         : undefined;
 
-    const { products, totalCount } = await productService.getAllProducts({
+    const { auctions, totalCount } = await auctionService.getAllAuctions({
       search,
       userId,
       excludeUserId,
@@ -96,8 +96,8 @@ export const getAllProducts = async (
       limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1;
 
     res.status(200).json({
-      message: "Successfully retrieved products",
-      data: products,
+      message: "Successfully retrieved auctions",
+      data: auctions,
       page,
       limit,
       totalPages,
@@ -108,11 +108,11 @@ export const getAllProducts = async (
       res.status(error.statusCode).json({ message: error.message });
       return;
     }
-    res.status(500).json({ message: "Error retrieving products" });
+    res.status(500).json({ message: "Error retrieving auctions" });
   }
 };
 
-export const createProduct = async (
+export const createAuction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -136,8 +136,9 @@ export const createProduct = async (
       paymentMethods,
       meetupLocations,
       shippingDetails,
+      biddingEndsAt,
     } = req.body;
-    const product = await productService.createProduct({
+    const auction = await auctionService.createAuction({
       name,
       userId,
       productCategory,
@@ -151,41 +152,54 @@ export const createProduct = async (
       paymentMethods,
       meetupLocations,
       shippingDetails,
+      biddingEndsAt,
     });
-    res.status(201).json({ data: product });
+    res.status(201).json({ data: auction });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
 
-export const updateProduct = async (
+export const updateAuction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
     const data = req.body;
-    const updatedProduct = await productService.updateProduct(id, data);
+    const updatedAuction = await auctionService.updateAuction(id, data);
     res
       .status(200)
-      .json({ message: "Product updated successfully", data: updatedProduct });
+      .json({ message: "Auction updated successfully", data: updatedAuction });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
 
-export const deleteProduct = async (
+export const deleteAuction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const deletedProduct = await productService.deleteProduct(id);
+    const deletedAuction = await auctionService.deleteAuction(id);
     res.status(200).json({
-      message: `Product ${deletedProduct.name} deleted successfully`,
-      data: deletedProduct,
+      message: `Auction ${deletedAuction.name} deleted successfully`,
+      data: deletedAuction,
     });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };

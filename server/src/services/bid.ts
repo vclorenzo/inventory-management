@@ -23,7 +23,7 @@ export type BidGroupResponse = {
 };
 
 const bidInclude = {
-  product: {
+  auction: {
     include: {
       owner: {
         select: {
@@ -43,10 +43,10 @@ const formatBidGroups = (
   const groups = new Map<string, BidGroupResponse>();
 
   for (const bid of bids) {
-    const shopKey = bid.product.userId;
+    const shopKey = bid.auction.userId;
     if (!groups.has(shopKey)) {
       groups.set(shopKey, {
-        shop: { name: bid.product.owner.name },
+        shop: { name: bid.auction.owner.name },
         items: [],
       });
     }
@@ -54,8 +54,8 @@ const formatBidGroups = (
     groups.get(shopKey)!.items.push({
       id: bid.bidId,
       image: DEFAULT_PRODUCT_IMAGE,
-      title: bid.product.name,
-      startingPrice: bid.product.price,
+      title: bid.auction.name,
+      startingPrice: bid.auction.price,
       offerPrice: bid.offerPrice,
       currency: bid.currency,
     });
@@ -70,6 +70,12 @@ const assertValidOffer = (offerPrice: number, startingPrice: number) => {
       `Offer must be at least the starting price of ${startingPrice}`,
       400,
     );
+  }
+};
+
+const assertAuctionOpen = (biddingEndsAt: Date) => {
+  if (biddingEndsAt.getTime() <= Date.now()) {
+    throw new AppError("Bidding for this auction has ended", 400);
   }
 };
 
@@ -110,27 +116,24 @@ export const addBid = async ({
   currency?: string;
 }) => {
   try {
-    const product = await prisma.products.findFirst({
+    const auction = await prisma.auctions.findFirst({
       where: { productId },
     });
 
-    if (!product) {
-      throw new AppError("Product does not exist", 404);
+    if (!auction) {
+      throw new AppError("Auction does not exist", 404);
     }
 
-    if (product.listingType !== "auction") {
-      throw new AppError("Bids can only be placed on auction listings", 400);
-    }
-
-    if (product.userId === userId) {
+    if (auction.userId === userId) {
       throw new AppError("You cannot bid on your own listing", 400);
     }
 
-    if (product.stockQuantity <= 0) {
+    if (auction.stockQuantity <= 0) {
       throw new AppError("Product is out of stock", 400);
     }
 
-    assertValidOffer(offerPrice, product.price);
+    assertAuctionOpen(auction.biddingEndsAt);
+    assertValidOffer(offerPrice, auction.price);
 
     const existingBid = await prisma.bids.findFirst({
       where: {
@@ -145,14 +148,20 @@ export const addBid = async ({
         data: { offerPrice, currency },
       });
     } else {
-      await prisma.bids.create({
-        data: {
-          userId,
-          productId,
-          offerPrice,
-          currency,
-        },
-      });
+      await prisma.$transaction([
+        prisma.bids.create({
+          data: {
+            userId,
+            productId,
+            offerPrice,
+            currency,
+          },
+        }),
+        prisma.auctions.update({
+          where: { productId },
+          data: { bidCount: { increment: 1 } },
+        }),
+      ]);
     }
 
     return getBidsByUserId(userId);
@@ -176,7 +185,8 @@ export const updateBidOffer = async ({
       throw new AppError("Bid does not exist", 404);
     }
 
-    assertValidOffer(offerPrice, existingBid.product.price);
+    assertAuctionOpen(existingBid.auction.biddingEndsAt);
+    assertValidOffer(offerPrice, existingBid.auction.price);
 
     await prisma.bids.update({
       where: { bidId },
@@ -196,9 +206,15 @@ export const removeBid = async (bidId: string, userId: string) => {
       throw new AppError("Bid does not exist", 404);
     }
 
-    await prisma.bids.delete({
-      where: { bidId },
-    });
+    await prisma.$transaction([
+      prisma.bids.delete({
+        where: { bidId },
+      }),
+      prisma.auctions.update({
+        where: { productId: existingBid.productId },
+        data: { bidCount: { decrement: 1 } },
+      }),
+    ]);
 
     return getBidsByUserId(userId);
   } catch (error) {

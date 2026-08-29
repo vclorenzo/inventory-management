@@ -1,0 +1,239 @@
+[
+  {
+    "productId": "1afc136b-4d9f-4e8e-aace-8e1df908a404",
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "name": "Rocky Mountain Zinnia",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 264.37,
+    "rating": 3.23,
+    "stockQuantity": 842192,
+    "status": "Unavailable",
+    "paymentMethods": [
+      "Cash"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": null,
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "26b017c6-06d8-443f-9b4a-d6b1cee6f4c0",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Common Brighteyes",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 435.44,
+    "rating": 0.27,
+    "stockQuantity": 124068,
+    "status": "Unlisted",
+    "paymentMethods": [
+      "PayPal"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "2a339fb2-f9f3-43bc-a85a-b217a0a38f12",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Hamatocaulis Moss",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 639.9,
+    "rating": 1.17,
+    "stockQuantity": 754285,
+    "status": "Available",
+    "paymentMethods": [
+      "GCash"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Trinoma",
+        "address": "EDSA cor. North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=Trinoma"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "afded6df-058f-477d-9878-e0e0b1d3dff3",
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "name": "Smooth Phlox",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 575.6,
+    "rating": 4.38,
+    "stockQuantity": 673658,
+    "status": "Available",
+    "paymentMethods": [
+      "Bank Transfer",
+      "GCash"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "0c3e80ee-59b3-4fc4-b760-8b07acc2d3ae",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Lindley's Clerodendrum",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 51.66,
+    "rating": 1.53,
+    "stockQuantity": 263383,
+    "status": "Available",
+    "paymentMethods": [
+      "Credit Card"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Seller ships within 48 hours after payment confirmation.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "25d01c80-bca1-4a00-b1d0-0fbd39ff9e89",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Simpson's Rosinweed",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 184.41,
+    "rating": 1.98,
+    "stockQuantity": 953695,
+    "status": "Available",
+    "paymentMethods": [
+      "GCash",
+      "PayPal",
+      "Cash"
+    ],
+    "meetupLocations": [
+      {
+        "name": "Glorietta",
+        "address": "Ayala Center, Makati",
+        "mapLink": "https://maps.google.com/?q=Glorietta+Makati"
+      }
+    ],
+    "shippingDetails": "Ships nationwide via courier in 3–5 business days.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "1d6df6e3-b7ea-4507-9d66-87c6ee8ed5b9",
+    "userId": "3b0fd66b-a4d6-4d95-94e4-01940c99aedb",
+    "name": "Lobelia",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 163.6,
+    "rating": 0.81,
+    "stockQuantity": 341530,
+    "status": "Unlisted",
+    "paymentMethods": [
+      "PayPal"
+    ],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "9d5fafbc-312b-47e8-ada1-283918f0c3b5",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Yellowturbans",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 564.82,
+    "rating": 4.74,
+    "stockQuantity": 33021,
+    "status": "Unlisted",
+    "paymentMethods": [
+      "PayPal"
+    ],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "LBC / J&T; tracking sent after dispatch.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  },
+  {
+    "productId": "fcf2e432-62a3-4b6f-a34d-36e42a12272e",
+    "userId": "c7072fb5-cd2b-4703-8a58-328e5b7ed95a",
+    "name": "Mad River Fleabane",
+    "productCategory": "Apparel",
+    "brand": "Nike",
+    "condition": "Brand New",
+    "description": "Nike Dunk Low",
+    "price": 669.97,
+    "rating": 1.34,
+    "stockQuantity": 880242,
+    "status": "Available",
+    "paymentMethods": [
+      "Bank Transfer"
+    ],
+    "meetupLocations": [
+      {
+        "name": "SM North EDSA",
+        "address": "North Ave, Quezon City",
+        "mapLink": "https://maps.google.com/?q=SM+North+EDSA"
+      }
+    ],
+    "shippingDetails": "Same-day Metro Manila delivery available on orders before 2 PM.",
+    "biddingEndsAt": "2026-09-12T12:00:00.000Z",
+    "bidCount": 0
+  }
+]

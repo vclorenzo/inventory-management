@@ -1,7 +1,5 @@
 import z from "zod";
 
-export const listingTypeSchema = z.enum(["marketplace", "auction"]);
-
 export const productIdSchema = z.object({
   productId: z.string().uuid(),
 });
@@ -11,7 +9,6 @@ export const createProductSchema = z.object({
   price: z.number().positive(),
   rating: z.number().min(0).max(5).optional(),
   stockQuantity: z.number().int().min(0),
-  listingType: listingTypeSchema,
 });
 
 export const updateProductSchema = z
@@ -20,14 +17,12 @@ export const updateProductSchema = z
     price: z.number().positive().optional(),
     rating: z.number().min(0).max(5).optional(),
     stockQuantity: z.number().int().min(0).optional(),
-    listingType: listingTypeSchema.optional(),
   })
   .refine(
     (data) => {
-      // Ensure at least one field is provided for update
       return Object.keys(data).length > 0;
     },
     {
-      message: 'At least one field must be provided for update',
+      message: "At least one field must be provided for update",
     },
   );

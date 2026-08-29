@@ -5,7 +5,6 @@ import path from 'path';
 
 const prisma = new PrismaClient();
 
-/** Primary-key field per Prisma model (camelCase name from seed JSON filename). */
 /** Stable owner per product — same productId always maps to the same user. */
 function pickProductOwnerId(productId: string, userIds: string[]): string {
 	let hash = 0;
@@ -15,17 +14,10 @@ function pickProductOwnerId(productId: string, userIds: string[]): string {
 	return userIds[hash % userIds.length];
 }
 
-function pickListingType(productId: string): 'marketplace' | 'auction' {
-	let hash = 0;
-	for (let i = 0; i < productId.length; i++) {
-		hash = (hash * 31 + productId.charCodeAt(i)) >>> 0;
-	}
-	return hash % 3 === 0 ? 'auction' : 'marketplace';
-}
-
 const MODEL_ID_FIELD: Record<string, string> = {
 	users: 'userId',
 	products: 'productId',
+	auctions: 'productId',
 	sales: 'saleId',
 	purchases: 'purchaseId',
 	expenses: 'expenseId',
@@ -48,6 +40,7 @@ async function main() {
 		'users.json',
 		'reviews.json',
 		'products.json',
+		'auctions.json',
 		'expenseSummary.json',
 		'sales.json',
 		'salesSummary.json',
@@ -75,10 +68,23 @@ async function main() {
 				data.password = await bcrypt.hash(data.password, 10);
 			}
 
-			if (modelName === 'products' && data.productId) {
+			if (
+				(modelName === 'products' || modelName === 'auctions') &&
+				data.productId
+			) {
 				data.userId = pickProductOwnerId(data.productId, userIds);
-				if (data.listingType !== 'marketplace' && data.listingType !== 'auction') {
-					data.listingType = pickListingType(data.productId);
+			}
+
+			if (
+				(modelName === 'sales' || modelName === 'purchases') &&
+				data.productId
+			) {
+				const product = await prisma.products.findUnique({
+					where: { productId: data.productId },
+					select: { productId: true },
+				});
+				if (!product) {
+					continue;
 				}
 			}
 

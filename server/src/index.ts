@@ -10,6 +10,7 @@ import authRoutes from "./routes/auth.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import expenseRoutes from "./routes/expense.routes";
 import productRoutes from "./routes/product.routes";
+import auctionRoutes from "./routes/auction.routes";
 import userRoutes from "./routes/user.routes";
 import profileRoutes from "./routes/profile.routes";
 import reviewRoutes from "./routes/review.routes ";
@@ -46,6 +47,7 @@ app.use(cookieParser());
 // ROUTES
 app.use("/dashboard", dashboardRoutes);
 app.use("/products", productRoutes);
+app.use("/auctions", auctionRoutes);
 app.use("/users", userRoutes);
 app.use("/profile", profileRoutes);
 app.use("/auth", authRoutes);

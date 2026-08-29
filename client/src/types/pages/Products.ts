@@ -1,7 +1,5 @@
 type meetupLocations = { name: string; address: string; mapLink: string }
 
-export type ListingType = 'marketplace' | 'auction'
-
 export interface Product {
 	productId: string
 	name: string
@@ -13,7 +11,6 @@ export interface Product {
 	reviewCount?: number
 	stockQuantity: number
 	status: string
-	listingType: ListingType
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]
@@ -29,7 +26,6 @@ export interface NewProduct {
 	price: number
 	stockQuantity: number
 	status?: string
-	listingType: ListingType
 	description: string
 	paymentMethods?: string[]
 	meetupLocations?: meetupLocations[]
@@ -44,7 +40,6 @@ export type ProductFormValues = {
 	price: number
 	stockQuantity: number
 	status: string
-	listingType: ListingType
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]

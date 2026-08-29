@@ -9,7 +9,7 @@ function Marketplace() {
 
 	return (
 		<ProductsCatalog
-			listingType="marketplace"
+			source="marketplace"
 			excludeUserId={userId || undefined}
 			heading="Marketplace"
 		/>

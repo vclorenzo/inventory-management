@@ -1,10 +1,10 @@
 "use client";
 
-import { Product, ProductFormValues } from "@/types/pages/Products";
+import { Auction, AuctionFormValues } from "@/types/pages/Auctions";
 import {
-  useDeleteProductMutation,
-  useUpdateProductMutation,
-} from "@/state/internal/productsApi";
+  useDeleteAuctionMutation,
+  useUpdateAuctionMutation,
+} from "@/state/internal/auctionsApi";
 import {
   ChevronDown,
   ChevronLeft,
@@ -15,10 +15,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ProductModal from "@/app/(authenticated)/products/ProductModal";
-import { productToFormValues } from "@/utils/productForm";
+import AuctionModal from "@/app/(authenticated)/products/AuctionModal";
+import { auctionToFormValues } from "@/utils/auctionForm";
 
-export type ProductTableSortKey =
+export type AuctionTableSortKey =
   | "productId"
   | "name"
   | "productCategory"
@@ -27,6 +27,8 @@ export type ProductTableSortKey =
   | "price"
   | "rating"
   | "stockQuantity"
+  | "bidCount"
+  | "biddingEndsAt"
   | "status"
   | "description";
 
@@ -37,7 +39,7 @@ type PageSizeOption = 5 | 10 | 15;
 const PAGE_SIZE_OPTIONS: PageSizeOption[] = [5, 10, 15];
 
 const COLUMNS: {
-  key: ProductTableSortKey;
+  key: AuctionTableSortKey;
   label: string;
   align?: "right";
 }[] = [
@@ -48,26 +50,34 @@ const COLUMNS: {
   { key: "price", label: "Price", align: "right" },
   { key: "rating", label: "Rating", align: "right" },
   { key: "stockQuantity", label: "Stock", align: "right" },
+  { key: "bidCount", label: "Bids", align: "right" },
+  { key: "biddingEndsAt", label: "Ends" },
   { key: "status", label: "Status" },
   { key: "description", label: "Description" },
 ];
 
-function getSortValue(p: Product, key: ProductTableSortKey): string | number {
+function getSortValue(
+  p: Auction,
+  key: AuctionTableSortKey,
+): string | number {
   switch (key) {
     case "price":
     case "stockQuantity":
+    case "bidCount":
       return p[key];
     case "rating":
       return p.rating ?? 0;
+    case "biddingEndsAt":
+      return new Date(p.biddingEndsAt).getTime();
     default:
       return String(p[key] ?? "");
   }
 }
 
-function compareProducts(
-  a: Product,
-  b: Product,
-  key: ProductTableSortKey,
+function compareAuctions(
+  a: Auction,
+  b: Auction,
+  key: AuctionTableSortKey,
   dir: SortDir,
 ): number {
   const va = getSortValue(a, key);
@@ -99,47 +109,47 @@ function statusTone(status: string) {
   return "bg-gray-50 text-gray-800 ring-gray-200";
 }
 
-export type ProductsDataTableProps = {
-  products: Product[];
+export type AuctionsDataTableProps = {
+  auctions: Auction[];
 };
 
-export function ProductsDataTable({ products }: ProductsDataTableProps) {
+export function AuctionsDataTable({ auctions }: AuctionsDataTableProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingAuction, setEditingAuction] = useState<Auction | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<PageSizeOption>(5);
-  const [sortKey, setSortKey] = useState<ProductTableSortKey>("name");
+  const [sortKey, setSortKey] = useState<AuctionTableSortKey>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [deleteProduct, { isLoading: isDeleteLoading }] =
-    useDeleteProductMutation();
-  const [updateProduct, updateProductState] = useUpdateProductMutation();
+  const [deleteAuction, { isLoading: isDeleteLoading }] =
+    useDeleteAuctionMutation();
+  const [updateAuction, updateAuctionState] = useUpdateAuctionMutation();
 
   const modalDefaultValues = useMemo(
-    () => (editingProduct ? productToFormValues(editingProduct) : undefined),
-    [editingProduct],
+    () => (editingAuction ? auctionToFormValues(editingAuction) : undefined),
+    [editingAuction],
   );
 
-  async function handleUpdateProduct(productData: ProductFormValues) {
-    if (!editingProduct) return;
+  async function handleUpdateAuction(auctionData: AuctionFormValues) {
+    if (!editingAuction) return;
     try {
-      await updateProduct({
-        productId: editingProduct.productId,
-        ...productData,
+      await updateAuction({
+        productId: editingAuction.productId,
+        ...auctionData,
       }).unwrap();
       setIsModalOpen(false);
-      setEditingProduct(null);
+      setEditingAuction(null);
     } catch {
-      window.alert("Could not update this product. Please try again.");
+      window.alert("Could not update this auction. Please try again.");
     }
   }
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const selectAllRef = useRef<HTMLInputElement>(null);
 
   const sorted = useMemo(() => {
-    const copy = [...products];
-    copy.sort((a, b) => compareProducts(a, b, sortKey, sortDir));
+    const copy = [...auctions];
+    copy.sort((a, b) => compareAuctions(a, b, sortKey, sortDir));
     return copy;
-  }, [products, sortKey, sortDir]);
+  }, [auctions, sortKey, sortDir]);
 
   const total = sorted.length;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
@@ -154,7 +164,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
   }, [sorted, page, pageSize]);
 
   useEffect(() => {
-    const valid = new Set(products.map((p) => p.productId));
+    const valid = new Set(auctions.map((p) => p.productId));
     setSelectedIds((prev) => {
       let pruned = false;
       const next = new Set<string>();
@@ -164,7 +174,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
       });
       return pruned ? next : prev;
     });
-  }, [products]);
+  }, [auctions]);
 
   const selectedOnListCount = useMemo(() => {
     let n = 0;
@@ -184,7 +194,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = total === 0 ? 0 : Math.min(page * pageSize, total);
 
-  function handleSortClick(key: ProductTableSortKey) {
+  function handleSortClick(key: AuctionTableSortKey) {
     if (key === sortKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     } else {
@@ -200,17 +210,17 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
   }
 
   function ariaSortFor(
-    key: ProductTableSortKey,
+    key: AuctionTableSortKey,
   ): "ascending" | "descending" | "none" {
     if (key !== sortKey) return "none";
     return sortDir === "asc" ? "ascending" : "descending";
   }
 
-  async function handleDeleteRow(p: Product) {
+  async function handleDeleteRow(p: Auction) {
     const ok = window.confirm(`Delete "${p.name}"? This cannot be undone.`);
     if (!ok) return;
     try {
-      await deleteProduct(p.productId).unwrap();
+      await deleteAuction(p.productId).unwrap();
       setSelectedIds((prev) => {
         if (!prev.has(p.productId)) return prev;
         const next = new Set(prev);
@@ -218,7 +228,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
         return next;
       });
     } catch {
-      window.alert("Could not delete this product. Please try again.");
+      window.alert("Could not delete this auction. Please try again.");
     }
   }
 
@@ -261,8 +271,8 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     checked={allOnListSelected}
                     onChange={handleToggleSelectAll}
                     disabled={sorted.length === 0}
-                    aria-label="Select all products"
-                    title="Select all products"
+                    aria-label="Select all auctions"
+                    title="Select all auctions"
                   />
                 </th>
                 {COLUMNS.map((col) => (
@@ -318,7 +328,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     colSpan={COLUMNS.length + 2}
                     className="px-3 py-8 text-center text-gray-500"
                   >
-                    No products to display.
+                    No auctions to display.
                   </td>
                 </tr>
               ) : (
@@ -344,7 +354,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     </td>
                     <td className="max-w-[10rem] truncate px-3 py-2 text-gray-800">
                       <Link
-                        href={`/products/${p.productId}`}
+                        href={`/auctions/${p.productId}`}
                         className="text-blue-600 hover:underline"
                       >
                         {p.name}
@@ -367,6 +377,12 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     </td>
                     <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-gray-800">
                       {p.stockQuantity}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-gray-800">
+                      {p.bidCount}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-2 text-gray-800">
+                      {new Date(p.biddingEndsAt).toLocaleString()}
                     </td>
                     <td className="whitespace-nowrap px-3 py-2">
                       <span
@@ -391,9 +407,9 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                           className="inline-flex h-9 w-9 items-center justify-center rounded-full text-blue-600 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={`Edit ${p.name}`}
                           title="Edit"
-                          disabled={updateProductState.isLoading}
+                          disabled={updateAuctionState.isLoading}
                           onClick={() => {
-                            setEditingProduct(p);
+                            setEditingAuction(p);
                             setIsModalOpen(true);
                           }}
                         >
@@ -476,14 +492,14 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
           </div>
         </div>
       </div>
-      <ProductModal
+      <AuctionModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setEditingProduct(null);
+          setEditingAuction(null);
         }}
-        onSend={handleUpdateProduct}
-        isProductLoading={updateProductState.isLoading}
+        onSend={handleUpdateAuction}
+        isAuctionLoading={updateAuctionState.isLoading}
         defaultValues={modalDefaultValues}
       />
     </div>

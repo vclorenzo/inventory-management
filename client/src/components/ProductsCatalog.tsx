@@ -1,28 +1,34 @@
 "use client";
 import Cards from "@/components/Cards";
 import Header from "@/components/Header";
-import { useProducts } from "@/hooks/useProducts";
+import { useGetAuctionsQuery } from "@/state/internal/auctionsApi";
+import { useGetProductsQuery } from "@/state/internal/productsApi";
 import { ProductQueryParams } from "@/state/internal/productsApi";
-import { ListingType, Product } from "@/types/pages/Products";
+import { Auction } from "@/types/pages/Auctions";
+import { Product } from "@/types/pages/Products";
 import { CircularProgress } from "@mui/material";
 import { SearchIcon } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { useMe } from "@/hooks/useMe";
 
+export type CatalogSource = "marketplace" | "auctions";
+
 type Props = {
   userId?: string;
   excludeUserId?: string;
-  listingType?: ListingType;
+  source?: CatalogSource;
   heading?: string;
 };
+
+type CatalogItem = Product | Auction;
 
 type SortPreset = "recent" | "price_high" | "price_low";
 
 /** Unique values from API products plus any active selections (sorted). */
 function uniqueSortedFromProducts(
-  products: Product[],
+  products: CatalogItem[],
   selectedValues: string[],
-  pick: (p: Product) => string | undefined,
+  pick: (p: CatalogItem) => string | undefined,
 ): string[] {
   const set = new Set<string>();
   for (const s of selectedValues) {
@@ -45,7 +51,7 @@ type FacetField = "condition" | "status" | "productCategory" | "brand";
  * empty results does not wipe checkboxes from the panel.
  */
 function useAccumulatedFacetOptions(
-  products: Product[],
+  products: CatalogItem[],
   selectedValues: string[],
   field: FacetField,
 ): string[] {
@@ -153,7 +159,7 @@ function FilterCheckboxSection({
 const ProductsCatalog = ({
   userId: userIdProp,
   excludeUserId,
-  listingType,
+  source,
   heading = "Products",
 }: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -166,10 +172,9 @@ const ProductsCatalog = ({
   const [maxPrice, setMaxPrice] = useState("");
 
   const { me } = useMe();
-  const fieldId = listingType ?? "catalog";
-  // Public listing pages pass listingType and should not be scoped to the
-  // current user; account pages still default to the signed-in seller.
-  const userId = listingType
+  const fieldId = source ?? "catalog";
+  const isPublicCatalog = source === "marketplace" || source === "auctions";
+  const userId = isPublicCatalog
     ? userIdProp ?? ""
     : userIdProp ?? me?.data.userId ?? "";
 
@@ -188,7 +193,6 @@ const ProductsCatalog = ({
       search: searchTerm,
       userId: userId || undefined,
       excludeUserId: excludeUserId || undefined,
-      listingType,
       category: categories.length ? categories : undefined,
       brand: brands.length ? brands : undefined,
       status: statuses.length ? statuses : undefined,
@@ -217,7 +221,6 @@ const ProductsCatalog = ({
     categoryFilters,
     conditionFilters,
     excludeUserId,
-    listingType,
     maxPrice,
     minPrice,
     searchTerm,
@@ -226,12 +229,25 @@ const ProductsCatalog = ({
     userId,
   ]);
 
-  const {
-    products,
-    isLoading: isGetProductsLoading,
-    isFetching: isGetProductsFetching,
-    isError: hasGetProductsError,
-  } = useProducts(queryParams);
+  const isAuctions = source === "auctions";
+  const productsQuery = useGetProductsQuery(queryParams, {
+    skip: isAuctions,
+  });
+  const auctionsQuery = useGetAuctionsQuery(queryParams, {
+    skip: !isAuctions,
+  });
+  const products = isAuctions
+    ? (auctionsQuery.data ?? [])
+    : (productsQuery.data ?? []);
+  const isGetProductsLoading = isAuctions
+    ? auctionsQuery.isLoading
+    : productsQuery.isLoading;
+  const isGetProductsFetching = isAuctions
+    ? auctionsQuery.isFetching
+    : productsQuery.isFetching;
+  const hasGetProductsError = isAuctions
+    ? auctionsQuery.isError
+    : productsQuery.isError;
 
   const conditionOptions = useAccumulatedFacetOptions(
     products,
@@ -379,7 +395,16 @@ const ProductsCatalog = ({
                 <CircularProgress />
               </div>
             ) : (
-              <Cards products={products} />
+              <Cards
+                products={products}
+                hrefBase={
+                  source === "auctions"
+                    ? "auctions"
+                    : source === "marketplace"
+                      ? "marketplace"
+                      : "products"
+                }
+              />
             )}
           </div>
         </div>

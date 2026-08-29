@@ -9,7 +9,7 @@ function Auctions() {
 
 	return (
 		<ProductsCatalog
-			listingType="auction"
+			source="auctions"
 			excludeUserId={userId || undefined}
 			heading="Auctions"
 		/>

@@ -22,7 +22,7 @@ export const bidsApi = api.injectEndpoints({
 			}),
 			transformResponse: (response: { data?: BidGroup[] }) =>
 				Array.isArray(response?.data) ? response.data : [],
-			invalidatesTags: ['Bids'],
+			invalidatesTags: ['Bids', 'Auctions'],
 		}),
 
 		updateBid: builder.mutation<BidGroup[], UpdateBidRequest>({
@@ -43,7 +43,7 @@ export const bidsApi = api.injectEndpoints({
 			}),
 			transformResponse: (response: { data?: BidGroup[] }) =>
 				Array.isArray(response?.data) ? response.data : [],
-			invalidatesTags: ['Bids'],
+			invalidatesTags: ['Bids', 'Auctions'],
 		}),
 	}),
 })
