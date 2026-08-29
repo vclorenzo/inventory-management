@@ -216,6 +216,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 						<AddToCartButton
 							productId={product.productId}
 							disabled={!inStock}
+							listingPrice={product.price}
 						/>
 						<Link
 							href="/products"
