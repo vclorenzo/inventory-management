@@ -1,3 +1,5 @@
+export type BidOutcome = 'leading' | 'outbid' | 'won' | 'lost'
+
 export interface BidItem {
 	id: string
 	image: string
@@ -5,6 +7,9 @@ export interface BidItem {
 	startingPrice: number
 	offerPrice: number
 	currency: string
+	isAuctionOpen?: boolean
+	currentHighestBid?: number | null
+	outcome?: BidOutcome
 }
 
 export interface BidGroup {

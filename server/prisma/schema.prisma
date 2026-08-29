@@ -99,7 +99,7 @@ model Products {
 }
 
 model Auctions {
-  productId        String   @id @default(uuid())
+  productId        String    @id @default(uuid())
   userId           String
   name             String
   price            Float
@@ -110,13 +110,19 @@ model Auctions {
   stockQuantity    Int
   status           String
   description      String
-  paymentMethods   String[] @default([])
-  meetupLocations  Json     @default(dbgenerated("'[]'::jsonb"))
+  paymentMethods   String[]  @default([])
+  meetupLocations  Json      @default(dbgenerated("'[]'::jsonb"))
   shippingDetails  String?
   biddingEndsAt    DateTime
-  bidCount         Int      @default(0)
-  owner            Users    @relation(fields: [userId], references: [userId])
-  bids             Bids[]
+  bidCount         Int       @default(0)
+  winningBidId     String?   @unique
+  settledAt        DateTime?
+  owner            Users     @relation(fields: [userId], references: [userId])
+  bids             Bids[]    @relation("AuctionBids")
+  winningBid       Bids?     @relation("AuctionWinner", fields: [winningBidId], references: [bidId], onDelete: SetNull)
+
+  @@index([biddingEndsAt])
+  @@index([settledAt])
 }
 
 model CartItems {
@@ -142,8 +148,9 @@ model Bids {
   offerPrice Float
   currency   String @default("₱")
 
-  user    Users    @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  auction Auctions @relation(fields: [productId], references: [productId], onDelete: Cascade)
+  user       Users     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  auction    Auctions  @relation("AuctionBids", fields: [productId], references: [productId], onDelete: Cascade)
+  wonAuction Auctions? @relation("AuctionWinner")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

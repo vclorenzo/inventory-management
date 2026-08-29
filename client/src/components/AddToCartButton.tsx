@@ -13,6 +13,7 @@ type AddToCartButtonProps = {
 	disabled?: boolean
 	className?: string
 	listingPrice?: number
+	currentHighestBid?: number | null
 }
 
 function getRequestErrorMessage(error: unknown, fallback: string) {
@@ -45,6 +46,7 @@ function AddToCartButton({
 	disabled = false,
 	className = 'inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60',
 	listingPrice,
+	currentHighestBid,
 }: AddToCartButtonProps) {
 	const router = useRouter()
 	const pathname = usePathname()
@@ -57,7 +59,7 @@ function AddToCartButton({
 	const isLoading = isAuction ? isBidLoading : isCartLoading
 	const [errorMessage, setErrorMessage] = useState<string | null>(null)
 	const [isOfferModalOpen, setIsOfferModalOpen] = useState(false)
-	const label = isAuction ? 'Make Offer' : 'Add to Cart'
+	const label = isAuction ? 'Place Bid' : 'Add to Cart'
 
 	const handleAddToCart = async () => {
 		setErrorMessage(null)
@@ -83,7 +85,6 @@ function AddToCartButton({
 		try {
 			await addBid({ productId, offerPrice }).unwrap()
 			setIsOfferModalOpen(false)
-			router.push('/bids')
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
 				router.push('/login')
@@ -91,7 +92,7 @@ function AddToCartButton({
 			}
 
 			setErrorMessage(
-				getRequestErrorMessage(error, 'Could not submit your offer'),
+				getRequestErrorMessage(error, 'Could not submit your bid'),
 			)
 		}
 	}
@@ -125,10 +126,10 @@ function AddToCartButton({
 				disabled={disabled || isLoading}
 				className={className}
 			>
-				{isCartLoading && !isAuction ? (
+				{isLoading ? (
 					<span className="inline-flex items-center gap-2">
 						<CircularProgress size={18} color="inherit" />
-						Adding…
+						{isAuction ? 'Placing bid…' : 'Adding…'}
 					</span>
 				) : (
 					label
@@ -144,6 +145,7 @@ function AddToCartButton({
 					isOpen={isOfferModalOpen}
 					isSubmitting={isBidLoading}
 					listingPrice={listingPrice}
+					currentHighestBid={currentHighestBid}
 					errorMessage={errorMessage}
 					onClose={handleCloseOfferModal}
 					onConfirm={handleConfirmOffer}

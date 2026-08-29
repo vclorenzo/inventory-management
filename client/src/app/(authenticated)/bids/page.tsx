@@ -2,11 +2,34 @@
 
 import Header from '@/components/Header'
 import { useBids } from '@/hooks/useBids'
+import { BidItem } from '@/types/pages/Bids'
 import { CircularProgress } from '@mui/material'
 import Image from 'next/image'
 
 const formatPrice = (amount: number, currency: string) =>
 	`${currency}${amount.toLocaleString('en-PH')}`
+
+const outcomeLabel: Record<
+	NonNullable<BidItem['outcome']>,
+	{ text: string; className: string }
+> = {
+	leading: {
+		text: 'Highest bid',
+		className: 'text-emerald-700',
+	},
+	outbid: {
+		text: 'Outbid',
+		className: 'text-amber-700',
+	},
+	won: {
+		text: 'Won',
+		className: 'text-emerald-700',
+	},
+	lost: {
+		text: 'Did not win',
+		className: 'text-slate-600',
+	},
+}
 
 const Bids = () => {
 	const {
@@ -50,10 +73,11 @@ const Bids = () => {
 			<Header name="Bids" />
 
 			<div className="rounded-sm border border-[#ebebeb] bg-white shadow-sm">
-				<div className="grid grid-cols-[minmax(0,1fr)_140px_140px_100px] items-center gap-4 border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3 text-sm text-gray-500">
+				<div className="grid grid-cols-[minmax(0,1fr)_140px_140px_120px_100px] items-center gap-4 border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3 text-sm text-gray-500">
 					<span>Product</span>
 					<span className="text-center">Starting Price</span>
-					<span className="text-center">Your Offer</span>
+					<span className="text-center">Your Bid</span>
+					<span className="text-center">Status</span>
 					<span className="text-center">Actions</span>
 				</div>
 
@@ -76,7 +100,7 @@ const Bids = () => {
 							{group.items.map((item) => (
 								<div
 									key={item.id}
-									className="grid grid-cols-[minmax(0,1fr)_140px_140px_100px] items-start gap-4 border-b border-[#ebebeb] px-4 py-5 last:border-b-0"
+									className="grid grid-cols-[minmax(0,1fr)_140px_140px_120px_100px] items-start gap-4 border-b border-[#ebebeb] px-4 py-5 last:border-b-0"
 								>
 									<div className="flex gap-4">
 										<div className="relative h-[80px] w-[80px] shrink-0 overflow-hidden border border-[#ebebeb] bg-white">
@@ -104,11 +128,26 @@ const Bids = () => {
 										{formatPrice(item.offerPrice, item.currency)}
 									</div>
 
+									<div className="mt-8 text-center text-sm">
+										{item.outcome ? (
+											<span
+												className={`font-medium ${outcomeLabel[item.outcome].className}`}
+											>
+												{outcomeLabel[item.outcome].text}
+											</span>
+										) : (
+											<span className="text-gray-500">—</span>
+										)}
+									</div>
+
 									<div className="mt-8 flex flex-col items-center gap-2 text-sm">
 										<button
 											type="button"
 											onClick={() => handleRemoveBid(item.id)}
-											disabled={isRemoving}
+											disabled={
+												isRemoving ||
+												item.isAuctionOpen === false
+											}
 											className="hover:text-primary text-gray-600 transition-colors disabled:opacity-50"
 										>
 											Delete

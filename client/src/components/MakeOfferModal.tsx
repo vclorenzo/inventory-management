@@ -7,6 +7,7 @@ type MakeOfferModalProps = {
 	isOpen: boolean
 	isSubmitting?: boolean
 	listingPrice?: number
+	currentHighestBid?: number | null
 	errorMessage?: string | null
 	onClose: () => void
 	onConfirm: (amount: number) => void | Promise<void>
@@ -24,6 +25,7 @@ function MakeOfferModal({
 	isOpen,
 	isSubmitting = false,
 	listingPrice,
+	currentHighestBid,
 	errorMessage,
 	onClose,
 	onConfirm,
@@ -54,6 +56,13 @@ function MakeOfferModal({
 
 	if (!isOpen) return null
 
+	const hasLeadingBid =
+		currentHighestBid != null && Number.isFinite(currentHighestBid)
+	const minimumBid = hasLeadingBid
+		? currentHighestBid
+		: listingPrice
+	const mustExceedLeading = hasLeadingBid
+
 	const handleSubmit = async (event: FormEvent) => {
 		event.preventDefault()
 		const offerAmount = parseOfferAmount(amount)
@@ -63,9 +72,24 @@ function MakeOfferModal({
 			return
 		}
 
-		if (listingPrice != null && offerAmount < listingPrice) {
+		if (
+			mustExceedLeading &&
+			minimumBid != null &&
+			offerAmount <= minimumBid
+		) {
 			setValidationError(
-				`Offer must be at least the starting price of P${listingPrice.toFixed(2)}.`,
+				`Bid must exceed the current highest bid of P${minimumBid.toFixed(2)}.`,
+			)
+			return
+		}
+
+		if (
+			!mustExceedLeading &&
+			listingPrice != null &&
+			offerAmount < listingPrice
+		) {
+			setValidationError(
+				`Bid must be at least the starting price of P${listingPrice.toFixed(2)}.`,
 			)
 			return
 		}
@@ -92,7 +116,7 @@ function MakeOfferModal({
 			>
 				<header className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
 					<h2 id={titleId} className="text-lg font-semibold text-gray-900">
-						Make an offer
+						Place a bid
 					</h2>
 					<button
 						type="button"
@@ -110,11 +134,13 @@ function MakeOfferModal({
 						htmlFor={amountId}
 						className="text-sm font-medium text-gray-800"
 					>
-						Offer amount
+						Bid amount
 					</label>
 					{listingPrice != null && (
 						<p className="mt-1 text-xs text-gray-500">
-							Starting price at P{listingPrice.toFixed(2)}
+							{hasLeadingBid && minimumBid != null
+								? `Current highest bid P${minimumBid.toFixed(2)}. Your bid must be higher.`
+								: `Starting price at P${listingPrice.toFixed(2)}`}
 						</p>
 					)}
 					<div className="relative mt-2">
@@ -125,7 +151,13 @@ function MakeOfferModal({
 							id={amountId}
 							type="number"
 							inputMode="decimal"
-							min={listingPrice != null ? listingPrice : 0.01}
+							min={
+								minimumBid != null
+									? mustExceedLeading
+										? Number((minimumBid + 0.01).toFixed(2))
+										: minimumBid
+									: 0.01
+							}
 							step="0.01"
 							autoFocus
 							value={amount}

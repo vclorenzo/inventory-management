@@ -33,7 +33,7 @@ export const bidsApi = api.injectEndpoints({
 			}),
 			transformResponse: (response: { data?: BidGroup[] }) =>
 				Array.isArray(response?.data) ? response.data : [],
-			invalidatesTags: ['Bids'],
+			invalidatesTags: ['Bids', 'Auctions'],
 		}),
 
 		removeBid: builder.mutation<BidGroup[], string>({

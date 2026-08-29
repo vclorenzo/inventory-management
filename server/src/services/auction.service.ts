@@ -1,11 +1,114 @@
 import { AppError } from "#error/AppError.ts";
+import logger from "#config/logger.ts";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const CLOSED_AUCTION_STATUSES = new Set([
+  "Sold",
+  "Unsold",
+  "Unlisted",
+  "Unavailable",
+]);
+
+const highestValidBidOrder = [
+  { offerPrice: "desc" as const },
+  { updated_at: "asc" as const },
+];
+
 const toDate = (value: Date | string | undefined) => {
   if (value === undefined) return undefined;
   return value instanceof Date ? value : new Date(value);
+};
+
+type AuctionTiming = {
+  biddingEndsAt: Date;
+  status: string;
+  settledAt: Date | null;
+};
+
+export const isAuctionOpen = (auction: AuctionTiming) => {
+  if (auction.settledAt) return false;
+  if (CLOSED_AUCTION_STATUSES.has(auction.status)) return false;
+  return auction.biddingEndsAt.getTime() > Date.now();
+};
+
+const findHighestValidBid = (
+  client: Prisma.TransactionClient | PrismaClient,
+  productId: string,
+  startingPrice: number,
+) =>
+  client.bids.findFirst({
+    where: {
+      productId,
+      offerPrice: { gte: startingPrice },
+    },
+    orderBy: highestValidBidOrder,
+    include: {
+      user: {
+        select: { name: true },
+      },
+    },
+  });
+
+export const settleAuctionIfClosed = async (productId: string) => {
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`
+        SELECT "productId" FROM "Auctions"
+        WHERE "productId" = ${productId}
+        FOR UPDATE
+      `;
+
+      const auction = await tx.auctions.findFirst({
+        where: { productId },
+      });
+
+      if (!auction) return null;
+      if (auction.settledAt) return auction;
+      if (auction.status === "Unlisted") return auction;
+      if (auction.biddingEndsAt.getTime() > Date.now()) return auction;
+
+      const winner = await findHighestValidBid(
+        tx,
+        productId,
+        auction.price,
+      );
+
+      return tx.auctions.update({
+        where: { productId },
+        data: {
+          winningBidId: winner?.bidId ?? null,
+          settledAt: new Date(),
+          status: winner ? "Sold" : "Unsold",
+        },
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const settleExpiredAuctions = async () => {
+  try {
+    const expired = await prisma.auctions.findMany({
+      where: {
+        settledAt: null,
+        biddingEndsAt: { lte: new Date() },
+        status: { not: "Unlisted" },
+      },
+      select: { productId: true },
+    });
+
+    for (const auction of expired) {
+      await settleAuctionIfClosed(auction.productId);
+    }
+
+    return expired.length;
+  } catch (error) {
+    logger.error("Error settling expired auctions", error);
+    throw error;
+  }
 };
 
 export const getAllAuctions = async ({
@@ -46,6 +149,8 @@ export const getAllAuctions = async ({
   limit?: number;
 } = {}) => {
   try {
+    await settleExpiredAuctions();
+
     const whereParts: Prisma.Sql[] = [Prisma.sql`1=1`];
     const normalizedSearch = search?.trim();
     const hasSearch = Boolean(normalizedSearch);
@@ -166,11 +271,21 @@ export const getAllAuctions = async ({
         WHERE ${whereSql}
       `,
       prisma.$queryRaw<
-        (Prisma.AuctionsGetPayload<object> & { userName: string })[]
+        (Prisma.AuctionsGetPayload<object> & {
+          currentHighestBid: number | null;
+        })[]
       >`
-        SELECT p.*
+        SELECT p.*, high."currentHighestBid"
         FROM "Auctions" p
         INNER JOIN "Users" u ON p."userId" = u."userId"
+        LEFT JOIN LATERAL (
+          SELECT b."offerPrice" AS "currentHighestBid"
+          FROM "Bids" b
+          WHERE b."productId" = p."productId"
+            AND b."offerPrice" >= p."price"
+          ORDER BY b."offerPrice" DESC, b."updated_at" ASC
+          LIMIT 1
+        ) high ON true
         WHERE ${whereSql}
         ORDER BY ${orderBySql}
         ${paginationSql}
@@ -178,19 +293,83 @@ export const getAllAuctions = async ({
     ]);
 
     const totalCount = Number(countRows[0]?.count ?? BigInt(0));
-    return { auctions, totalCount };
+    return {
+      auctions: auctions.map((auction) => ({
+        ...auction,
+        currentHighestBid:
+          auction.currentHighestBid == null
+            ? null
+            : Number(auction.currentHighestBid),
+        isOpen: isAuctionOpen(auction),
+        winningBid: null,
+        viewerBid: null,
+      })),
+      totalCount,
+    };
   } catch (error) {
     throw error;
   }
 };
 
-export const getAuctionById = async (id: string) => {
+export const getAuctionById = async (
+  id: string,
+  viewerUserId?: string,
+) => {
   try {
-    return await prisma.auctions.findFirst({
+    await settleAuctionIfClosed(id);
+
+    const auction = await prisma.auctions.findFirst({
       where: {
         productId: id,
       },
+      include: {
+        winningBid: {
+          include: {
+            user: {
+              select: { name: true },
+            },
+          },
+        },
+      },
     });
+
+    if (!auction) return null;
+
+    const leadingBid = await findHighestValidBid(
+      prisma,
+      auction.productId,
+      auction.price,
+    );
+    const viewerBidRecord = viewerUserId
+      ? await prisma.bids.findFirst({
+          where: { productId: id, userId: viewerUserId },
+        })
+      : null;
+
+    const isOpen = isAuctionOpen(auction);
+    const { winningBid: winningBidRecord, ...auctionFields } = auction;
+
+    return {
+      ...auctionFields,
+      currentHighestBid: leadingBid?.offerPrice ?? null,
+      isOpen,
+      winningBid:
+        !isOpen && winningBidRecord
+          ? {
+              bidId: winningBidRecord.bidId,
+              offerPrice: winningBidRecord.offerPrice,
+              bidderName: winningBidRecord.user.name,
+            }
+          : null,
+      viewerBid: viewerBidRecord
+        ? {
+            bidId: viewerBidRecord.bidId,
+            offerPrice: viewerBidRecord.offerPrice,
+            isLeading: leadingBid?.bidId === viewerBidRecord.bidId,
+            isWinner: auction.winningBidId === viewerBidRecord.bidId,
+          }
+        : null,
+    };
   } catch (error) {
     throw error;
   }
@@ -314,6 +493,10 @@ export const deleteAuction = async (id: string) => {
     if (!existingAuction) {
       throw new AppError("Auction does not exist");
     }
+    await prisma.auctions.update({
+      where: { productId: id },
+      data: { winningBidId: null },
+    });
     return await prisma.auctions.delete({
       where: { productId: id },
     });

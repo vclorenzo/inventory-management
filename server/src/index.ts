@@ -18,8 +18,12 @@ import cartRoutes from "./routes/cart.routes";
 import bidRoutes from "./routes/bid.routes";
 import purchaseRoutes from "./routes/purchase.routes";
 import { parseReviewPagination } from "#middleware/pagination.middleware.ts";
+import { settleExpiredAuctions } from "#services/auction.service.ts";
+import logger from "#config/logger.ts";
 // import { botBlocker } from '#middleware/botBlocker.ts';
 import securityMiddleware from "#middleware/security.middeware.ts";
+
+const AUCTION_SETTLE_INTERVAL_MS = 15_000;
 
 // CONFIGURATION
 dotenv.config();
@@ -64,4 +68,12 @@ app.use(errorHandler);
 const port = Number(process.env.PORT) || 8000;
 app.listen(port, "0.0.0.0", () => {
   console.log(`server is running on port ${port}`);
+  settleExpiredAuctions().catch((error) => {
+    logger.error("Failed to settle expired auctions on startup", error);
+  });
+  setInterval(() => {
+    settleExpiredAuctions().catch((error) => {
+      logger.error("Failed to settle expired auctions", error);
+    });
+  }, AUCTION_SETTLE_INTERVAL_MS);
 });

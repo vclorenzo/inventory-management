@@ -7,7 +7,14 @@ import React from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { Bookmark, ChevronLeft, ExternalLink, MapPin, Package } from 'lucide-react'
+import {
+	Bookmark,
+	ChevronLeft,
+	ExternalLink,
+	Gavel,
+	MapPin,
+	Package,
+} from 'lucide-react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -18,14 +25,19 @@ import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
+import { useMe } from '@/hooks/useMe'
 
-const productImageUrls = (length: number) => {
+const productImageUrls = (productId: string, length: number) => {
+	let hash = 0
+	for (let i = 0; i < productId.length; i++) {
+		hash = (hash * 31 + productId.charCodeAt(i)) >>> 0
+	}
+
 	const images = []
 	for (let i = 0; i < length; i++) {
+		const index = ((hash + i) % 3) + 1
 		images.push({
-			src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
-				Math.floor(Math.random() * 3) + 1
-			}.png`,
+			src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${index}.png`,
 		})
 	}
 
@@ -38,7 +50,10 @@ const stockTone = (qty: number) => {
 	return 'bg-emerald-50 text-emerald-800 ring-emerald-200'
 }
 
+const formatPeso = (amount: number) => `P${amount.toFixed(2)}`
+
 const AuctionDetails = ({ params }: { params: { productId: string } }) => {
+	const { me } = useMe()
 	const {
 		data: product,
 		isLoading,
@@ -93,8 +108,14 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 		)
 	}
 
-	const images = productImageUrls(3)
+	const images = productImageUrls(product.productId, 3)
 	const inStock = product.stockQuantity > 0
+	const isOpen =
+		product.isOpen ??
+		new Date(product.biddingEndsAt).getTime() > Date.now()
+	const isOwner = me?.data.userId === product.userId
+	const canBid = inStock && isOpen && !isOwner
+	const currentHighestBid = product.currentHighestBid ?? null
 	const paymentMethods = Array.isArray(product.paymentMethods)
 		? product.paymentMethods
 		: []
@@ -166,7 +187,22 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							</h1>
 							<div className="mt-2 flex flex-wrap items-center gap-3">
 								<span className="text-2xl font-semibold text-gray-900">
-									${product.price.toFixed(2)}
+									{formatPeso(
+										isOpen
+											? (currentHighestBid ?? product.price)
+											: (product.winningBid?.offerPrice ??
+												currentHighestBid ??
+												product.price),
+									)}
+								</span>
+								<span
+									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${
+										isOpen
+											? 'bg-emerald-50 text-emerald-800 ring-emerald-200'
+											: 'bg-slate-50 text-slate-700 ring-slate-200'
+									}`}
+								>
+									{isOpen ? 'Live auction' : 'Auction ended'}
 								</span>
 								<span
 									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${stockTone(
@@ -175,11 +211,16 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 								>
 									{inStock ? 'In stock' : 'Out of stock'}
 								</span>
-								<span className="inline-flex items-center rounded-full bg-gray-50 px-3 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200">
-									{product.bidCount}{' '}
-									{product.bidCount === 1 ? 'bid' : 'bids'}
-								</span>
 							</div>
+							<p className="mt-1 text-sm text-gray-500">
+								{isOpen
+									? currentHighestBid != null
+										? `Current highest bid · starting price ${formatPeso(product.price)}`
+										: `Starting price ${formatPeso(product.price)} · no bids yet`
+									: product.winningBid
+										? `Winning bid · starting price ${formatPeso(product.price)}`
+										: `Starting price ${formatPeso(product.price)}`}
+							</p>
 						</div>
 
 						<div className="flex flex-col items-end gap-1">
@@ -234,23 +275,92 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 								</div>
 							</div>
 						</div>
-						<div className="flex justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-							<div className="grid grid-cols-[120px_160px] items-center gap-x-6">
-								<div className="text-xs font-medium uppercase tracking-wide text-gray-500">
-									Bidding ends:
+						<div className="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-4">
+							<div
+								className="flex items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100"
+								aria-label={`${product.bidCount} ${
+									product.bidCount === 1 ? 'bid' : 'bids'
+								}`}
+							>
+								<div className="inline-flex items-center gap-1.5 font-medium text-gray-900">
+									<Gavel
+										className="text-gray-500"
+										size={20}
+										aria-hidden="true"
+									/>
+									<span>{product.bidCount}</span>
 								</div>
-								<div className="text-left font-medium text-gray-900">
-									{new Date(product.biddingEndsAt).toLocaleString()}
+							</div>
+							<div className="flex min-w-0 items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+								<div className="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1">
+									<div className="shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500">
+										{isOpen ? 'Bidding ends:' : 'Closed:'}
+									</div>
+									<div className="min-w-0 text-left font-medium text-gray-900">
+										{new Date(
+											product.biddingEndsAt,
+										).toLocaleString()}
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 
+					{!isOpen && (
+						<div
+							className={`mt-6 rounded-xl p-4 ring-1 ${
+								product.winningBid
+									? 'bg-emerald-50 ring-emerald-200'
+									: 'bg-slate-50 ring-slate-200'
+							}`}
+						>
+							<p className="text-sm font-semibold text-gray-900">
+								{product.winningBid
+									? `Winning bid: ${formatPeso(product.winningBid.offerPrice)}`
+									: 'No winning bid'}
+							</p>
+							<p className="mt-1 text-sm text-gray-700">
+								{product.winningBid
+									? `Won by ${product.winningBid.bidderName}. Highest valid bid at closing that met the starting price of ${formatPeso(product.price)}.`
+									: `This auction closed without a bid that met the starting price of ${formatPeso(product.price)}.`}
+							</p>
+							{product.viewerBid?.isWinner && (
+								<p className="mt-2 text-sm font-medium text-emerald-800">
+									You won this auction.
+								</p>
+							)}
+							{product.viewerBid && !product.viewerBid.isWinner && (
+								<p className="mt-2 text-sm font-medium text-slate-700">
+									You did not win this auction.
+								</p>
+							)}
+						</div>
+					)}
+					{isOpen && product.viewerBid && (
+						<div
+							className={`mt-6 rounded-xl p-4 ring-1 ${
+								product.viewerBid.isLeading
+									? 'bg-emerald-50 ring-emerald-200'
+									: 'bg-amber-50 ring-amber-200'
+							}`}
+						>
+							<p className="text-sm font-semibold text-gray-900">
+								{product.viewerBid.isLeading
+									? 'You are the highest bidder'
+									: 'You have been outbid'}
+							</p>
+							<p className="mt-1 text-sm text-gray-700">
+								Your bid: {formatPeso(product.viewerBid.offerPrice)}
+							</p>
+						</div>
+					)}
+
 					<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
 						<AddToCartButton
 							productId={product.productId}
-							disabled={!inStock}
+							disabled={!canBid}
 							listingPrice={product.price}
+							currentHighestBid={currentHighestBid}
 						/>
 						<Link
 							href="/products"
@@ -259,6 +369,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							<Bookmark />
 						</Link>
 					</div>
+					{isOwner && isOpen && (
+						<p className="mt-2 text-center text-sm text-gray-500">
+							You cannot bid on your own listing.
+						</p>
+					)}
 					<div className="mt-3 flex flex-col justify-center gap-3 sm:flex-row">
 						<Link
 							href="/auctions"

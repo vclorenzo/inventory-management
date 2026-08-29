@@ -106,6 +106,12 @@ function statusTone(status: string) {
   if (normalized === "unlisted") {
     return "bg-slate-50 text-slate-700 ring-slate-200";
   }
+  if (normalized === "sold") {
+    return "bg-emerald-50 text-emerald-800 ring-emerald-200";
+  }
+  if (normalized === "unsold") {
+    return "bg-amber-50 text-amber-800 ring-amber-200";
+  }
   return "bg-gray-50 text-gray-800 ring-gray-200";
 }
 

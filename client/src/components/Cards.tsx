@@ -44,11 +44,20 @@ function Cards({
 				{isAuction(product) ? (
 					<div className="mt-1 space-y-0.5 text-center text-sm text-gray-600">
 						<div>
+							{product.currentHighestBid != null
+								? `Highest P${product.currentHighestBid.toFixed(2)}`
+								: `Starts at P${product.price.toFixed(2)}`}
+						</div>
+						<div>
 							{product.bidCount}{' '}
 							{product.bidCount === 1 ? 'bid' : 'bids'}
 						</div>
 						<div>
-							Ends {new Date(product.biddingEndsAt).toLocaleString()}
+							{(product.isOpen ??
+								new Date(product.biddingEndsAt).getTime() >
+									Date.now())
+								? `Ends ${new Date(product.biddingEndsAt).toLocaleString()}`
+								: 'Auction ended'}
 						</div>
 					</div>
 				) : null}

@@ -1,6 +1,18 @@
 import { Request, Response } from "express";
 import * as auctionService from "../services/auction.service";
 import { AppError } from "#error/AppError.ts";
+import { jwtToken } from "#utils/jwt.ts";
+
+const getOptionalUserId = (req: Request): string | undefined => {
+  const token = req.cookies?.token;
+  if (!token || typeof token !== "string") return undefined;
+  try {
+    const decoded = jwtToken.verify(token) as { id?: string };
+    return decoded.id;
+  } catch {
+    return undefined;
+  }
+};
 
 const parseCsv = (value?: string): string[] | undefined => {
   if (!value) return undefined;
@@ -23,7 +35,10 @@ export const getAuctionById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const auction = await auctionService.getAuctionById(id);
+    const auction = await auctionService.getAuctionById(
+      id,
+      getOptionalUserId(req),
+    );
     if (!auction) {
       res.status(404).json({ message: "Auction not found" });
     } else {
