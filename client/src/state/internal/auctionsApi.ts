@@ -24,8 +24,18 @@ export const auctionsApi = api.injectEndpoints({
 			providesTags: ['Auctions'],
 		}),
 
-		getAuctionById: builder.query<Auction, string>({
-			query: (id) => `/auctions/${id}`,
+		getAuctionById: builder.query<
+			Auction,
+			string | { id: string; listed?: boolean }
+		>({
+			query: (arg) => {
+				const id = typeof arg === 'string' ? arg : arg.id
+				const listed = typeof arg === 'object' ? arg.listed : undefined
+				return {
+					url: `/auctions/${id}`,
+					params: listed ? { listed: 'true' } : undefined,
+				}
+			},
 			transformResponse: (response: { data: Auction }) => response.data,
 			providesTags: ['Auctions'],
 		}),

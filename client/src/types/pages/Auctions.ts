@@ -1,3 +1,4 @@
+import { AuctionStatus } from '@/constants/auctionStatus'
 import { Product, ProductFormValues } from '@/types/pages/Products'
 
 export interface AuctionWinningBid {
@@ -13,7 +14,8 @@ export interface AuctionViewerBid {
 	isWinner: boolean
 }
 
-export interface Auction extends Product {
+export interface Auction extends Omit<Product, 'status' | 'rating' | 'stockQuantity'> {
+	status: AuctionStatus | string
 	biddingEndsAt: string
 	bidCount: number
 	winningBidId?: string | null
@@ -24,7 +26,7 @@ export interface Auction extends Product {
 	viewerBid?: AuctionViewerBid | null
 }
 
-export type AuctionFormValues = ProductFormValues & {
+export type AuctionFormValues = Omit<ProductFormValues, 'stockQuantity'> & {
 	biddingEndsAt: string
 }
 

@@ -1,4 +1,8 @@
 import { AppError } from '#error/AppError.ts'
+import {
+	isPurchasableProductStatus,
+	PRODUCT_STATUS,
+} from '#src/constants/productStatus.ts'
 import { PrismaClient } from '@prisma/client'
 import { randomUUID } from 'crypto'
 
@@ -191,6 +195,13 @@ export const placeOrder = async ({
 			)
 		}
 
+		if (!isPurchasableProductStatus(item.product.status)) {
+			throw new AppError(
+				`"${item.product.name}" is not available for purchase`,
+				400,
+			)
+		}
+
 		if (item.product.stockQuantity < item.quantity) {
 			throw new AppError(
 				`Insufficient stock for "${item.product.name}". Available: ${item.product.stockQuantity}`,
@@ -200,7 +211,7 @@ export const placeOrder = async ({
 
 		if (item.product.stockQuantity <= 0) {
 			throw new AppError(
-				`"${item.product.name}" is out of stock`,
+				`"${item.product.name}" is sold out`,
 				400,
 			)
 		}
@@ -242,7 +253,7 @@ export const placeOrder = async ({
 			if (refreshed && refreshed.stockQuantity <= 0) {
 				await tx.products.update({
 					where: { productId: product.productId },
-					data: { status: 'Unavailable' },
+					data: { status: PRODUCT_STATUS.SoldOut },
 				})
 			}
 

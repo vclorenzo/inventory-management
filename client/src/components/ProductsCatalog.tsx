@@ -195,10 +195,17 @@ const ProductsCatalog = ({
       excludeUserId: excludeUserId || undefined,
       category: categories.length ? categories : undefined,
       brand: brands.length ? brands : undefined,
-      status: statuses.length ? statuses : undefined,
+      status:
+        isPublicCatalog
+          ? undefined
+          : statuses.length
+            ? statuses
+            : undefined,
       condition: conditions.length ? conditions : undefined,
       sortBy,
       sortOrder,
+      marketplace: source === "marketplace",
+      listed: source === "auctions",
     };
 
     if (minPrice.trim()) {
@@ -226,6 +233,7 @@ const ProductsCatalog = ({
     searchTerm,
     sortPreset,
     statusFilters,
+    source,
     userId,
   ]);
 
@@ -327,13 +335,18 @@ const ProductsCatalog = ({
               onSelectedChange={setConditionFilters}
               emptyHint="Load products to see conditions."
             />
-            <FilterCheckboxSection
-              legend="Listing status"
-              options={statusOptions.map((value) => ({ label: value, value }))}
-              selected={statusFilters}
-              onSelectedChange={setStatusFilters}
-              emptyHint="Load products to see statuses."
-            />
+            {isPublicCatalog ? null : (
+              <FilterCheckboxSection
+                legend="Listing status"
+                options={statusOptions.map((value) => ({
+                  label: value,
+                  value,
+                }))}
+                selected={statusFilters}
+                onSelectedChange={setStatusFilters}
+                emptyHint="Load products to see statuses."
+              />
+            )}
             <div>
               <p className="form-section-label">Price</p>
               <div className="mt-2 grid grid-cols-2 gap-2">

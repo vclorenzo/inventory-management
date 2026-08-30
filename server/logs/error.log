@@ -128,3 +128,6 @@
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-29T07:57:22.125Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-29T14:21:28.101Z"}
 {"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-29T14:21:30.503Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-30T02:52:30.693Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-30T02:52:47.060Z"}
+{"level":"error","message":"Invalid credentials","service":"acquisitions-api","timestamp":"2026-08-30T02:52:47.724Z"}

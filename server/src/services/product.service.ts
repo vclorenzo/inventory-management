@@ -1,3 +1,7 @@
+import {
+  MARKETPLACE_PRODUCT_STATUS,
+  resolveProductStatus,
+} from "#src/constants/productStatus.ts";
 import { AppError } from "#error/AppError.ts";
 import { Prisma, PrismaClient } from "@prisma/client";
 
@@ -21,6 +25,7 @@ export const getAllProducts = async ({
   sortOrder = "desc",
   page = 1,
   limit,
+  marketplace = false,
 }: {
   search?: string;
   userId?: string;
@@ -39,6 +44,7 @@ export const getAllProducts = async ({
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+  marketplace?: boolean;
 } = {}) => {
   try {
     const whereParts: Prisma.Sql[] = [Prisma.sql`1=1`];
@@ -69,8 +75,12 @@ export const getAllProducts = async ({
       whereParts.push(Prisma.sql`p."condition" IN (${Prisma.join(condition)})`);
     }
 
-    if (status?.length) {
-      whereParts.push(Prisma.sql`p."status" IN (${Prisma.join(status)})`);
+    if (marketplace) {
+      whereParts.push(
+        Prisma.sql`p."status" = CAST(${MARKETPLACE_PRODUCT_STATUS} AS "ProductStatus")`,
+      );
+    } else if (status?.length) {
+      whereParts.push(Prisma.sql`p."status"::text IN (${Prisma.join(status)})`);
     }
 
     if (typeof minPrice === "number") {
@@ -179,11 +189,15 @@ export const getAllProducts = async ({
   }
 };
 
-export const getProductById = async (id: string) => {
+export const getProductById = async (
+  id: string,
+  { listedOnly = false }: { listedOnly?: boolean } = {},
+) => {
   try {
     const product = await prisma.products.findFirst({
       where: {
         productId: id,
+        ...(listedOnly ? { status: MARKETPLACE_PRODUCT_STATUS } : {}),
       },
       include: {
         productReviews: {
@@ -253,7 +267,10 @@ export const createProduct = async ({
         price,
         rating,
         stockQuantity,
-        status: status?.trim() || "Available",
+        status: resolveProductStatus({
+          status,
+          stockQuantity,
+        }),
         description,
         paymentMethods,
         meetupLocations,
@@ -284,8 +301,15 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
   try {
     const existingProduct = await getProductById(id);
     if (!existingProduct) {
-      throw new AppError("Product does not exist");
+      throw new AppError("Product does not exist", 404);
     }
+
+    const nextStockQuantity =
+      data.stockQuantity ?? existingProduct.stockQuantity;
+    const nextStatus = resolveProductStatus({
+      status: data.status ?? existingProduct.status,
+      stockQuantity: nextStockQuantity,
+    });
 
     return await prisma.products.update({
       where: { productId: id },
@@ -298,7 +322,7 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
         price: data.price,
         rating: data.rating,
         stockQuantity: data.stockQuantity,
-        status: data.status,
+        status: nextStatus,
         paymentMethods: data.paymentMethods,
         meetupLocations: data.meetupLocations,
         shippingDetails: data.shippingDetails,
@@ -312,7 +336,7 @@ export const deleteProduct = async (id: string) => {
   try {
     const existingProduct = await getProductById(id);
     if (!existingProduct) {
-      throw new AppError("Product does not exist");
+      throw new AppError("Product does not exist", 404);
     }
     return await prisma.$transaction(async (tx) => {
       await tx.sales.deleteMany({ where: { productId: id } });

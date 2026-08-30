@@ -1,4 +1,7 @@
+import { AuctionStatus } from "@prisma/client";
 import z from "zod";
+
+const auctionStatusSchema = z.nativeEnum(AuctionStatus);
 
 const futureDate = z.coerce.date().refine((date) => date.getTime() > Date.now(), {
   message: "Bidding end date must be in the future",
@@ -7,8 +10,7 @@ const futureDate = z.coerce.date().refine((date) => date.getTime() > Date.now(),
 export const createAuctionSchema = z.object({
   name: z.string().min(1).max(255).trim(),
   price: z.number().positive(),
-  rating: z.number().min(0).max(5).optional(),
-  stockQuantity: z.number().int().min(0),
+  status: auctionStatusSchema.optional(),
   biddingEndsAt: futureDate,
 });
 
@@ -16,8 +18,7 @@ export const updateAuctionSchema = z
   .object({
     name: z.string().min(1).max(255).trim().optional(),
     price: z.number().positive().optional(),
-    rating: z.number().min(0).max(5).optional(),
-    stockQuantity: z.number().int().min(0).optional(),
+    status: auctionStatusSchema.optional(),
     biddingEndsAt: z.coerce.date().optional(),
   })
   .refine(

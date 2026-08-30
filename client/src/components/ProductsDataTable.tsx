@@ -17,6 +17,10 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import { productToFormValues } from "@/utils/productForm";
+import {
+  productStatusLabel,
+  productStatusTone,
+} from "@/constants/productStatus";
 
 export type ProductTableSortKey =
   | "productId"
@@ -86,17 +90,7 @@ function compareProducts(
 
 /** Matches product detail page status chips for consistency. */
 function statusTone(status: string) {
-  const normalized = status.trim().toLowerCase();
-  if (normalized === "available") {
-    return "bg-emerald-50 text-emerald-800 ring-emerald-200";
-  }
-  if (normalized === "unavailable") {
-    return "bg-rose-50 text-rose-800 ring-rose-200";
-  }
-  if (normalized === "unlisted") {
-    return "bg-slate-50 text-slate-700 ring-slate-200";
-  }
-  return "bg-gray-50 text-gray-800 ring-gray-200";
+  return productStatusTone(status);
 }
 
 export type ProductsDataTableProps = {
@@ -373,9 +367,9 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                         className={`inline-flex max-w-full items-center truncate rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusTone(
                           p.status,
                         )}`}
-                        title={p.status}
+                        title={productStatusLabel(p.status)}
                       >
-                        {p.status}
+                        {productStatusLabel(p.status)}
                       </span>
                     </td>
                     <td

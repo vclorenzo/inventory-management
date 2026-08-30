@@ -1,4 +1,5 @@
 import { AppError } from "#error/AppError.ts";
+import { AUCTION_STATUS } from "#src/constants/auctionStatus.ts";
 import {
   isAuctionOpen,
   settleAuctionIfClosed,
@@ -9,13 +10,6 @@ const prisma = new PrismaClient();
 
 const DEFAULT_PRODUCT_IMAGE =
   "https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product1.png";
-
-const CLOSED_AUCTION_STATUSES = new Set([
-  "Sold",
-  "Unsold",
-  "Unlisted",
-  "Unavailable",
-]);
 
 const highestValidBidOrder = [
   { offerPrice: "desc" as const },
@@ -132,7 +126,10 @@ const assertAuctionAcceptingBids = (auction: {
   status: string;
   settledAt: Date | null;
 }) => {
-  if (CLOSED_AUCTION_STATUSES.has(auction.status) || auction.settledAt) {
+  if (
+    auction.status !== AUCTION_STATUS.Available ||
+    auction.settledAt
+  ) {
     throw new AppError("Bidding for this auction has ended", 400);
   }
   if (auction.biddingEndsAt.getTime() <= Date.now()) {
@@ -266,10 +263,6 @@ export const addBid = async ({
 
       if (auction.userId === userId) {
         throw new AppError("You cannot bid on your own listing", 400);
-      }
-
-      if (auction.stockQuantity <= 0) {
-        throw new AppError("Product is out of stock", 400);
       }
 
       assertAuctionAcceptingBids(auction);

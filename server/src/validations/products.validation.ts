@@ -1,4 +1,7 @@
+import { ProductStatus } from "@prisma/client";
 import z from "zod";
+
+const productStatusSchema = z.nativeEnum(ProductStatus);
 
 export const productIdSchema = z.object({
   productId: z.string().uuid(),
@@ -9,6 +12,7 @@ export const createProductSchema = z.object({
   price: z.number().positive(),
   rating: z.number().min(0).max(5).optional(),
   stockQuantity: z.number().int().min(0),
+  status: productStatusSchema.optional(),
 });
 
 export const updateProductSchema = z
@@ -17,6 +21,7 @@ export const updateProductSchema = z
     price: z.number().positive().optional(),
     rating: z.number().min(0).max(5).optional(),
     stockQuantity: z.number().int().min(0).optional(),
+    status: productStatusSchema.optional(),
   })
   .refine(
     (data) => {

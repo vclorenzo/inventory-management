@@ -1,3 +1,5 @@
+import { ProductStatus } from '@/constants/productStatus'
+
 type meetupLocations = { name: string; address: string; mapLink: string }
 
 export interface Product {
@@ -10,7 +12,7 @@ export interface Product {
 	rating: number | null
 	reviewCount?: number
 	stockQuantity: number
-	status: string
+	status: ProductStatus | string
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]

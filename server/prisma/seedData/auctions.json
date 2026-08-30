@@ -8,9 +8,7 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 264.37,
-    "rating": 3.23,
-    "stockQuantity": 842192,
-    "status": "Unavailable",
+    "status": "Available",
     "paymentMethods": [
       "Cash"
     ],
@@ -34,8 +32,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 435.44,
-    "rating": 0.27,
-    "stockQuantity": 124068,
     "status": "Unlisted",
     "paymentMethods": [
       "PayPal"
@@ -60,8 +56,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 639.9,
-    "rating": 1.17,
-    "stockQuantity": 754285,
     "status": "Available",
     "paymentMethods": [
       "GCash"
@@ -86,8 +80,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 575.6,
-    "rating": 4.38,
-    "stockQuantity": 673658,
     "status": "Available",
     "paymentMethods": [
       "Bank Transfer",
@@ -113,8 +105,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 51.66,
-    "rating": 1.53,
-    "stockQuantity": 263383,
     "status": "Available",
     "paymentMethods": [
       "Credit Card"
@@ -139,8 +129,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 184.41,
-    "rating": 1.98,
-    "stockQuantity": 953695,
     "status": "Available",
     "paymentMethods": [
       "GCash",
@@ -167,8 +155,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 163.6,
-    "rating": 0.81,
-    "stockQuantity": 341530,
     "status": "Unlisted",
     "paymentMethods": [
       "PayPal"
@@ -193,8 +179,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 564.82,
-    "rating": 4.74,
-    "stockQuantity": 33021,
     "status": "Unlisted",
     "paymentMethods": [
       "PayPal"
@@ -219,8 +203,6 @@
     "condition": "Brand New",
     "description": "Nike Dunk Low",
     "price": 669.97,
-    "rating": 1.34,
-    "stockQuantity": 880242,
     "status": "Available",
     "paymentMethods": [
       "Bank Transfer"

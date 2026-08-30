@@ -35,9 +35,12 @@ export const getAuctionById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
+    const listedOnly =
+      req.query.listed === "true" || req.query.listed === "1";
     const auction = await auctionService.getAuctionById(
       id,
       getOptionalUserId(req),
+      { listedOnly },
     );
     if (!auction) {
       res.status(404).json({ message: "Auction not found" });
@@ -64,18 +67,14 @@ export const getAllAuctions = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
+    const listed =
+      req.query.listed === "true" || req.query.listed === "1";
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
-    const minRating = parseNumber(req.query.minRating);
-    const maxRating = parseNumber(req.query.maxRating);
-    const minStock = parseNumber(req.query.minStock);
-    const maxStock = parseNumber(req.query.maxStock);
     const sortBy = req.query.sortBy?.toString() as
       | "relevance"
       | "name"
       | "price"
-      | "rating"
-      | "stockQuantity"
       | undefined;
     const sortOrder = req.query.sortOrder?.toString() as
       | "asc"
@@ -98,14 +97,11 @@ export const getAllAuctions = async (
       status,
       minPrice,
       maxPrice,
-      minRating,
-      maxRating,
-      minStock,
-      maxStock,
       sortBy,
       sortOrder,
       page,
       limit,
+      listed,
     });
     const totalPages =
       limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1;
@@ -144,8 +140,6 @@ export const createAuction = async (
       brand,
       condition,
       price,
-      rating,
-      stockQuantity,
       status,
       description,
       paymentMethods,
@@ -160,8 +154,6 @@ export const createAuction = async (
       brand,
       condition,
       price,
-      rating,
-      stockQuantity,
       status,
       description,
       paymentMethods,

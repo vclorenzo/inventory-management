@@ -23,7 +23,9 @@ export const getProductById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const product = await productService.getProductById(id);
+    const listedOnly =
+      req.query.marketplace === "true" || req.query.marketplace === "1";
+    const product = await productService.getProductById(id, { listedOnly });
     if (!product) {
       res.status(404).json({ message: "Product not found" });
     } else {
@@ -49,6 +51,8 @@ export const getAllProducts = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
+    const marketplace =
+      req.query.marketplace === "true" || req.query.marketplace === "1";
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
     const minRating = parseNumber(req.query.minRating);
@@ -91,6 +95,7 @@ export const getAllProducts = async (
       sortOrder,
       page,
       limit,
+      marketplace,
     });
     const totalPages =
       limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1;
@@ -154,6 +159,10 @@ export const createProduct = async (
     });
     res.status(201).json({ data: product });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -170,6 +179,10 @@ export const updateProduct = async (
       .status(200)
       .json({ message: "Product updated successfully", data: updatedProduct });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -186,6 +199,10 @@ export const deleteProduct = async (
       data: deletedProduct,
     });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };

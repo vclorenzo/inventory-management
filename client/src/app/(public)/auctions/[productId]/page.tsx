@@ -1,6 +1,6 @@
 'use client'
 import { useGetAuctionByIdQuery } from '@/state/internal/auctionsApi'
-import { CircularProgress, Rating } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules'
 import React from 'react'
@@ -21,11 +21,18 @@ import 'swiper/css/pagination'
 import 'swiper/css/scrollbar'
 
 import AddToCartButton from '@/components/AddToCartButton'
+import BiddingCountdown from '@/components/BiddingCountdown'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
+import {
+	auctionStatusLabel,
+	auctionStatusTone,
+	isAuctionScreenVisibleStatus,
+} from '@/constants/auctionStatus'
 import { useMe } from '@/hooks/useMe'
+import { formatPeso } from '@/utils/priceFormatter'
 
 const productImageUrls = (productId: string, length: number) => {
 	let hash = 0
@@ -44,13 +51,7 @@ const productImageUrls = (productId: string, length: number) => {
 	return images
 }
 
-const stockTone = (qty: number) => {
-	if (qty <= 0) return 'bg-red-50 text-red-700 ring-red-200'
-	if (qty <= 10) return 'bg-amber-50 text-amber-800 ring-amber-200'
-	return 'bg-emerald-50 text-emerald-800 ring-emerald-200'
-}
 
-const formatPeso = (amount: number) => `P${amount.toFixed(2)}`
 
 const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	const { me } = useMe()
@@ -59,7 +60,10 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 		isLoading,
 		isError,
 		error,
-	} = useGetAuctionByIdQuery(params.productId)
+	} = useGetAuctionByIdQuery({
+		id: params.productId,
+		listed: true,
+	})
 
 	if (isLoading) {
 		return (
@@ -109,12 +113,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	}
 
 	const images = productImageUrls(product.productId, 3)
-	const inStock = product.stockQuantity > 0
 	const isOpen =
-		product.isOpen ??
-		new Date(product.biddingEndsAt).getTime() > Date.now()
+		product.isOpen ?? new Date(product.biddingEndsAt).getTime() > Date.now()
 	const isOwner = me?.data.userId === product.userId
-	const canBid = inStock && isOpen && !isOwner
+	const canBid =
+		isOpen && !isOwner && isAuctionScreenVisibleStatus(product.status)
 	const currentHighestBid = product.currentHighestBid ?? null
 	const paymentMethods = Array.isArray(product.paymentMethods)
 		? product.paymentMethods
@@ -187,58 +190,23 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							</h1>
 							<div className="mt-2 flex flex-wrap items-center gap-3">
 								<span className="text-2xl font-semibold text-gray-900">
+									Current Price:{' '}
 									{formatPeso(
 										isOpen
 											? (currentHighestBid ?? product.price)
 											: (product.winningBid?.offerPrice ??
-												currentHighestBid ??
-												product.price),
+													currentHighestBid ??
+													product.price),
 									)}
 								</span>
 								<span
-									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${
-										isOpen
-											? 'bg-emerald-50 text-emerald-800 ring-emerald-200'
-											: 'bg-slate-50 text-slate-700 ring-slate-200'
-									}`}
-								>
-									{isOpen ? 'Live auction' : 'Auction ended'}
-								</span>
-								<span
-									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${stockTone(
-										product.stockQuantity,
+									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${auctionStatusTone(
+										product.status,
 									)}`}
 								>
-									{inStock ? 'In stock' : 'Out of stock'}
+									{auctionStatusLabel(product.status)}
 								</span>
 							</div>
-							<p className="mt-1 text-sm text-gray-500">
-								{isOpen
-									? currentHighestBid != null
-										? `Current highest bid · starting price ${formatPeso(product.price)}`
-										: `Starting price ${formatPeso(product.price)} · no bids yet`
-									: product.winningBid
-										? `Winning bid · starting price ${formatPeso(product.price)}`
-										: `Starting price ${formatPeso(product.price)}`}
-							</p>
-						</div>
-
-						<div className="flex flex-col items-end gap-1">
-							{typeof product.rating === 'number' ? (
-								<div className="flex items-center gap-2">
-									<span className="text-sm font-medium text-gray-800">
-										{product.rating.toFixed(1)}
-									</span>
-									<Rating
-										value={product.rating}
-										precision={0.1}
-										readOnly
-										size="small"
-									/>
-								</div>
-							) : (
-								<div className="text-sm text-gray-600">Not rated</div>
-							)}
 						</div>
 					</div>
 
@@ -297,9 +265,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 										{isOpen ? 'Bidding ends:' : 'Closed:'}
 									</div>
 									<div className="min-w-0 text-left font-medium text-gray-900">
-										{new Date(
-											product.biddingEndsAt,
-										).toLocaleString()}
+										{isOpen ? (
+											<BiddingCountdown endsAt={product.biddingEndsAt} />
+										) : (
+											new Date(product.biddingEndsAt).toLocaleString()
+										)}
 									</div>
 								</div>
 							</div>
@@ -386,9 +356,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 			</div>
 			<div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
 				<div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-					<h2 className="text-2xl font-semibold text-gray-900">
-						Description
-					</h2>
+					<h2 className="text-2xl font-semibold text-gray-900">Description</h2>
 					<div className="mt-4 space-y-4 text-gray-700">
 						{product.description}
 					</div>
@@ -399,9 +367,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 					</h2>
 					<div className="mt-6 space-y-5">
 						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-							<p className="text-xl font-semibold text-gray-900">
-								Payment
-							</p>
+							<p className="text-xl font-semibold text-gray-900">Payment</p>
 							{paymentMethods.length > 0 ? (
 								<ul className="mt-2 space-y-1 text-gray-700">
 									{paymentMethods.map((method) => (
@@ -409,15 +375,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 									))}
 								</ul>
 							) : (
-								<p className="text-gray-700">
-									No payment methods provided.
-								</p>
+								<p className="text-gray-700">No payment methods provided.</p>
 							)}
 						</div>
 						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-							<p className="text-xl font-semibold text-gray-900">
-								Meet-up
-							</p>
+							<p className="text-xl font-semibold text-gray-900">Meet-up</p>
 							{meetupLocations.length > 0 ? (
 								<div className="mt-2 space-y-2 text-gray-700">
 									{meetupLocations.map((location) => (
@@ -426,9 +388,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 											className="flex items-center gap-2"
 										>
 											<MapPin className="h-4 w-4 text-gray-500" />
-											<Link href={location.mapLink}>
-												{location.name}
-											</Link>
+											<Link href={location.mapLink}>{location.name}</Link>
 											<ExternalLink className="h-4 w-4 text-gray-500" />
 										</div>
 									))}
@@ -440,12 +400,9 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							)}
 						</div>
 						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
-							<p className="text-xl font-semibold text-gray-900">
-								Shipping
-							</p>
+							<p className="text-xl font-semibold text-gray-900">Shipping</p>
 							<p className="mt-1 text-gray-700">
-								{shippingDetails ??
-									'No shipping details provided.'}
+								{shippingDetails ?? 'No shipping details provided.'}
 							</p>
 						</div>
 					</div>

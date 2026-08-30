@@ -19,6 +19,7 @@ import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
 import ProductRating from '@/components/ProductRating'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
+import { PRODUCT_STATUS } from '@/constants/productStatus'
 
 const productImageUrls = (length: number) => {
 	const images = []
@@ -45,7 +46,10 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 		isLoading,
 		isError,
 		error,
-	} = useGetProductByIdQuery(params.productId)
+	} = useGetProductByIdQuery({
+		id: params.productId,
+		marketplace: true,
+	})
 
 	if (isLoading) {
 		return (
@@ -96,6 +100,8 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 
 	const images = productImageUrls(3)
 	const inStock = product.stockQuantity > 0
+	const canPurchase =
+		inStock && product.status === PRODUCT_STATUS.Available
 	const paymentMethods = Array.isArray(product.paymentMethods)
 		? product.paymentMethods
 		: []
@@ -225,7 +231,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 					<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
 						<AddToCartButton
 							productId={product.productId}
-							disabled={!inStock}
+							disabled={!canPurchase}
 						/>
 						<Link
 							href="/products"

@@ -1,15 +1,14 @@
 import { AppError } from "#error/AppError.ts";
 import logger from "#config/logger.ts";
-import { Prisma, PrismaClient } from "@prisma/client";
+import {
+  AUCTION_STATUS,
+  PUBLIC_AUCTION_STATUS,
+  resolveCreateAuctionStatus,
+  resolveUpdatedAuctionStatus,
+} from "#src/constants/auctionStatus.ts";
+import { AuctionStatus, Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-
-const CLOSED_AUCTION_STATUSES = new Set([
-  "Sold",
-  "Unsold",
-  "Unlisted",
-  "Unavailable",
-]);
 
 const highestValidBidOrder = [
   { offerPrice: "desc" as const },
@@ -23,13 +22,13 @@ const toDate = (value: Date | string | undefined) => {
 
 type AuctionTiming = {
   biddingEndsAt: Date;
-  status: string;
+  status: AuctionStatus | string;
   settledAt: Date | null;
 };
 
 export const isAuctionOpen = (auction: AuctionTiming) => {
   if (auction.settledAt) return false;
-  if (CLOSED_AUCTION_STATUSES.has(auction.status)) return false;
+  if (auction.status !== AUCTION_STATUS.Available) return false;
   return auction.biddingEndsAt.getTime() > Date.now();
 };
 
@@ -66,7 +65,7 @@ export const settleAuctionIfClosed = async (productId: string) => {
 
       if (!auction) return null;
       if (auction.settledAt) return auction;
-      if (auction.status === "Unlisted") return auction;
+      if (auction.status !== AUCTION_STATUS.Available) return auction;
       if (auction.biddingEndsAt.getTime() > Date.now()) return auction;
 
       const winner = await findHighestValidBid(
@@ -80,7 +79,7 @@ export const settleAuctionIfClosed = async (productId: string) => {
         data: {
           winningBidId: winner?.bidId ?? null,
           settledAt: new Date(),
-          status: winner ? "Sold" : "Unsold",
+          status: winner ? AUCTION_STATUS.SoldOut : AUCTION_STATUS.Unsold,
         },
       });
     });
@@ -95,7 +94,7 @@ export const settleExpiredAuctions = async () => {
       where: {
         settledAt: null,
         biddingEndsAt: { lte: new Date() },
-        status: { not: "Unlisted" },
+        status: AUCTION_STATUS.Available,
       },
       select: { productId: true },
     });
@@ -121,14 +120,11 @@ export const getAllAuctions = async ({
   status,
   minPrice,
   maxPrice,
-  minRating,
-  maxRating,
-  minStock,
-  maxStock,
   sortBy = "relevance",
   sortOrder = "desc",
   page = 1,
   limit,
+  listed = false,
 }: {
   search?: string;
   userId?: string;
@@ -139,14 +135,11 @@ export const getAllAuctions = async ({
   status?: string[];
   minPrice?: number;
   maxPrice?: number;
-  minRating?: number;
-  maxRating?: number;
-  minStock?: number;
-  maxStock?: number;
-  sortBy?: "relevance" | "name" | "price" | "rating" | "stockQuantity";
+  sortBy?: "relevance" | "name" | "price";
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+  listed?: boolean;
 } = {}) => {
   try {
     await settleExpiredAuctions();
@@ -179,8 +172,12 @@ export const getAllAuctions = async ({
       whereParts.push(Prisma.sql`p."condition" IN (${Prisma.join(condition)})`);
     }
 
-    if (status?.length) {
-      whereParts.push(Prisma.sql`p."status" IN (${Prisma.join(status)})`);
+    if (listed) {
+      whereParts.push(
+        Prisma.sql`p."status" = CAST(${PUBLIC_AUCTION_STATUS} AS "AuctionStatus")`,
+      );
+    } else if (status?.length) {
+      whereParts.push(Prisma.sql`p."status"::text IN (${Prisma.join(status)})`);
     }
 
     if (typeof minPrice === "number") {
@@ -189,22 +186,6 @@ export const getAllAuctions = async ({
 
     if (typeof maxPrice === "number") {
       whereParts.push(Prisma.sql`p."price" <= ${maxPrice}`);
-    }
-
-    if (typeof minRating === "number") {
-      whereParts.push(Prisma.sql`COALESCE(p."rating", 0) >= ${minRating}`);
-    }
-
-    if (typeof maxRating === "number") {
-      whereParts.push(Prisma.sql`COALESCE(p."rating", 0) <= ${maxRating}`);
-    }
-
-    if (typeof minStock === "number") {
-      whereParts.push(Prisma.sql`p."stockQuantity" >= ${minStock}`);
-    }
-
-    if (typeof maxStock === "number") {
-      whereParts.push(Prisma.sql`p."stockQuantity" <= ${maxStock}`);
     }
 
     if (hasSearch) {
@@ -234,10 +215,6 @@ export const getAllAuctions = async ({
     let orderBySql = Prisma.sql`p."name" ASC`;
     if (sortBy === "price") {
       orderBySql = Prisma.sql`p."price" ${safeSortOrder}, p."name" ASC`;
-    } else if (sortBy === "rating") {
-      orderBySql = Prisma.sql`COALESCE(p."rating", 0) ${safeSortOrder}, p."name" ASC`;
-    } else if (sortBy === "stockQuantity") {
-      orderBySql = Prisma.sql`p."stockQuantity" ${safeSortOrder}, p."name" ASC`;
     } else if (sortBy === "name") {
       orderBySql = Prisma.sql`p."name" ${safeSortOrder}`;
     } else if (hasSearch) {
@@ -314,6 +291,7 @@ export const getAllAuctions = async ({
 export const getAuctionById = async (
   id: string,
   viewerUserId?: string,
+  { listedOnly = false }: { listedOnly?: boolean } = {},
 ) => {
   try {
     await settleAuctionIfClosed(id);
@@ -321,6 +299,9 @@ export const getAuctionById = async (
     const auction = await prisma.auctions.findFirst({
       where: {
         productId: id,
+        ...(listedOnly
+          ? { status: { not: AUCTION_STATUS.Unlisted } }
+          : {}),
       },
       include: {
         winningBid: {
@@ -382,8 +363,6 @@ export const createAuction = async ({
   brand,
   condition,
   price,
-  rating,
-  stockQuantity,
   status,
   description,
   paymentMethods = [],
@@ -397,8 +376,6 @@ export const createAuction = async ({
   brand: string;
   condition: string;
   price: number;
-  rating: number;
-  stockQuantity: number;
   status?: string;
   description: string;
   paymentMethods?: string[];
@@ -423,9 +400,7 @@ export const createAuction = async ({
         brand,
         condition,
         price,
-        rating,
-        stockQuantity,
-        status: status?.trim() || "Available",
+        status: resolveCreateAuctionStatus(status),
         description,
         paymentMethods,
         meetupLocations,
@@ -446,8 +421,6 @@ type AuctionUpdatePayload = {
   condition?: string;
   description?: string;
   price?: number;
-  rating?: number | null;
-  stockQuantity?: number;
   status?: string;
   paymentMethods?: string[];
   meetupLocations?: Prisma.InputJsonValue;
@@ -462,7 +435,53 @@ export const updateAuction = async (id: string, data: AuctionUpdatePayload) => {
       throw new AppError("Auction does not exist");
     }
 
-    const biddingEndsAt = toDate(data.biddingEndsAt);
+    const biddingEndsAt =
+      toDate(data.biddingEndsAt) ?? existingAuction.biddingEndsAt;
+    const isRelisting =
+      existingAuction.status === AUCTION_STATUS.Unsold &&
+      (data.status?.trim() === AUCTION_STATUS.Available ||
+        (data.biddingEndsAt !== undefined &&
+          biddingEndsAt.getTime() > Date.now()));
+    const nextStatus = resolveUpdatedAuctionStatus({
+      requestedStatus: isRelisting
+        ? AUCTION_STATUS.Available
+        : data.status,
+      existingStatus: existingAuction.status as AuctionStatus,
+      biddingEndsAt,
+      isRelisting,
+    });
+    const shouldResetSettlement =
+      nextStatus === AUCTION_STATUS.Available &&
+      (existingAuction.status === AUCTION_STATUS.Unsold ||
+        existingAuction.settledAt != null);
+
+    if (shouldResetSettlement) {
+      return await prisma.$transaction(async (tx) => {
+        await tx.auctions.update({
+          where: { productId: id },
+          data: { winningBidId: null },
+        });
+        await tx.bids.deleteMany({ where: { productId: id } });
+        return tx.auctions.update({
+          where: { productId: id },
+          data: {
+            name: data.name,
+            productCategory: data.productCategory,
+            brand: data.brand,
+            condition: data.condition,
+            description: data.description,
+            price: data.price,
+            status: nextStatus,
+            paymentMethods: data.paymentMethods,
+            meetupLocations: data.meetupLocations,
+            shippingDetails: data.shippingDetails,
+            biddingEndsAt,
+            settledAt: null,
+            bidCount: 0,
+          },
+        });
+      });
+    }
 
     return await prisma.auctions.update({
       where: { productId: id },
@@ -473,13 +492,11 @@ export const updateAuction = async (id: string, data: AuctionUpdatePayload) => {
         condition: data.condition,
         description: data.description,
         price: data.price,
-        rating: data.rating,
-        stockQuantity: data.stockQuantity,
-        status: data.status,
+        status: nextStatus,
         paymentMethods: data.paymentMethods,
         meetupLocations: data.meetupLocations,
         shippingDetails: data.shippingDetails,
-        biddingEndsAt,
+        biddingEndsAt: toDate(data.biddingEndsAt),
       },
     });
   } catch (error) {

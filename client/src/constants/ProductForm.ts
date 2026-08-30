@@ -94,7 +94,9 @@ export function buildAuctionFormFields({
 	return [
 		...(buildProductFormFields({
 			getValues: getValues as unknown as UseFormGetValues<ProductFormValues>,
-		}) as unknown as ReusableFieldConfig<AuctionFormValues>[]),
+		}).filter(
+			(field) => field.name !== 'stockQuantity',
+		) as unknown as ReusableFieldConfig<AuctionFormValues>[]),
 		{
 			name: 'biddingEndsAt',
 			label: 'Bidding ends',

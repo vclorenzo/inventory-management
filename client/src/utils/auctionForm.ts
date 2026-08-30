@@ -1,7 +1,12 @@
 import { Auction, AuctionFormValues } from '@/types/pages/Auctions'
-import { productToFormValues } from '@/utils/productForm'
 
 const pad = (value: number) => String(value).padStart(2, '0')
+
+const emptyMeetupLocation = () => ({
+	name: '',
+	address: '',
+	mapLink: '',
+})
 
 export function toDatetimeLocalValue(iso: string): string {
 	const date = new Date(iso)
@@ -21,8 +26,34 @@ export function biddingEndsAtToIso(value: string): string {
 }
 
 export function auctionToFormValues(auction: Auction): AuctionFormValues {
+	const locations = Array.isArray(auction.meetupLocations)
+		? auction.meetupLocations.map((location) => ({
+				name: typeof location?.name === 'string' ? location.name : '',
+				address:
+					typeof location?.address === 'string' ? location.address : '',
+				mapLink:
+					typeof location?.mapLink === 'string' ? location.mapLink : '',
+			}))
+		: []
+
 	return {
-		...productToFormValues(auction),
+		name: auction.name,
+		productCategory: auction.productCategory,
+		brand: auction.brand,
+		condition: auction.condition,
+		price: auction.price,
+		status: auction.status,
+		description: auction.description,
+		paymentMethods: Array.isArray(auction.paymentMethods)
+			? [...auction.paymentMethods]
+			: [],
+		meetupLocations:
+			locations.length > 0 ? locations : [emptyMeetupLocation()],
+		shippingDetails:
+			auction.shippingDetails === null ||
+			auction.shippingDetails === undefined
+				? ''
+				: auction.shippingDetails,
 		biddingEndsAt: toDatetimeLocalValue(auction.biddingEndsAt),
 	}
 }

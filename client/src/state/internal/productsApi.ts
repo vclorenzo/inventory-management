@@ -28,6 +28,8 @@ export interface ProductQueryParams {
 	sortOrder?: SortOrder
 	page?: number
 	limit?: number
+	marketplace?: boolean
+	listed?: boolean
 }
 
 export const normalizeQueryParams = (
@@ -59,6 +61,8 @@ export const normalizeQueryParams = (
 	if (params.sortOrder) query.sortOrder = params.sortOrder
 	if (typeof params.page === 'number') query.page = params.page
 	if (typeof params.limit === 'number') query.limit = params.limit
+	if (params.marketplace) query.marketplace = 'true'
+	if (params.listed) query.listed = 'true'
 
 	return query
 }
@@ -78,8 +82,19 @@ export const productsApi = api.injectEndpoints({
 			providesTags: ['Products'],
 		}),
 
-		getProductById: builder.query<Product, string>({
-			query: (id) => `/products/${id}`,
+		getProductById: builder.query<
+			Product,
+			string | { id: string; marketplace?: boolean }
+		>({
+			query: (arg) => {
+				const id = typeof arg === 'string' ? arg : arg.id
+				const marketplace =
+					typeof arg === 'object' ? arg.marketplace : undefined
+				return {
+					url: `/products/${id}`,
+					params: marketplace ? { marketplace: 'true' } : undefined,
+				}
+			},
 			transformResponse: (response: { data: Product }) => response.data,
 			providesTags: ['Products'],
 		}),

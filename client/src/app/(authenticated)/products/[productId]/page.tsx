@@ -27,6 +27,11 @@ import ProductModal from "../ProductModal";
 import Reviews from "@/components/Reviews";
 import ProfileBanner from "@/components/ProfileBanner";
 import ProductRating from "@/components/ProductRating";
+import {
+  PRODUCT_STATUS,
+  productStatusLabel,
+  productStatusTone,
+} from "@/constants/productStatus";
 
 const productImageUrls = (length: number) => {
   const images = [];
@@ -41,16 +46,6 @@ const productImageUrls = (length: number) => {
   return images;
 };
 
-const statusTone = (status: string) => {
-  const normalized = status.trim().toLowerCase();
-  if (normalized === "available")
-    return "bg-emerald-50 text-emerald-800 ring-emerald-200";
-  if (normalized === "unavailable")
-    return "bg-rose-50 text-rose-800 ring-rose-200";
-  if (normalized === "unlisted")
-    return "bg-slate-50 text-slate-700 ring-slate-200";
-  return "bg-gray-50 text-gray-800 ring-gray-200";
-};
 
 const ProductDetails = ({ params }: { params: { productId: string } }) => {
   const {
@@ -77,11 +72,12 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 
   const handleMarkAsReserved = async () => {
     if (!product) return;
+    if (product.stockQuantity !== 1) return;
     const values = productToFormValues(product);
     await updateProduct({
       productId: params.productId,
       ...values,
-      status: "Unavailable",
+      status: PRODUCT_STATUS.Reserved,
     }).unwrap();
   };
   const handleMarkAsUnlisted = async () => {
@@ -90,7 +86,16 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
     await updateProduct({
       productId: params.productId,
       ...values,
-      status: "Unlisted",
+      status: PRODUCT_STATUS.Unlisted,
+    }).unwrap();
+  };
+  const handleListForSale = async () => {
+    if (!product || product.stockQuantity <= 0) return;
+    const values = productToFormValues(product);
+    await updateProduct({
+      productId: params.productId,
+      ...values,
+      status: PRODUCT_STATUS.Available,
     }).unwrap();
   };
 
@@ -203,11 +208,11 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
                   ${product.price.toFixed(2)}
                 </span>
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusTone(
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${productStatusTone(
                     product.status,
                   )}`}
                 >
-                  {product.status}
+                  {productStatusLabel(product.status)}
                 </span>
               </div>
             </div>
@@ -253,15 +258,30 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
                 </div>
               </div>
             </div>
+            <div className="rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100 flex justify-center">
+              <div className="grid grid-cols-[120px_120px] gap-x-6 items-center">
+                <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+                  Stock:
+                </div>
+                <div className="font-medium text-gray-900 text-left">
+                  {product.stockQuantity}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
             <button
               type="button"
               disabled={
-                product.status === "Unavailable" ||
-                product.status === "Unlisted" ||
+                product.status !== PRODUCT_STATUS.Available ||
+                product.stockQuantity !== 1 ||
                 updateProductState.isLoading
+              }
+              title={
+                product.stockQuantity !== 1
+                  ? "Reserved is only available for single-quantity items"
+                  : undefined
               }
               className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleMarkAsReserved}
@@ -276,15 +296,31 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
             </button>
           </div>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row justify-center">
-            <button
-              onClick={handleMarkAsUnlisted}
-              disabled={
-                product.status === "Unlisted" || updateProductState.isLoading
-              }
-              className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Unlist
-            </button>
+            {product.status === PRODUCT_STATUS.Unlisted ||
+            product.status === PRODUCT_STATUS.Reserved ? (
+              <button
+                type="button"
+                onClick={handleListForSale}
+                disabled={
+                  product.stockQuantity <= 0 || updateProductState.isLoading
+                }
+                className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                List for sale
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleMarkAsUnlisted}
+                disabled={
+                  product.status === PRODUCT_STATUS.SoldOut ||
+                  updateProductState.isLoading
+                }
+                className="inline-flex justify-center items-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Unlist
+              </button>
+            )}
           </div>
         </div>
       </div>

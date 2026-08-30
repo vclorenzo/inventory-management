@@ -1,5 +1,6 @@
 import ReactHookForm from '@/components/forms/ReactHookForm'
 import Header from '@/components/Header'
+import { AUCTION_STATUS } from '@/constants/auctionStatus'
 import { buildAuctionFormFields } from '@/constants/ProductForm'
 import { ReusableFieldConfig } from '@/types/components/ReactHookForm'
 import { AuctionFormValues } from '@/types/pages/Auctions'
@@ -28,8 +29,7 @@ const EMPTY_AUCTION_FORM: AuctionFormValues = {
 	brand: '',
 	condition: '',
 	price: 0,
-	stockQuantity: 0,
-	status: 'Available',
+	status: AUCTION_STATUS.Available,
 	description: '',
 	paymentMethods: [],
 	meetupLocations: [createMeetupLocation()],
