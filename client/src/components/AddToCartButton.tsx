@@ -14,6 +14,7 @@ type AddToCartButtonProps = {
 	className?: string
 	listingPrice?: number
 	currentHighestBid?: number | null
+	hasExistingBid?: boolean
 }
 
 function getRequestErrorMessage(error: unknown, fallback: string) {
@@ -47,6 +48,7 @@ function AddToCartButton({
 	className = 'inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 w-full h-12 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60',
 	listingPrice,
 	currentHighestBid,
+	hasExistingBid = false,
 }: AddToCartButtonProps) {
 	const router = useRouter()
 	const pathname = usePathname()
@@ -59,7 +61,12 @@ function AddToCartButton({
 	const isLoading = isAuction ? isBidLoading : isCartLoading
 	const [errorMessage, setErrorMessage] = useState<string | null>(null)
 	const [isOfferModalOpen, setIsOfferModalOpen] = useState(false)
-	const label = isAuction ? 'Place Bid' : 'Add to Cart'
+	const isUpdatingBid = isAuction && hasExistingBid
+	const label = isAuction
+		? isUpdatingBid
+			? 'Update Bid'
+			: 'Place Bid'
+		: 'Add to Cart'
 
 	const handleAddToCart = async () => {
 		setErrorMessage(null)
@@ -129,7 +136,11 @@ function AddToCartButton({
 				{isLoading ? (
 					<span className="inline-flex items-center gap-2">
 						<CircularProgress size={18} color="inherit" />
-						{isAuction ? 'Placing bid…' : 'Adding…'}
+						{isAuction
+							? isUpdatingBid
+								? 'Updating bid…'
+								: 'Placing bid…'
+							: 'Adding…'}
 					</span>
 				) : (
 					label
@@ -146,6 +157,7 @@ function AddToCartButton({
 					isSubmitting={isBidLoading}
 					listingPrice={listingPrice}
 					currentHighestBid={currentHighestBid}
+					hasExistingBid={hasExistingBid}
 					errorMessage={errorMessage}
 					onClose={handleCloseOfferModal}
 					onConfirm={handleConfirmOffer}

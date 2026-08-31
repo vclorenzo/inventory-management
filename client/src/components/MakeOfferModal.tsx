@@ -8,6 +8,7 @@ type MakeOfferModalProps = {
 	isSubmitting?: boolean
 	listingPrice?: number
 	currentHighestBid?: number | null
+	hasExistingBid?: boolean
 	errorMessage?: string | null
 	onClose: () => void
 	onConfirm: (amount: number) => void | Promise<void>
@@ -26,6 +27,7 @@ function MakeOfferModal({
 	isSubmitting = false,
 	listingPrice,
 	currentHighestBid,
+	hasExistingBid = false,
 	errorMessage,
 	onClose,
 	onConfirm,
@@ -116,7 +118,7 @@ function MakeOfferModal({
 			>
 				<header className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
 					<h2 id={titleId} className="text-lg font-semibold text-gray-900">
-						Place a bid
+						{hasExistingBid ? 'Update bid' : 'Place a bid'}
 					</h2>
 					<button
 						type="button"

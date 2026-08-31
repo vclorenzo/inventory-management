@@ -20,6 +20,7 @@ export type BidOutcome = "leading" | "outbid" | "won" | "lost";
 
 export type BidItemResponse = {
   id: string;
+  productId: string;
   image: string;
   title: string;
   startingPrice: number;
@@ -27,11 +28,13 @@ export type BidItemResponse = {
   currency: string;
   isAuctionOpen: boolean;
   currentHighestBid: number | null;
+  endedAt: string;
   outcome: BidOutcome;
 };
 
 export type BidGroupResponse = {
   shop: {
+    userId: string;
     name: string;
   };
   items: BidItemResponse[];
@@ -64,7 +67,10 @@ const formatBidGroups = (
     const shopKey = bid.auction.userId;
     if (!groups.has(shopKey)) {
       groups.set(shopKey, {
-        shop: { name: bid.auction.owner.name },
+        shop: {
+          userId: bid.auction.userId,
+          name: bid.auction.owner.name,
+        },
         items: [],
       });
     }
@@ -83,6 +89,7 @@ const formatBidGroups = (
 
     groups.get(shopKey)!.items.push({
       id: bid.bidId,
+      productId: bid.productId,
       image: DEFAULT_PRODUCT_IMAGE,
       title: bid.auction.name,
       startingPrice: bid.auction.price,
@@ -90,6 +97,9 @@ const formatBidGroups = (
       currency: bid.currency,
       isAuctionOpen: auctionOpen,
       currentHighestBid: leading?.offerPrice ?? null,
+      endedAt: (
+        bid.auction.settledAt ?? bid.auction.biddingEndsAt
+      ).toISOString(),
       outcome,
     });
   }

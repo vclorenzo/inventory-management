@@ -27,6 +27,7 @@ import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
 import {
+	AUCTION_STATUS,
 	auctionStatusLabel,
 	auctionStatusTone,
 	isAuctionScreenVisibleStatus,
@@ -51,8 +52,6 @@ const productImageUrls = (productId: string, length: number) => {
 	return images
 }
 
-
-
 const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	const { me } = useMe()
 	const {
@@ -60,10 +59,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 		isLoading,
 		isError,
 		error,
-	} = useGetAuctionByIdQuery({
-		id: params.productId,
-		listed: true,
-	})
+	} = useGetAuctionByIdQuery(params.productId)
 
 	if (isLoading) {
 		return (
@@ -115,6 +111,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	const images = productImageUrls(product.productId, 3)
 	const isOpen =
 		product.isOpen ?? new Date(product.biddingEndsAt).getTime() > Date.now()
+	const isUnlisted = product.status === AUCTION_STATUS.Unlisted
 	const isOwner = me?.data.userId === product.userId
 	const canBid =
 		isOpen && !isOwner && isAuctionScreenVisibleStatus(product.status)
@@ -262,7 +259,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							<div className="flex min-w-0 items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
 								<div className="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1">
 									<div className="shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500">
-										{isOpen ? 'Bidding ends:' : 'Closed:'}
+										{isOpen
+											? 'Bidding ends:'
+											: isUnlisted
+												? 'Unlisted'
+												: 'Closed:'}
 									</div>
 									<div className="min-w-0 text-left font-medium text-gray-900">
 										{isOpen ? (
@@ -276,7 +277,23 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 						</div>
 					</div>
 
-					{!isOpen && (
+					{isUnlisted && (
+						<div className="mt-6 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+							<p className="text-sm font-semibold text-gray-900">
+								This auction is no longer listed.
+							</p>
+							<p className="mt-1 text-sm text-gray-700">
+								The seller has unpublished this listing, so bidding
+								is closed.
+							</p>
+							{product.viewerBid && (
+								<p className="mt-2 text-sm font-medium text-slate-700">
+									Your bid: {formatPeso(product.viewerBid.offerPrice)}
+								</p>
+							)}
+						</div>
+					)}
+					{!isOpen && !isUnlisted && (
 						<div
 							className={`mt-6 rounded-xl p-4 ring-1 ${
 								product.winningBid
@@ -308,19 +325,10 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 					)}
 					{isOpen && product.viewerBid && (
 						<div
-							className={`mt-6 rounded-xl p-4 ring-1 ${
-								product.viewerBid.isLeading
-									? 'bg-emerald-50 ring-emerald-200'
-									: 'bg-amber-50 ring-amber-200'
-							}`}
+							className={`ring-emerald-200} mt-6 rounded-xl bg-emerald-50 p-4 ring-1`}
 						>
-							<p className="text-sm font-semibold text-gray-900">
-								{product.viewerBid.isLeading
-									? 'You are the highest bidder'
-									: 'You have been outbid'}
-							</p>
-							<p className="mt-1 text-sm text-gray-700">
-								Your bid: {formatPeso(product.viewerBid.offerPrice)}
+							<p className="mt-1 text-center text-sm font-semibold text-gray-700">
+								Your current bid: {formatPeso(product.viewerBid.offerPrice)}
 							</p>
 						</div>
 					)}
@@ -331,6 +339,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							disabled={!canBid}
 							listingPrice={product.price}
 							currentHighestBid={currentHighestBid}
+							hasExistingBid={Boolean(product.viewerBid)}
 						/>
 						<Link
 							href="/products"

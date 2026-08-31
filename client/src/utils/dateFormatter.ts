@@ -1,3 +1,10 @@
+export function formatEndedAt(isoDate: string): string {
+	return new Date(isoDate).toLocaleString('en-PH', {
+		dateStyle: 'medium',
+		timeStyle: 'short',
+	})
+}
+
 export function formatClosingDay(isoDate: string): string {
 	const end = new Date(isoDate)
 	const now = new Date()

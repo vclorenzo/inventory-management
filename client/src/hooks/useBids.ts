@@ -4,6 +4,39 @@ import {
 	useRemoveBidMutation,
 	useUpdateBidMutation,
 } from '@/state/internal/bidsApi'
+import { BidGroup, BidItem, CompletedBidEntry } from '@/types/pages/Bids'
+import { useMemo } from 'react'
+
+const isCompletedBid = (item: BidItem) => item.isAuctionOpen === false
+
+const isActiveBid = (item: BidItem) => item.isAuctionOpen === true
+
+export const flattenCompletedBids = (
+	groups: BidGroup[],
+): CompletedBidEntry[] =>
+	groups
+		.flatMap((group) =>
+			group.items
+				.filter(isCompletedBid)
+				.map((item) => ({ shop: group.shop, item })),
+		)
+		.sort((a, b) => {
+			const aEnded = a.item.endedAt
+				? new Date(a.item.endedAt).getTime()
+				: 0
+			const bEnded = b.item.endedAt
+				? new Date(b.item.endedAt).getTime()
+				: 0
+			return bEnded - aEnded
+		})
+
+export const filterActiveBidGroups = (groups: BidGroup[]): BidGroup[] =>
+	groups
+		.map((group) => ({
+			...group,
+			items: group.items.filter(isActiveBid),
+		}))
+		.filter((group) => group.items.length > 0)
 
 export const useBids = () => {
 	const query = useGetBidsQuery()
@@ -11,8 +44,20 @@ export const useBids = () => {
 	const [updateBid, updateBidState] = useUpdateBidMutation()
 	const [removeBid, removeBidState] = useRemoveBidMutation()
 
+	const bidGroups = query.data ?? []
+	const completedBids = useMemo(
+		() => flattenCompletedBids(bidGroups),
+		[bidGroups],
+	)
+	const activeBidGroups = useMemo(
+		() => filterActiveBidGroups(bidGroups),
+		[bidGroups],
+	)
+
 	return {
-		bidGroups: query.data ?? [],
+		bidGroups,
+		activeBidGroups,
+		completedBids,
 		isLoading: query.isLoading,
 		isFetching: query.isFetching,
 		isError: query.isError,
