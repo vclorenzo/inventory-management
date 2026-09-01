@@ -2,8 +2,8 @@ import {
 	Product,
 	NewProduct,
 	UpdateProduct,
-	ListingType,
 } from '@/types/pages/Products'
+import { isProductStatus } from '@/constants/productStatus'
 import { api } from '../api'
 
 export type ProductSortBy =
@@ -19,7 +19,6 @@ export interface ProductQueryParams {
 	brand?: string[]
 	condition?: string[]
 	status?: string[]
-	listingType?: ListingType | ListingType[]
 	minPrice?: number
 	maxPrice?: number
 	minRating?: number
@@ -30,9 +29,11 @@ export interface ProductQueryParams {
 	sortOrder?: SortOrder
 	page?: number
 	limit?: number
+	marketplace?: boolean
+	listed?: boolean
 }
 
-const normalizeQueryParams = (
+export const normalizeQueryParams = (
 	params?: string | ProductQueryParams,
 ): Record<string, string | number> => {
 	if (!params) return {}
@@ -51,11 +52,6 @@ const normalizeQueryParams = (
 	if (params.brand?.length) query.brand = params.brand.join(',')
 	if (params.condition?.length) query.condition = params.condition.join(',')
 	if (params.status?.length) query.status = params.status.join(',')
-	if (typeof params.listingType === 'string') {
-		query.listingType = params.listingType
-	} else if (params.listingType?.length) {
-		query.listingType = params.listingType.join(',')
-	}
 	if (typeof params.minPrice === 'number') query.minPrice = params.minPrice
 	if (typeof params.maxPrice === 'number') query.maxPrice = params.maxPrice
 	if (typeof params.minRating === 'number') query.minRating = params.minRating
@@ -66,8 +62,35 @@ const normalizeQueryParams = (
 	if (params.sortOrder) query.sortOrder = params.sortOrder
 	if (typeof params.page === 'number') query.page = params.page
 	if (typeof params.limit === 'number') query.limit = params.limit
+	if (params.marketplace) query.marketplace = 'true'
+	if (params.listed) query.listed = 'true'
 
 	return query
+}
+
+function parseProduct(value: unknown): Product | null {
+	if (!value || typeof value !== 'object') return null
+	const status = 'status' in value ? value.status : undefined
+	if (!isProductStatus(status)) return null
+	return { ...(value as Product), status }
+}
+
+function parseProductList(response: { data?: unknown }): Product[] {
+	const rows = Array.isArray(response.data) ? response.data : []
+	const products: Product[] = []
+	for (const row of rows) {
+		const product = parseProduct(row)
+		if (product) products.push(product)
+	}
+	return products
+}
+
+function parseProductRecord(response: { data?: unknown }): Product {
+	const product = parseProduct(response.data)
+	if (!product) {
+		throw new Error('Invalid product payload')
+	}
+	return product
 }
 
 export const productsApi = api.injectEndpoints({
@@ -80,14 +103,24 @@ export const productsApi = api.injectEndpoints({
 				url: '/products',
 				params: normalizeQueryParams(params),
 			}),
-			transformResponse: (response: { data?: Product[] }) =>
-				Array.isArray(response?.data) ? response.data : [],
+			transformResponse: parseProductList,
 			providesTags: ['Products'],
 		}),
 
-		getProductById: builder.query<Product, string>({
-			query: (id) => `/products/${id}`,
-			transformResponse: (response: { data: Product }) => response.data,
+		getProductById: builder.query<
+			Product,
+			string | { id: string; marketplace?: boolean }
+		>({
+			query: (arg) => {
+				const id = typeof arg === 'string' ? arg : arg.id
+				const marketplace =
+					typeof arg === 'object' ? arg.marketplace : undefined
+				return {
+					url: `/products/${id}`,
+					params: marketplace ? { marketplace: 'true' } : undefined,
+				}
+			},
+			transformResponse: parseProductRecord,
 			providesTags: ['Products'],
 		}),
 
@@ -97,6 +130,7 @@ export const productsApi = api.injectEndpoints({
 				method: 'POST',
 				body,
 			}),
+			transformResponse: parseProductRecord,
 			invalidatesTags: ['Products'],
 		}),
 		updateProduct: builder.mutation<Product, UpdateProduct>({
@@ -105,6 +139,7 @@ export const productsApi = api.injectEndpoints({
 				method: 'PUT',
 				body,
 			}),
+			transformResponse: parseProductRecord,
 			invalidatesTags: ['Products'],
 		}),
 

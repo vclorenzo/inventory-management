@@ -10,12 +10,27 @@ type Tab = {
 type TabsProps = {
 	tabs: Tab[];
 	defaultIndex?: number;
+	activeIndex?: number;
+	onChange?: (index: number) => void;
 };
 
 import React from 'react';
 
-const Tabs = ({ tabs, defaultIndex = 0 }: TabsProps) => {
-	const [activeIndex, setActiveIndex] = useState(defaultIndex);
+const Tabs = ({
+	tabs,
+	defaultIndex = 0,
+	activeIndex: controlledIndex,
+	onChange,
+}: TabsProps) => {
+	const [internalIndex, setInternalIndex] = useState(defaultIndex);
+	const activeIndex = controlledIndex ?? internalIndex;
+
+	const handleTabClick = (index: number) => {
+		if (controlledIndex === undefined) {
+			setInternalIndex(index);
+		}
+		onChange?.(index);
+	};
 
 	return (
 		<div className="w-full">
@@ -27,7 +42,7 @@ const Tabs = ({ tabs, defaultIndex = 0 }: TabsProps) => {
 					return (
 						<button
 							key={tab.label}
-							onClick={() => setActiveIndex(index)}
+							onClick={() => handleTabClick(index)}
 							className={`
                 relative px-4 py-2 text-sm font-medium transition-colors
                 ${isActive ? 'text-black' : 'text-gray-500 hover:text-gray-700'}

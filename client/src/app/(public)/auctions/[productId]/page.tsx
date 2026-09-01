@@ -1,5 +1,5 @@
 'use client'
-import { useGetProductByIdQuery } from '@/state/internal/productsApi'
+import { useGetAuctionByIdQuery } from '@/state/internal/auctionsApi'
 import { CircularProgress } from '@mui/material'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules'
@@ -7,46 +7,60 @@ import React from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronLeft, Package } from 'lucide-react'
+import {
+	Bookmark,
+	ChevronLeft,
+	ExternalLink,
+	Gavel,
+	MapPin,
+	Package,
+} from 'lucide-react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/scrollbar'
 
 import AddToCartButton from '@/components/AddToCartButton'
+import BiddingCountdown from '@/components/BiddingCountdown'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
-import ProductRating from '@/components/ProductRating'
-import { Bookmark } from 'lucide-react'
 import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
+import {
+	AUCTION_STATUS,
+	auctionStatusLabel,
+	auctionStatusTone,
+	isAuctionScreenVisibleStatus,
+} from '@/constants/auctionStatus'
+import { useMe } from '@/hooks/useMe'
+import { formatPeso } from '@/utils/priceFormatter'
+import { getSafeHttpUrl } from '@/utils/url'
 
-const productImageUrls = (length: number) => {
+const productImageUrls = (productId: string, length: number) => {
+	let hash = 0
+	for (let i = 0; i < productId.length; i++) {
+		hash = (hash * 31 + productId.charCodeAt(i)) >>> 0
+	}
+
 	const images = []
 	for (let i = 0; i < length; i++) {
+		const index = ((hash + i) % 3) + 1
 		images.push({
-			src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${
-				Math.floor(Math.random() * 3) + 1
-			}.png`,
+			src: `https://s3-inventory-management-img-bucket.s3.ap-southeast-2.amazonaws.com/product${index}.png`,
 		})
 	}
 
 	return images
 }
 
-const stockTone = (qty: number) => {
-	if (qty <= 0) return 'bg-red-50 text-red-700 ring-red-200'
-	if (qty <= 10) return 'bg-amber-50 text-amber-800 ring-amber-200'
-	return 'bg-emerald-50 text-emerald-800 ring-emerald-200'
-}
-
 const AuctionDetails = ({ params }: { params: { productId: string } }) => {
+	const { me } = useMe()
 	const {
 		data: product,
 		isLoading,
 		isError,
 		error,
-	} = useGetProductByIdQuery(params.productId)
+	} = useGetAuctionByIdQuery(params.productId)
 
 	if (isLoading) {
 		return (
@@ -72,7 +86,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 								We couldn’t load this product.
 							</div>
 							<div className="mt-1 text-sm text-red-800">
-								Please try again, or go back to the products list.
+								Please try again, or go back to the auctions list.
 							</div>
 							{error && (
 								<div className="mt-3 rounded-lg bg-white/70 p-3 text-xs text-red-900 ring-1 ring-red-200">
@@ -81,11 +95,11 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							)}
 							<div className="mt-4">
 								<Link
-									href="/products"
+									href="/auctions"
 									className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-200 hover:bg-gray-50"
 								>
 									<ChevronLeft className="h-4 w-4" />
-									Back to Products
+									Back to Auctions
 								</Link>
 							</div>
 						</div>
@@ -95,8 +109,25 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 		)
 	}
 
-	const images = productImageUrls(3)
-	const inStock = product.stockQuantity > 0
+	const images = productImageUrls(product.productId, 3)
+	const isOpen =
+		product.isOpen ?? new Date(product.biddingEndsAt).getTime() > Date.now()
+	const isUnlisted = product.status === AUCTION_STATUS.Unlisted
+	const isOwner = me?.data.userId === product.userId
+	const canBid =
+		isOpen && !isOwner && isAuctionScreenVisibleStatus(product.status)
+	const currentHighestBid = product.currentHighestBid ?? null
+	const paymentMethods = Array.isArray(product.paymentMethods)
+		? product.paymentMethods
+		: []
+	const meetupLocations = Array.isArray(product.meetupLocations)
+		? product.meetupLocations
+		: []
+	const shippingDetails =
+		typeof product.shippingDetails === 'string' &&
+		product.shippingDetails.trim()
+			? product.shippingDetails
+			: null
 
 	return (
 		<div className="mx-auto w-full max-w-5xl pb-10">
@@ -157,23 +188,23 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							</h1>
 							<div className="mt-2 flex flex-wrap items-center gap-3">
 								<span className="text-2xl font-semibold text-gray-900">
-									${product.price.toFixed(2)}
+									Current Price:{' '}
+									{formatPeso(
+										isOpen
+											? (currentHighestBid ?? product.price)
+											: (product.winningBid?.offerPrice ??
+													currentHighestBid ??
+													product.price),
+									)}
 								</span>
 								<span
-									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${stockTone(
-										product.stockQuantity,
+									className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ${auctionStatusTone(
+										product.status,
 									)}`}
 								>
-									{inStock ? 'In stock' : 'Out of stock'}
+									{auctionStatusLabel(product.status)}
 								</span>
 							</div>
-						</div>
-
-						<div className="flex flex-col items-end gap-1">
-							<ProductRating
-								rating={product.rating}
-								reviewCount={product.reviewCount}
-							/>
 						</div>
 					</div>
 
@@ -210,12 +241,105 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 								</div>
 							</div>
 						</div>
+						<div className="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-4">
+							<div
+								className="flex items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100"
+								aria-label={`${product.bidCount} ${
+									product.bidCount === 1 ? 'bid' : 'bids'
+								}`}
+							>
+								<div className="inline-flex items-center gap-1.5 font-medium text-gray-900">
+									<Gavel
+										className="text-gray-500"
+										size={20}
+										aria-hidden="true"
+									/>
+									<span>{product.bidCount}</span>
+								</div>
+							</div>
+							<div className="flex min-w-0 items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+								<div className="flex min-w-0 flex-wrap items-center justify-center gap-x-4 gap-y-1">
+									<div className="shrink-0 text-xs font-medium uppercase tracking-wide text-gray-500">
+										{isOpen
+											? 'Bidding ends:'
+											: isUnlisted
+												? 'Unlisted'
+												: 'Closed:'}
+									</div>
+									<div className="min-w-0 text-left font-medium text-gray-900">
+										{isOpen ? (
+											<BiddingCountdown endsAt={product.biddingEndsAt} />
+										) : (
+											new Date(product.biddingEndsAt).toLocaleString()
+										)}
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
+
+					{isUnlisted && (
+						<div className="mt-6 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200">
+							<p className="text-sm font-semibold text-gray-900">
+								This auction is no longer listed.
+							</p>
+							<p className="mt-1 text-sm text-gray-700">
+								The seller has unpublished this listing, so bidding is closed.
+							</p>
+							{product.viewerBid && (
+								<p className="mt-2 text-sm font-medium text-slate-700">
+									Your bid: {formatPeso(product.viewerBid.offerPrice)}
+								</p>
+							)}
+						</div>
+					)}
+					{!isOpen && !isUnlisted && (
+						<div
+							className={`mt-6 rounded-xl p-4 ring-1 ${
+								product.winningBid
+									? 'bg-emerald-50 ring-emerald-200'
+									: 'bg-slate-50 ring-slate-200'
+							}`}
+						>
+							<p className="text-sm font-semibold text-gray-900">
+								{product.winningBid
+									? `Winning bid: ${formatPeso(product.winningBid.offerPrice)}`
+									: 'No winning bid'}
+							</p>
+							<p className="mt-1 text-sm text-gray-700">
+								{product.winningBid
+									? `Won by ${product.winningBid.bidderName}. Highest valid bid at closing that met the starting price of ${formatPeso(product.price)}.`
+									: `This auction closed without a bid that met the starting price of ${formatPeso(product.price)}.`}
+							</p>
+							{product.viewerBid?.isWinner && (
+								<p className="mt-2 text-sm font-medium text-emerald-800">
+									You won this auction.
+								</p>
+							)}
+							{product.viewerBid && !product.viewerBid.isWinner && (
+								<p className="mt-2 text-sm font-medium text-slate-700">
+									You did not win this auction.
+								</p>
+							)}
+						</div>
+					)}
+					{isOpen && product.viewerBid && (
+						<div
+							className={`mt-6 rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200`}
+						>
+							<p className="mt-1 text-center text-sm font-semibold text-gray-700">
+								Your current bid: {formatPeso(product.viewerBid.offerPrice)}
+							</p>
+						</div>
+					)}
 
 					<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
 						<AddToCartButton
 							productId={product.productId}
-							disabled={!inStock}
+							disabled={!canBid}
+							listingPrice={product.price}
+							currentHighestBid={currentHighestBid}
+							hasExistingBid={Boolean(product.viewerBid)}
 						/>
 						<Link
 							href="/products"
@@ -224,20 +348,91 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							<Bookmark />
 						</Link>
 					</div>
+					{isOwner && isOpen && (
+						<p className="mt-2 text-center text-sm text-gray-500">
+							You cannot bid on your own listing.
+						</p>
+					)}
 					<div className="mt-3 flex flex-col justify-center gap-3 sm:flex-row">
 						<Link
-							href="/products"
+							href="/auctions"
 							className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
 						>
-							Browse more products
+							Browse more auctions
 						</Link>
 					</div>
 				</div>
 			</div>
-			<div className="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
-				<div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-					<Reviews productId={product.productId} />
+			<div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+				<div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+					<h2 className="text-2xl font-semibold text-gray-900">Description</h2>
+					<div className="mt-4 space-y-4 text-gray-700">
+						{product.description}
+					</div>
 				</div>
+				<div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+					<h2 className="text-2xl font-semibold tracking-tight text-gray-900">
+						Transaction Details
+					</h2>
+					<div className="mt-6 space-y-5">
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">Payment</p>
+							{paymentMethods.length > 0 ? (
+								<ul className="mt-2 space-y-1 text-gray-700">
+									{paymentMethods.map((method) => (
+										<li key={method}>- {method}</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-gray-700">No payment methods provided.</p>
+							)}
+						</div>
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">Meet-up</p>
+							{meetupLocations.length > 0 ? (
+								<div className="mt-2 space-y-2 text-gray-700">
+									{meetupLocations.map((location) => {
+										const mapLink = getSafeHttpUrl(location.mapLink)
+										return (
+											<div
+												key={location.name}
+												className="flex items-center gap-2"
+											>
+												<MapPin className="h-4 w-4 text-gray-500" />
+												{mapLink ? (
+													<>
+														<Link
+															href={mapLink}
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															{location.name}
+														</Link>
+														<ExternalLink className="h-4 w-4 text-gray-500" />
+													</>
+												) : (
+													<span>{location.name}</span>
+												)}
+											</div>
+										)
+									})}
+								</div>
+							) : (
+								<p className="mt-1 text-gray-700">
+									No meet-up locations provided.
+								</p>
+							)}
+						</div>
+						<div className="flex flex-col justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">
+							<p className="text-xl font-semibold text-gray-900">Shipping</p>
+							<p className="mt-1 text-gray-700">
+								{shippingDetails ?? 'No shipping details provided.'}
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="mt-8 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
 				<div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
 					<ProfileBanner userId={product.userId} />
 					<div className="mt-6 flex min-h-0 flex-1 flex-col">

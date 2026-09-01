@@ -17,6 +17,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import { productToFormValues } from "@/utils/productForm";
+import {
+  PRODUCT_STATUS,
+  productStatusLabel,
+  productStatusTone,
+  type ProductStatus,
+} from "@/constants/productStatus";
 
 export type ProductTableSortKey =
   | "productId"
@@ -28,7 +34,6 @@ export type ProductTableSortKey =
   | "rating"
   | "stockQuantity"
   | "status"
-  | "listingType"
   | "description";
 
 type SortDir = "asc" | "desc";
@@ -49,7 +54,6 @@ const COLUMNS: {
   { key: "price", label: "Price", align: "right" },
   { key: "rating", label: "Rating", align: "right" },
   { key: "stockQuantity", label: "Stock", align: "right" },
-  { key: "listingType", label: "Listing" },
   { key: "status", label: "Status" },
   { key: "description", label: "Description" },
 ];
@@ -57,9 +61,10 @@ const COLUMNS: {
 function getSortValue(p: Product, key: ProductTableSortKey): string | number {
   switch (key) {
     case "price":
-    case "rating":
     case "stockQuantity":
       return p[key];
+    case "rating":
+      return p.rating ?? 0;
     default:
       return String(p[key] ?? "");
   }
@@ -86,18 +91,8 @@ function compareProducts(
 }
 
 /** Matches product detail page status chips for consistency. */
-function statusTone(status: string) {
-  const normalized = status.trim().toLowerCase();
-  if (normalized === "available") {
-    return "bg-emerald-50 text-emerald-800 ring-emerald-200";
-  }
-  if (normalized === "unavailable") {
-    return "bg-rose-50 text-rose-800 ring-rose-200";
-  }
-  if (normalized === "unlisted") {
-    return "bg-slate-50 text-slate-700 ring-slate-200";
-  }
-  return "bg-gray-50 text-gray-800 ring-gray-200";
+function statusTone(status: ProductStatus) {
+  return productStatusTone(status);
 }
 
 export type ProductsDataTableProps = {
@@ -369,17 +364,14 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                     <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-gray-800">
                       {p.stockQuantity}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-800 capitalize">
-                      {p.listingType}
-                    </td>
                     <td className="whitespace-nowrap px-3 py-2">
                       <span
                         className={`inline-flex max-w-full items-center truncate rounded-full px-3 py-1 text-xs font-medium ring-1 ${statusTone(
                           p.status,
                         )}`}
-                        title={p.status}
+                        title={productStatusLabel(p.status)}
                       >
-                        {p.status}
+                        {productStatusLabel(p.status)}
                       </span>
                     </td>
                     <td
@@ -408,7 +400,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                           className="inline-flex h-9 w-9 items-center justify-center rounded-full text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={`Delete ${p.name}`}
                           title="Delete"
-                          disabled={isDeleteLoading || p.status !== "Unlisted"}
+                          disabled={isDeleteLoading || p.status !== PRODUCT_STATUS.Unlisted}
                           onClick={() => void handleDeleteRow(p)}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />

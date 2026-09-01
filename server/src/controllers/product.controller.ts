@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import * as productService from "../services/product.service";
 import { AppError } from "#error/AppError.ts";
-import { listingTypeSchema } from "#validations/products.validation.ts";
 
 const parseCsv = (value?: string): string[] | undefined => {
   if (!value) return undefined;
@@ -10,22 +9,6 @@ const parseCsv = (value?: string): string[] | undefined => {
     .map((item) => item.trim())
     .filter(Boolean);
   return parsed.length ? parsed : undefined;
-};
-
-const parseListingType = (value?: string): string[] | undefined => {
-  const raw = parseCsv(value);
-  if (!raw) return undefined;
-
-  const parsed = raw.filter(
-    (type) => listingTypeSchema.safeParse(type).success,
-  );
-  if (!parsed.length) {
-    throw new AppError(
-      "Invalid listingType. Allowed values: marketplace, auction.",
-      400,
-    );
-  }
-  return parsed;
 };
 
 const parseNumber = (value: unknown): number | undefined => {
@@ -40,7 +23,9 @@ export const getProductById = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const product = await productService.getProductById(id);
+    const listedOnly =
+      req.query.marketplace === "true" || req.query.marketplace === "1";
+    const product = await productService.getProductById(id, { listedOnly });
     if (!product) {
       res.status(404).json({ message: "Product not found" });
     } else {
@@ -66,7 +51,8 @@ export const getAllProducts = async (
     const brand = parseCsv(req.query.brand?.toString());
     const condition = parseCsv(req.query.condition?.toString());
     const status = parseCsv(req.query.status?.toString());
-    const listingType = parseListingType(req.query.listingType?.toString());
+    const marketplace =
+      req.query.marketplace === "true" || req.query.marketplace === "1";
     const minPrice = parseNumber(req.query.minPrice);
     const maxPrice = parseNumber(req.query.maxPrice);
     const minRating = parseNumber(req.query.minRating);
@@ -99,7 +85,6 @@ export const getAllProducts = async (
       brand,
       condition,
       status,
-      listingType,
       minPrice,
       maxPrice,
       minRating,
@@ -110,6 +95,7 @@ export const getAllProducts = async (
       sortOrder,
       page,
       limit,
+      marketplace,
     });
     const totalPages =
       limit !== undefined ? Math.max(Math.ceil(totalCount / limit), 1) : 1;
@@ -151,7 +137,6 @@ export const createProduct = async (
       rating,
       stockQuantity,
       status,
-      listingType,
       description,
       paymentMethods,
       meetupLocations,
@@ -167,7 +152,6 @@ export const createProduct = async (
       rating,
       stockQuantity,
       status,
-      listingType,
       description,
       paymentMethods,
       meetupLocations,
@@ -175,6 +159,10 @@ export const createProduct = async (
     });
     res.status(201).json({ data: product });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -191,6 +179,10 @@ export const updateProduct = async (
       .status(200)
       .json({ message: "Product updated successfully", data: updatedProduct });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };
@@ -207,6 +199,10 @@ export const deleteProduct = async (
       data: deletedProduct,
     });
   } catch (error: any) {
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({ message: error.message });
+      return;
+    }
     res.status(500).json({ message: error.message });
   }
 };

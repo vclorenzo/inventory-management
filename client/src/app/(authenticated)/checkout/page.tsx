@@ -8,17 +8,22 @@ import { useCart } from '@/hooks/useCart'
 import { useMe } from '@/hooks/useMe'
 import { useProfile } from '@/hooks/useProfile'
 import { usePlaceOrderMutation } from '@/state/internal/purchasesApi'
-import { CheckoutFormValues } from '@/types/pages/Checkout'
+import { CartGroup } from '@/types/pages/Cart'
+import {
+	CheckoutFormValues,
+	PlaceOrderResult,
+} from '@/types/pages/Checkout'
 import type { Address } from '@/types/pages/Profile'
 import {
 	clearCheckoutSelectedIds,
 	loadCheckoutSelectedIds,
 } from '@/utils/checkout'
 import { CircularProgress } from '@mui/material'
+import { CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 const SHIPPING_FEE = 50
@@ -28,6 +33,191 @@ const formatPrice = (amount: number, currency: string) =>
 
 const getDefaultAddress = (addresses: Address[]) =>
 	addresses.find((address) => address.isDefault) ?? addresses[0]
+
+const paymentMethodLabel = (value: string) =>
+	PAYMENT_METHOD_OPTIONS.find((method) => method.value === value)?.label ??
+	value
+
+type CheckoutSnapshot = {
+	groups: CartGroup[]
+	address: Address | null
+	paymentMethod: string
+}
+
+const CheckoutSuccess = ({
+	order,
+	snapshot,
+}: {
+	order: PlaceOrderResult
+	snapshot: CheckoutSnapshot | null
+}) => {
+	const currency = order.currency
+	const groups = snapshot?.groups ?? []
+	const address = snapshot?.address ?? null
+	const paymentLabel = paymentMethodLabel(
+		snapshot?.paymentMethod ?? order.paymentMethod,
+	)
+
+	return (
+		<div className="flex flex-col gap-4">
+			<Header name="Order confirmed" />
+
+			<section className="rounded-sm border border-green-200 bg-green-50 p-8 text-center">
+				<CheckCircle className="mx-auto h-10 w-10 text-green-700" />
+				<p className="mt-3 text-base font-medium text-green-800">
+					Order placed successfully!
+				</p>
+				<p className="mt-2 text-sm text-green-700">
+					Thank you for your purchase. You will receive a confirmation
+					soon.
+				</p>
+				<p className="mt-3 text-xs text-green-800">
+					Order ID:{' '}
+					<span className="font-medium">{order.orderId}</span>
+				</p>
+			</section>
+
+			<div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+				<div className="flex flex-col gap-4">
+					<SectionCard title="Items">
+						<div className="flex flex-col gap-4">
+							{groups.length > 0
+								? groups.map((group) => (
+										<div
+											key={group.shop.name}
+											className="flex flex-col gap-3"
+										>
+											<p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+												{group.shop.name}
+											</p>
+											{group.items.map((item) => (
+												<div
+													key={item.id}
+													className="flex gap-3"
+												>
+													<div className="relative h-14 w-14 shrink-0 overflow-hidden border border-[#ebebeb] bg-white">
+														<Image
+															src={item.image}
+															alt={item.title}
+															fill
+															className="object-cover"
+															sizes="56px"
+														/>
+													</div>
+													<div className="flex min-w-0 flex-1 flex-col gap-1">
+														<p className="line-clamp-2 text-sm text-gray-900">
+															{item.title}
+														</p>
+														<p className="text-xs text-gray-500">
+															x{item.quantity}
+														</p>
+														<p className="text-primary text-sm font-medium">
+															{formatPrice(
+																item.unitPrice *
+																	item.quantity,
+																item.currency,
+															)}
+														</p>
+													</div>
+												</div>
+											))}
+										</div>
+									))
+								: order.items.map((item) => (
+										<div
+											key={item.purchaseId}
+											className="flex justify-between gap-3 text-sm"
+										>
+											<div className="min-w-0">
+												<p className="text-gray-900">
+													{item.productName}
+												</p>
+												<p className="text-xs text-gray-500">
+													x{item.quantity}
+												</p>
+											</div>
+											<p className="text-primary shrink-0 font-medium">
+												{formatPrice(
+													item.totalAmount,
+													currency,
+												)}
+											</p>
+										</div>
+									))}
+						</div>
+					</SectionCard>
+
+					<SectionCard title="Shipping Details">
+						{address ? (
+							<div className="flex flex-col gap-1">
+								<p className="text-sm font-medium text-gray-900">
+									{address.label}
+								</p>
+								<p className="text-sm text-gray-800">
+									{address.name}
+									{address.contactNumber
+										? ` · ${address.contactNumber}`
+										: ''}
+								</p>
+								<AddressLine address={address} />
+							</div>
+						) : (
+							<p className="text-sm text-gray-600">
+								Your order is on its way to the selected
+								address.
+							</p>
+						)}
+					</SectionCard>
+
+					<SectionCard title="Payment Details">
+						<p className="text-sm text-gray-800">{paymentLabel}</p>
+					</SectionCard>
+				</div>
+
+				<aside className="flex h-fit flex-col gap-4 lg:sticky lg:top-4">
+					<SectionCard title="Order Details">
+						<div className="text-sm">
+							<div className="flex justify-between text-gray-600">
+								<span>
+									Subtotal ({order.itemCount}{' '}
+									{order.itemCount === 1 ? 'item' : 'items'})
+								</span>
+								<span>
+									{formatPrice(order.subtotal, currency)}
+								</span>
+							</div>
+							<div className="mt-2 flex justify-between text-gray-600">
+								<span>Shipping</span>
+								<span>
+									{formatPrice(order.shippingFee, currency)}
+								</span>
+							</div>
+							<div className="mt-3 flex justify-between border-t border-[#ebebeb] pt-3 text-base font-semibold text-gray-900">
+								<span>Total</span>
+								<span className="text-primary">
+									{formatPrice(order.total, currency)}
+								</span>
+							</div>
+						</div>
+					</SectionCard>
+
+					<Link
+						href="/history"
+						className="flex h-[50px] items-center justify-center rounded bg-blue-500 px-4 py-2 text-center text-white hover:bg-blue-700"
+					>
+						View purchases
+					</Link>
+					<Link
+						href="/marketplace"
+						className="flex h-[50px] items-center justify-center rounded border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-800 hover:bg-gray-50"
+					>
+						Continue shopping
+					</Link>
+				</aside>
+			</div>
+		</div>
+	)
+}
 
 const SectionCard = ({
 	title,
@@ -53,7 +243,6 @@ const Checkout = () => {
 	const userId = me?.data.userId
 	const { profile, isLoading: isProfileLoading } = useProfile(userId ?? '')
 
-	const [orderPlaced, setOrderPlaced] = useState(false)
 	const [placeOrderError, setPlaceOrderError] = useState<string | null>(null)
 	const [selectedIds, setSelectedIds] = useState<string[] | null>(null)
 	const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
@@ -61,6 +250,7 @@ const Checkout = () => {
 	)
 	const [isManageAddressesOpen, setIsManageAddressesOpen] = useState(false)
 	const [placeOrder, placeOrderState] = usePlaceOrderMutation()
+	const checkoutSnapshotRef = useRef<CheckoutSnapshot | null>(null)
 
 	const form = useForm<CheckoutFormValues>({
 		defaultValues: {
@@ -133,6 +323,14 @@ const Checkout = () => {
 
 		setPlaceOrderError(null)
 
+		checkoutSnapshotRef.current = {
+			groups: selectedGroups,
+			address:
+				addresses.find((address) => address.addressId === selectedAddressId) ??
+				null,
+			paymentMethod: data.paymentMethod,
+		}
+
 		try {
 			await placeOrder({
 				cartItemIds: selectedIds,
@@ -141,8 +339,8 @@ const Checkout = () => {
 			}).unwrap()
 
 			clearCheckoutSelectedIds()
-			setOrderPlaced(true)
 		} catch (error) {
+			checkoutSnapshotRef.current = null
 			const message =
 				error &&
 				typeof error === 'object' &&
@@ -155,6 +353,15 @@ const Checkout = () => {
 					: 'Failed to place order. Please try again.'
 			setPlaceOrderError(message)
 		}
+	}
+
+	if (placeOrderState.isSuccess && placeOrderState.data) {
+		return (
+			<CheckoutSuccess
+				order={placeOrderState.data}
+				snapshot={checkoutSnapshotRef.current}
+			/>
+		)
 	}
 
 	if (isLoading || isMeLoading || isProfileLoading || selectedIds === null) {
@@ -181,28 +388,6 @@ const Checkout = () => {
 
 	if (selectedItems.length === 0) {
 		redirect('/cart')
-	}
-
-	if (orderPlaced) {
-		return (
-			<div className="flex flex-col gap-4">
-				<Header name="Checkout" />
-				<div className="rounded-sm border border-green-200 bg-green-50 p-8 text-center">
-					<p className="text-base font-medium text-green-800">
-						Order placed successfully!
-					</p>
-					<p className="mt-2 text-sm text-green-700">
-						Thank you for your purchase. You will receive a confirmation soon.
-					</p>
-					<Link
-						href="/cart"
-						className="mt-4 inline-block text-sm text-blue-600 hover:underline"
-					>
-						Return to cart
-					</Link>
-				</div>
-			</div>
-		)
 	}
 
 	return (

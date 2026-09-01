@@ -12,6 +12,7 @@ export type ReusableFieldType =
   | "password"
   | "number"
   | "date"
+  | "datetime-local"
   | "textarea"
   | "select"
   | "checkbox";

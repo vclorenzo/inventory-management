@@ -1,5 +1,6 @@
 'use client'
 
+import BidsHistory from '@/components/BidsHistory'
 import Header from '@/components/Header'
 import PurchasesHistory from '@/components/PurchasesHistory'
 import Tabs from '@/components/Tabs'
@@ -15,16 +16,12 @@ export default function History() {
 				<Tabs
 					tabs={[
 						{
-							label: 'Bids',
-							content: (
-								<div className="rounded-sm border border-[#ebebeb] bg-white px-4 py-12 text-center text-sm text-gray-500">
-									Your bid history will appear here.
-								</div>
-							),
-						},
-						{
 							label: 'Purchases',
 							content: <PurchasesHistory />,
+						},
+						{
+							label: 'Bids',
+							content: <BidsHistory />,
 						},
 					]}
 				/>

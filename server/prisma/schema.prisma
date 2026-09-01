@@ -24,7 +24,9 @@ model Users {
 
   profile Profile?
   products Products[]
+  auctions Auctions[]
   cartItems CartItems[]
+  bids Bids[]
   purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
@@ -74,13 +76,21 @@ model Address {
   @@index([profileId])
 }
 
-enum ListingType {
-  marketplace
-  auction
+/// Product listing status.
+/// Available: for sale and visible in the marketplace.
+/// Reserved: single-quantity hold; hidden from the marketplace.
+///   Becomes SoldOut when the buyer completes checkout.
+/// SoldOut: stock is 0. Not visible in the marketplace.
+/// Unlisted: in inventory but not for sale yet. Hidden from the marketplace.
+enum ProductStatus {
+  Available
+  Reserved
+  SoldOut
+  Unlisted
 }
 
 model Products {
-  productId        String      @id @default(uuid())
+  productId        String        @id @default(uuid())
   userId           String
   name             String
   price            Float
@@ -89,19 +99,57 @@ model Products {
   brand            String
   condition        String
   stockQuantity    Int
-  status           String
-  listingType      ListingType @default(marketplace)
+  status           ProductStatus @default(Available)
   description      String
-  paymentMethods   String[]    @default([])
-  meetupLocations  Json        @default(dbgenerated("'[]'::jsonb"))
+  paymentMethods   String[]      @default([])
+  meetupLocations  Json          @default(dbgenerated("'[]'::jsonb"))
   shippingDetails  String?
-  owner            Users       @relation(fields: [userId], references: [userId])
+  owner            Users         @relation(fields: [userId], references: [userId])
   Sales            Sales[]
   Purchases        Purchases[]
   cartItems        CartItems[]
   productReviews   ProductReviews[]
 
-  @@index([listingType])
+  @@index([status])
+}
+
+/// Auction listing status.
+/// Available: open for bidding and visible on the auction screen.
+/// Unsold: bidding ended with no winning bid. Hidden from the auction
+///   screen until the seller re-auctions it (then Available again).
+/// SoldOut: a buyer won the auction. Not visible on the auction screen.
+/// Unlisted: in inventory but not listed yet. Hidden from the auction screen.
+enum AuctionStatus {
+  Available
+  Unsold
+  SoldOut
+  Unlisted
+}
+
+model Auctions {
+  productId        String        @id @default(uuid())
+  userId           String
+  name             String
+  price            Float
+  productCategory  String
+  brand            String
+  condition        String
+  status           AuctionStatus @default(Available)
+  description      String
+  paymentMethods   String[]      @default([])
+  meetupLocations  Json          @default(dbgenerated("'[]'::jsonb"))
+  shippingDetails  String?
+  biddingEndsAt    DateTime
+  bidCount         Int           @default(0)
+  winningBidId     String?       @unique
+  settledAt        DateTime?
+  owner            Users         @relation(fields: [userId], references: [userId])
+  bids             Bids[]        @relation("AuctionBids")
+  winningBid       Bids?         @relation("AuctionWinner", fields: [winningBidId], references: [bidId], onDelete: SetNull)
+
+  @@index([biddingEndsAt])
+  @@index([settledAt])
+  @@index([status])
 }
 
 model CartItems {
@@ -118,6 +166,25 @@ model CartItems {
   updated_at DateTime @updatedAt
 
   @@unique([userId, productId])
+}
+
+model Bids {
+  bidId      String @id @default(uuid())
+  userId     String
+  productId  String
+  offerPrice Float
+  currency   String @default("₱")
+
+  user       Users     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  auction    Auctions  @relation("AuctionBids", fields: [productId], references: [productId], onDelete: Cascade)
+  wonAuction Auctions? @relation("AuctionWinner")
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
 }
 
 model Sales {

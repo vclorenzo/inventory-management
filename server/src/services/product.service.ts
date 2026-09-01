@@ -1,5 +1,9 @@
+import {
+  MARKETPLACE_PRODUCT_STATUS,
+  resolveProductStatus,
+} from "#src/constants/productStatus.ts";
 import { AppError } from "#error/AppError.ts";
-import { ListingType, Prisma, PrismaClient, Users } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,7 +15,6 @@ export const getAllProducts = async ({
   brand,
   condition,
   status,
-  listingType,
   minPrice,
   maxPrice,
   minRating,
@@ -22,6 +25,7 @@ export const getAllProducts = async ({
   sortOrder = "desc",
   page = 1,
   limit,
+  marketplace = false,
 }: {
   search?: string;
   userId?: string;
@@ -30,7 +34,6 @@ export const getAllProducts = async ({
   brand?: string[];
   condition?: string[];
   status?: string[];
-  listingType?: string[];
   minPrice?: number;
   maxPrice?: number;
   minRating?: number;
@@ -41,6 +44,7 @@ export const getAllProducts = async ({
   sortOrder?: "asc" | "desc";
   page?: number;
   limit?: number;
+  marketplace?: boolean;
 } = {}) => {
   try {
     const whereParts: Prisma.Sql[] = [Prisma.sql`1=1`];
@@ -71,22 +75,12 @@ export const getAllProducts = async ({
       whereParts.push(Prisma.sql`p."condition" IN (${Prisma.join(condition)})`);
     }
 
-    if (status?.length) {
-      whereParts.push(Prisma.sql`p."status" IN (${Prisma.join(status)})`);
-    }
-
-    if (listingType !== undefined) {
-      const listingTypes = listingType.filter(
-        (type): type is ListingType =>
-          type === "marketplace" || type === "auction",
+    if (marketplace) {
+      whereParts.push(
+        Prisma.sql`p."status" = CAST(${MARKETPLACE_PRODUCT_STATUS} AS "ProductStatus")`,
       );
-      if (listingTypes.length) {
-        whereParts.push(
-          Prisma.sql`p."listingType"::text IN (${Prisma.join(listingTypes)})`,
-        );
-      } else {
-        whereParts.push(Prisma.sql`1=0`);
-      }
+    } else if (status?.length) {
+      whereParts.push(Prisma.sql`p."status"::text IN (${Prisma.join(status)})`);
     }
 
     if (typeof minPrice === "number") {
@@ -195,11 +189,15 @@ export const getAllProducts = async ({
   }
 };
 
-export const getProductById = async (id: string) => {
+export const getProductById = async (
+  id: string,
+  { listedOnly = false }: { listedOnly?: boolean } = {},
+) => {
   try {
     const product = await prisma.products.findFirst({
       where: {
         productId: id,
+        ...(listedOnly ? { status: MARKETPLACE_PRODUCT_STATUS } : {}),
       },
       include: {
         productReviews: {
@@ -239,7 +237,6 @@ export const createProduct = async ({
   rating,
   stockQuantity,
   status,
-  listingType = "marketplace",
   description,
   paymentMethods = [],
   meetupLocations = [],
@@ -254,10 +251,9 @@ export const createProduct = async ({
   rating: number;
   stockQuantity: number;
   status?: string;
-  listingType?: ListingType;
   description: string;
   paymentMethods?: string[];
-  meetupLocations?: string[];
+  meetupLocations?: Prisma.InputJsonValue;
   shippingDetails?: string | null;
 }) => {
   try {
@@ -271,9 +267,10 @@ export const createProduct = async ({
         price,
         rating,
         stockQuantity,
-        status: status?.trim() || "Available",
-        listingType:
-          listingType === "auction" ? "auction" : "marketplace",
+        status: resolveProductStatus({
+          status,
+          stockQuantity,
+        }),
         description,
         paymentMethods,
         meetupLocations,
@@ -295,9 +292,8 @@ type ProductUpdatePayload = {
   rating?: number | null;
   stockQuantity?: number;
   status?: string;
-  listingType?: ListingType;
   paymentMethods?: string[];
-  meetupLocations?: string[];
+  meetupLocations?: Prisma.InputJsonValue;
   shippingDetails?: string | null;
 };
 
@@ -305,30 +301,67 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
   try {
     const existingProduct = await getProductById(id);
     if (!existingProduct) {
-      throw new AppError("Product does not exist");
+      throw new AppError("Product does not exist", 404);
     }
 
-    return await prisma.products.update({
-      where: { productId: id },
-      data: {
-        name: data.name,
-        productCategory: data.productCategory,
-        brand: data.brand,
-        condition: data.condition,
-        description: data.description,
-        price: data.price,
-        rating: data.rating,
-        stockQuantity: data.stockQuantity,
-        status: data.status,
-        listingType:
-          data.listingType === "auction" || data.listingType === "marketplace"
-            ? data.listingType
-            : undefined,
-        paymentMethods: data.paymentMethods,
-        meetupLocations: data.meetupLocations,
-        shippingDetails: data.shippingDetails,
-      },
+    const shouldWriteStatus =
+      data.stockQuantity !== undefined || data.status !== undefined;
+
+    const updateData: Prisma.ProductsUpdateManyMutationInput = {
+      name: data.name,
+      productCategory: data.productCategory,
+      brand: data.brand,
+      condition: data.condition,
+      description: data.description,
+      price: data.price,
+      rating: data.rating,
+      stockQuantity: data.stockQuantity,
+      paymentMethods: data.paymentMethods,
+      meetupLocations: data.meetupLocations,
+      shippingDetails: data.shippingDetails,
+    };
+
+    if (!shouldWriteStatus) {
+      return await prisma.products.update({
+        where: { productId: id },
+        data: updateData,
+      });
+    }
+
+    updateData.status = resolveProductStatus({
+      status: data.status ?? existingProduct.status,
+      stockQuantity: data.stockQuantity ?? existingProduct.stockQuantity,
     });
+
+    const { count } = await prisma.products.updateMany({
+      where: {
+        productId: id,
+        status: existingProduct.status,
+        stockQuantity: existingProduct.stockQuantity,
+      },
+      data: updateData,
+    });
+
+    if (count === 0) {
+      const current = await prisma.products.findUnique({
+        where: { productId: id },
+      });
+      if (!current) {
+        throw new AppError("Product does not exist", 404);
+      }
+      throw new AppError(
+        "Product was updated by another request. Please retry.",
+        409,
+      );
+    }
+
+    const updatedProduct = await prisma.products.findUnique({
+      where: { productId: id },
+    });
+    if (!updatedProduct) {
+      throw new AppError("Product does not exist", 404);
+    }
+    return updatedProduct;
   } catch (error) {
     throw error;
   }
@@ -337,7 +370,7 @@ export const deleteProduct = async (id: string) => {
   try {
     const existingProduct = await getProductById(id);
     if (!existingProduct) {
-      throw new AppError("Product does not exist");
+      throw new AppError("Product does not exist", 404);
     }
     return await prisma.$transaction(async (tx) => {
       await tx.sales.deleteMany({ where: { productId: id } });

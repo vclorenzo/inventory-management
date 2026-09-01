@@ -1,6 +1,6 @@
-type meetupLocations = { name: string; address: string; mapLink: string }
+import { ProductStatus } from '@/constants/productStatus'
 
-export type ListingType = 'marketplace' | 'auction'
+type meetupLocations = { name: string; address: string; mapLink: string }
 
 export interface Product {
 	productId: string
@@ -12,8 +12,7 @@ export interface Product {
 	rating: number | null
 	reviewCount?: number
 	stockQuantity: number
-	status: string
-	listingType: ListingType
+	status: ProductStatus
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]
@@ -28,8 +27,7 @@ export interface NewProduct {
 	condition: string
 	price: number
 	stockQuantity: number
-	status?: string
-	listingType: ListingType
+	status?: ProductStatus
 	description: string
 	paymentMethods?: string[]
 	meetupLocations?: meetupLocations[]
@@ -43,8 +41,7 @@ export type ProductFormValues = {
 	condition: string
 	price: number
 	stockQuantity: number
-	status: string
-	listingType: ListingType
+	status: ProductStatus
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]
