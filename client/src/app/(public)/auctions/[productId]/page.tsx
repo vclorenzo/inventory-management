@@ -32,6 +32,7 @@ import {
 	auctionStatusTone,
 	isAuctionScreenVisibleStatus,
 } from '@/constants/auctionStatus'
+import { useAuctionBidUpdates } from '@/hooks/useAuctionBidUpdates'
 import { useMe } from '@/hooks/useMe'
 import { formatPeso } from '@/utils/priceFormatter'
 import { getSafeHttpUrl } from '@/utils/url'
@@ -61,6 +62,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 		isError,
 		error,
 	} = useGetAuctionByIdQuery(params.productId)
+	const liveBidUpdate = useAuctionBidUpdates(params.productId)
 
 	if (isLoading) {
 		return (
@@ -116,7 +118,10 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	const isOwner = me?.data.userId === product.userId
 	const canBid =
 		isOpen && !isOwner && isAuctionScreenVisibleStatus(product.status)
-	const currentHighestBid = product.currentHighestBid ?? null
+	const currentHighestBid = liveBidUpdate
+		? liveBidUpdate.currentHighestBid
+		: (product.currentHighestBid ?? null)
+	const bidCount = liveBidUpdate?.bidCount ?? product.bidCount
 	const paymentMethods = Array.isArray(product.paymentMethods)
 		? product.paymentMethods
 		: []
@@ -244,8 +249,8 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 						<div className="grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] gap-4">
 							<div
 								className="flex items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100"
-								aria-label={`${product.bidCount} ${
-									product.bidCount === 1 ? 'bid' : 'bids'
+								aria-label={`${bidCount} ${
+									bidCount === 1 ? 'bid' : 'bids'
 								}`}
 							>
 								<div className="inline-flex items-center gap-1.5 font-medium text-gray-900">
@@ -254,7 +259,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 										size={20}
 										aria-hidden="true"
 									/>
-									<span>{product.bidCount}</span>
+									<span>{bidCount}</span>
 								</div>
 							</div>
 							<div className="flex min-w-0 items-center justify-center rounded-xl bg-gray-50 p-4 ring-1 ring-gray-100">

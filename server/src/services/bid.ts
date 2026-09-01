@@ -1,5 +1,7 @@
 import { AppError } from "#error/AppError.ts";
 import { AUCTION_STATUS } from "#src/constants/auctionStatus.ts";
+import logger from "#config/logger.ts";
+import { emitAuctionBidUpdate } from "#config/socket.ts";
 import {
   isAuctionOpen,
   settleAuctionIfClosed,
@@ -105,6 +107,25 @@ const formatBidGroups = (
   }
 
   return Array.from(groups.values());
+};
+
+const publishAuctionBidUpdate = async (productId: string) => {
+  try {
+    const auction = await prisma.auctions.findFirst({
+      where: { productId },
+      select: { bidCount: true, price: true },
+    });
+    if (!auction) return;
+
+    const leading = await findLeadingBid(prisma, productId, auction.price);
+    emitAuctionBidUpdate({
+      productId,
+      bidCount: auction.bidCount,
+      currentHighestBid: leading?.offerPrice ?? null,
+    });
+  } catch (error) {
+    logger.error("Failed to publish auction bid update", error);
+  }
 };
 
 const assertValidOffer = (offerPrice: number, startingPrice: number) => {
@@ -320,6 +341,7 @@ export const addBid = async ({
       });
     });
 
+    await publishAuctionBidUpdate(productId);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
@@ -384,6 +406,7 @@ export const updateBidOffer = async ({
       });
     });
 
+    await publishAuctionBidUpdate(existingBid.productId);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
@@ -435,6 +458,7 @@ export const removeBid = async (bidId: string, userId: string) => {
       });
     });
 
+    await publishAuctionBidUpdate(existingBid.productId);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
