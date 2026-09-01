@@ -16,12 +16,12 @@ export default function History() {
 				<Tabs
 					tabs={[
 						{
-							label: 'Bids',
-							content: <BidsHistory />,
-						},
-						{
 							label: 'Purchases',
 							content: <PurchasesHistory />,
+						},
+						{
+							label: 'Bids',
+							content: <BidsHistory />,
 						},
 					]}
 				/>

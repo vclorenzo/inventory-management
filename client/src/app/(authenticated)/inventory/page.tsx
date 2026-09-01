@@ -18,9 +18,46 @@ import { AuctionFormValues } from '@/types/pages/Auctions'
 import { ProductFormValues } from '@/types/pages/Products'
 import { CircularProgress } from '@mui/material'
 import { PlusCircleIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
+import Tabs from '@/components/Tabs'
 
 type InventoryTab = 'marketplace' | 'auctions'
+
+const INVENTORY_TABS: InventoryTab[] = ['marketplace', 'auctions']
+
+function InventoryPanel({
+	isReady,
+	isLoading,
+	isError,
+	hasRows,
+	errorMessage,
+	children,
+}: {
+	isReady: boolean
+	isLoading: boolean
+	isError: boolean
+	hasRows: boolean
+	errorMessage: string
+	children: ReactNode
+}) {
+	if (isLoading || !isReady) {
+		return (
+			<div className="py-4">
+				<CircularProgress />
+			</div>
+		)
+	}
+
+	if (isError || !hasRows) {
+		return (
+			<div className="py-4 text-center text-red-500">
+				{errorMessage}
+			</div>
+		)
+	}
+
+	return children
+}
 
 function Inventory() {
 	const [tab, setTab] = useState<InventoryTab>('marketplace')
@@ -53,10 +90,12 @@ function Inventory() {
 		setIsModalOpen(false)
 	}
 
+	const handleTabChange = (index: number) => {
+		setTab(INVENTORY_TABS[index] ?? 'marketplace')
+		setIsModalOpen(false)
+	}
+
 	const isMarketplace = tab === 'marketplace'
-	const isLoading = isMarketplace ? isProductsLoading : isAuctionsLoading
-	const isError = isMarketplace ? isProductsError : isAuctionsError
-	const hasRows = isMarketplace ? Boolean(products) : Boolean(auctions)
 
 	return (
 		<div className="flex flex-col">
@@ -72,52 +111,44 @@ function Inventory() {
 				</button>
 			</div>
 
-			<div className="mt-4 flex gap-2">
-				<button
-					type="button"
-					className={`rounded px-4 py-2 text-sm font-semibold ${
-						isMarketplace
-							? 'bg-gray-900 text-white'
-							: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-					}`}
-					onClick={() => {
-						setTab('marketplace')
-						setIsModalOpen(false)
-					}}
-				>
-					Marketplace
-				</button>
-				<button
-					type="button"
-					className={`rounded px-4 py-2 text-sm font-semibold ${
-						!isMarketplace
-							? 'bg-gray-900 text-white'
-							: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-					}`}
-					onClick={() => {
-						setTab('auctions')
-						setIsModalOpen(false)
-					}}
-				>
-					Auctions
-				</button>
-			</div>
-
-			{isLoading || !userId ? (
-				<div className="py-4">
-					<CircularProgress />
-				</div>
-			) : isError || !hasRows ? (
-				<div className="py-4 text-center text-red-500">
-					{isMarketplace
-						? 'Failed to fetch products'
-						: 'Failed to fetch auctions'}
-				</div>
-			) : isMarketplace ? (
-				<ProductsDataTable products={products ?? []} />
-			) : (
-				<AuctionsDataTable auctions={auctions ?? []} />
-			)}
+			<Tabs
+				activeIndex={isMarketplace ? 0 : 1}
+				onChange={handleTabChange}
+				tabs={[
+					{
+						label: 'Marketplace',
+						content: (
+							<InventoryPanel
+								isReady={Boolean(userId)}
+								isLoading={isProductsLoading}
+								isError={isProductsError}
+								hasRows={Boolean(products)}
+								errorMessage="Failed to fetch products"
+							>
+								<ProductsDataTable
+									products={products ?? []}
+								/>
+							</InventoryPanel>
+						),
+					},
+					{
+						label: 'Auctions',
+						content: (
+							<InventoryPanel
+								isReady={Boolean(userId)}
+								isLoading={isAuctionsLoading}
+								isError={isAuctionsError}
+								hasRows={Boolean(auctions)}
+								errorMessage="Failed to fetch auctions"
+							>
+								<AuctionsDataTable
+									auctions={auctions ?? []}
+								/>
+							</InventoryPanel>
+						),
+					},
+				]}
+			/>
 
 			{isMarketplace ? (
 				<ProductModal
