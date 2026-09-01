@@ -20,6 +20,7 @@ import { CircularProgress } from '@mui/material'
 import { PlusCircleIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import Tabs from '@/components/Tabs'
+import { getMutationErrorMessage } from '@/utils/mutation'
 
 type InventoryTab = 'marketplace' | 'auctions'
 
@@ -29,14 +30,12 @@ function InventoryPanel({
 	isReady,
 	isLoading,
 	isError,
-	hasRows,
 	errorMessage,
 	children,
 }: {
 	isReady: boolean
 	isLoading: boolean
 	isError: boolean
-	hasRows: boolean
 	errorMessage: string
 	children: ReactNode
 }) {
@@ -48,12 +47,8 @@ function InventoryPanel({
 		)
 	}
 
-	if (isError || !hasRows) {
-		return (
-			<div className="py-4 text-center text-red-500">
-				{errorMessage}
-			</div>
-		)
+	if (isError) {
+		return <div className="py-4 text-center text-red-500">{errorMessage}</div>
 	}
 
 	return children
@@ -81,13 +76,25 @@ function Inventory() {
 		useCreateAuctionMutation()
 
 	const handleCreateProduct = async (productData: ProductFormValues) => {
-		await createProduct(productData).unwrap()
-		setIsModalOpen(false)
+		try {
+			await createProduct(productData).unwrap()
+			setIsModalOpen(false)
+		} catch (error) {
+			throw new Error(
+				getMutationErrorMessage(error, 'Failed to create product'),
+			)
+		}
 	}
 
 	const handleCreateAuction = async (auctionData: AuctionFormValues) => {
-		await createAuction(auctionData).unwrap()
-		setIsModalOpen(false)
+		try {
+			await createAuction(auctionData).unwrap()
+			setIsModalOpen(false)
+		} catch (error) {
+			throw new Error(
+				getMutationErrorMessage(error, 'Failed to create auction'),
+			)
+		}
 	}
 
 	const handleTabChange = (index: number) => {
@@ -122,12 +129,9 @@ function Inventory() {
 								isReady={Boolean(userId)}
 								isLoading={isProductsLoading}
 								isError={isProductsError}
-								hasRows={Boolean(products)}
 								errorMessage="Failed to fetch products"
 							>
-								<ProductsDataTable
-									products={products ?? []}
-								/>
+								<ProductsDataTable products={products ?? []} />
 							</InventoryPanel>
 						),
 					},
@@ -138,12 +142,9 @@ function Inventory() {
 								isReady={Boolean(userId)}
 								isLoading={isAuctionsLoading}
 								isError={isAuctionsError}
-								hasRows={Boolean(auctions)}
 								errorMessage="Failed to fetch auctions"
 							>
-								<AuctionsDataTable
-									auctions={auctions ?? []}
-								/>
+								<AuctionsDataTable auctions={auctions ?? []} />
 							</InventoryPanel>
 						),
 					},

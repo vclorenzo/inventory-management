@@ -12,7 +12,7 @@ export interface Product {
 	rating: number | null
 	reviewCount?: number
 	stockQuantity: number
-	status: ProductStatus | string
+	status: ProductStatus
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]
@@ -27,7 +27,7 @@ export interface NewProduct {
 	condition: string
 	price: number
 	stockQuantity: number
-	status?: string
+	status?: ProductStatus
 	description: string
 	paymentMethods?: string[]
 	meetupLocations?: meetupLocations[]
@@ -41,7 +41,7 @@ export type ProductFormValues = {
 	condition: string
 	price: number
 	stockQuantity: number
-	status: string
+	status: ProductStatus
 	description: string
 	paymentMethods: string[]
 	meetupLocations: meetupLocations[]

@@ -18,8 +18,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ProductModal from "@/app/(authenticated)/products/ProductModal";
 import { productToFormValues } from "@/utils/productForm";
 import {
+  PRODUCT_STATUS,
   productStatusLabel,
   productStatusTone,
+  type ProductStatus,
 } from "@/constants/productStatus";
 
 export type ProductTableSortKey =
@@ -89,7 +91,7 @@ function compareProducts(
 }
 
 /** Matches product detail page status chips for consistency. */
-function statusTone(status: string) {
+function statusTone(status: ProductStatus) {
   return productStatusTone(status);
 }
 
@@ -398,7 +400,7 @@ export function ProductsDataTable({ products }: ProductsDataTableProps) {
                           className="inline-flex h-9 w-9 items-center justify-center rounded-full text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-40"
                           aria-label={`Delete ${p.name}`}
                           title="Delete"
-                          disabled={isDeleteLoading || p.status !== "Unlisted"}
+                          disabled={isDeleteLoading || p.status !== PRODUCT_STATUS.Unlisted}
                           onClick={() => void handleDeleteRow(p)}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />

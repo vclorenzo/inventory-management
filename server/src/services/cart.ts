@@ -1,5 +1,5 @@
 import { AppError } from "#error/AppError.ts";
-import { PRODUCT_STATUS } from "#src/constants/productStatus.ts";
+import { isPurchasableProductStatus } from "#src/constants/productStatus.ts";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -114,7 +114,7 @@ export const addCartItem = async ({
       throw new AppError("Product does not exist", 404);
     }
 
-    if (product.status !== PRODUCT_STATUS.Available) {
+    if (!isPurchasableProductStatus(product.status)) {
       throw new AppError("This product is not available for purchase", 400);
     }
 

@@ -15,7 +15,7 @@ export interface AuctionViewerBid {
 }
 
 export interface Auction extends Omit<Product, 'status' | 'rating' | 'stockQuantity'> {
-	status: AuctionStatus | string
+	status: AuctionStatus
 	biddingEndsAt: string
 	bidCount: number
 	winningBidId?: string | null
@@ -26,7 +26,11 @@ export interface Auction extends Omit<Product, 'status' | 'rating' | 'stockQuant
 	viewerBid?: AuctionViewerBid | null
 }
 
-export type AuctionFormValues = Omit<ProductFormValues, 'stockQuantity'> & {
+export type AuctionFormValues = Omit<
+	ProductFormValues,
+	'stockQuantity' | 'status'
+> & {
+	status: AuctionStatus
 	biddingEndsAt: string
 }
 

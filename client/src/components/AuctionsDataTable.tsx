@@ -21,6 +21,7 @@ import {
   AUCTION_STATUS,
   auctionStatusLabel,
   auctionStatusTone,
+  type AuctionStatus,
 } from "@/constants/auctionStatus";
 
 export type AuctionTableSortKey =
@@ -93,7 +94,7 @@ function compareAuctions(
 }
 
 /** Matches product detail page status chips for consistency. */
-function statusTone(status: string) {
+function statusTone(status: AuctionStatus) {
   return auctionStatusTone(status);
 }
 

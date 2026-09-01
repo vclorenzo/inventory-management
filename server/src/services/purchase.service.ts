@@ -231,6 +231,12 @@ export const placeOrder = async ({
 			const updated = await tx.products.updateMany({
 				where: {
 					productId: product.productId,
+					status: {
+						in: [
+							PRODUCT_STATUS.Available,
+							PRODUCT_STATUS.Reserved,
+						],
+					},
 					stockQuantity: { gte: quantity },
 				},
 				data: {
@@ -239,6 +245,21 @@ export const placeOrder = async ({
 			})
 
 			if (updated.count === 0) {
+				const current = await tx.products.findUnique({
+					where: { productId: product.productId },
+					select: { status: true, stockQuantity: true },
+				})
+
+				if (
+					!current ||
+					!isPurchasableProductStatus(current.status)
+				) {
+					throw new AppError(
+						`"${product.name}" is not available for purchase`,
+						400,
+					)
+				}
+
 				throw new AppError(
 					`Insufficient stock for "${product.name}"`,
 					400,

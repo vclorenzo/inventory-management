@@ -45,6 +45,7 @@ const AuctionModal = ({
 	defaultValues,
 }: AuctionModalProps) => {
 	const [paymentMethodInput, setPaymentMethodInput] = useState('')
+	const [submitError, setSubmitError] = useState<string | null>(null)
 
 	const form = useForm<AuctionFormValues>()
 	const {
@@ -66,6 +67,7 @@ const AuctionModal = ({
 			biddingEndsAt: defaultBiddingEndsAt(),
 		})
 		setPaymentMethodInput('')
+		setSubmitError(null)
 	}, [isOpen, defaultValues, reset])
 
 	useEffect(() => {
@@ -168,13 +170,21 @@ const AuctionModal = ({
 	}
 
 	const onSubmit = async (data: AuctionFormValues) => {
-		await Promise.resolve(
-			onSend({
-				...data,
-				biddingEndsAt: biddingEndsAtToIso(data.biddingEndsAt),
-			}),
-		)
-		onClose()
+		setSubmitError(null)
+		try {
+			await Promise.resolve(
+				onSend({
+					...data,
+					biddingEndsAt: biddingEndsAtToIso(data.biddingEndsAt),
+				}),
+			)
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: 'Failed to save auction',
+			)
+		}
 	}
 
 	if (!isOpen) return null
@@ -358,6 +368,15 @@ const AuctionModal = ({
 								</div>
 							) : null}
 						</div>
+
+						{submitError ? (
+							<div
+								role="alert"
+								className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+							>
+								{submitError}
+							</div>
+						) : null}
 					</div>
 				</ReactHookForm>
 			</div>

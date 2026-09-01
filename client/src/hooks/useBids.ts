@@ -7,9 +7,9 @@ import {
 import { BidGroup, BidItem, CompletedBidEntry } from '@/types/pages/Bids'
 import { useMemo } from 'react'
 
-const isCompletedBid = (item: BidItem) => item.isAuctionOpen === false
-
 const isActiveBid = (item: BidItem) => item.isAuctionOpen === true
+
+const isCompletedBid = (item: BidItem) => !isActiveBid(item)
 
 export const flattenCompletedBids = (
 	groups: BidGroup[],

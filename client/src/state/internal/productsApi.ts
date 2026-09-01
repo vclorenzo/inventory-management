@@ -3,6 +3,7 @@ import {
 	NewProduct,
 	UpdateProduct,
 } from '@/types/pages/Products'
+import { isProductStatus } from '@/constants/productStatus'
 import { api } from '../api'
 
 export type ProductSortBy =
@@ -67,6 +68,31 @@ export const normalizeQueryParams = (
 	return query
 }
 
+function parseProduct(value: unknown): Product | null {
+	if (!value || typeof value !== 'object') return null
+	const status = 'status' in value ? value.status : undefined
+	if (!isProductStatus(status)) return null
+	return { ...(value as Product), status }
+}
+
+function parseProductList(response: { data?: unknown }): Product[] {
+	const rows = Array.isArray(response.data) ? response.data : []
+	const products: Product[] = []
+	for (const row of rows) {
+		const product = parseProduct(row)
+		if (product) products.push(product)
+	}
+	return products
+}
+
+function parseProductRecord(response: { data?: unknown }): Product {
+	const product = parseProduct(response.data)
+	if (!product) {
+		throw new Error('Invalid product payload')
+	}
+	return product
+}
+
 export const productsApi = api.injectEndpoints({
 	endpoints: (builder) => ({
 		getProducts: builder.query<
@@ -77,8 +103,7 @@ export const productsApi = api.injectEndpoints({
 				url: '/products',
 				params: normalizeQueryParams(params),
 			}),
-			transformResponse: (response: { data?: Product[] }) =>
-				Array.isArray(response?.data) ? response.data : [],
+			transformResponse: parseProductList,
 			providesTags: ['Products'],
 		}),
 
@@ -95,7 +120,7 @@ export const productsApi = api.injectEndpoints({
 					params: marketplace ? { marketplace: 'true' } : undefined,
 				}
 			},
-			transformResponse: (response: { data: Product }) => response.data,
+			transformResponse: parseProductRecord,
 			providesTags: ['Products'],
 		}),
 
@@ -105,6 +130,7 @@ export const productsApi = api.injectEndpoints({
 				method: 'POST',
 				body,
 			}),
+			transformResponse: parseProductRecord,
 			invalidatesTags: ['Products'],
 		}),
 		updateProduct: builder.mutation<Product, UpdateProduct>({
@@ -113,6 +139,7 @@ export const productsApi = api.injectEndpoints({
 				method: 'PUT',
 				body,
 			}),
+			transformResponse: parseProductRecord,
 			invalidatesTags: ['Products'],
 		}),
 

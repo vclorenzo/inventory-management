@@ -8,7 +8,7 @@ export interface BidItem {
 	startingPrice: number
 	offerPrice: number
 	currency: string
-	isAuctionOpen?: boolean
+	isAuctionOpen: boolean
 	currentHighestBid?: number | null
 	endedAt?: string
 	outcome?: BidOutcome

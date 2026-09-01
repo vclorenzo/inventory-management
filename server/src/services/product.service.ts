@@ -304,30 +304,64 @@ export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
       throw new AppError("Product does not exist", 404);
     }
 
-    const nextStockQuantity =
-      data.stockQuantity ?? existingProduct.stockQuantity;
-    const nextStatus = resolveProductStatus({
+    const shouldWriteStatus =
+      data.stockQuantity !== undefined || data.status !== undefined;
+
+    const updateData: Prisma.ProductsUpdateManyMutationInput = {
+      name: data.name,
+      productCategory: data.productCategory,
+      brand: data.brand,
+      condition: data.condition,
+      description: data.description,
+      price: data.price,
+      rating: data.rating,
+      stockQuantity: data.stockQuantity,
+      paymentMethods: data.paymentMethods,
+      meetupLocations: data.meetupLocations,
+      shippingDetails: data.shippingDetails,
+    };
+
+    if (!shouldWriteStatus) {
+      return await prisma.products.update({
+        where: { productId: id },
+        data: updateData,
+      });
+    }
+
+    updateData.status = resolveProductStatus({
       status: data.status ?? existingProduct.status,
-      stockQuantity: nextStockQuantity,
+      stockQuantity: data.stockQuantity ?? existingProduct.stockQuantity,
     });
 
-    return await prisma.products.update({
-      where: { productId: id },
-      data: {
-        name: data.name,
-        productCategory: data.productCategory,
-        brand: data.brand,
-        condition: data.condition,
-        description: data.description,
-        price: data.price,
-        rating: data.rating,
-        stockQuantity: data.stockQuantity,
-        status: nextStatus,
-        paymentMethods: data.paymentMethods,
-        meetupLocations: data.meetupLocations,
-        shippingDetails: data.shippingDetails,
+    const { count } = await prisma.products.updateMany({
+      where: {
+        productId: id,
+        status: existingProduct.status,
+        stockQuantity: existingProduct.stockQuantity,
       },
+      data: updateData,
     });
+
+    if (count === 0) {
+      const current = await prisma.products.findUnique({
+        where: { productId: id },
+      });
+      if (!current) {
+        throw new AppError("Product does not exist", 404);
+      }
+      throw new AppError(
+        "Product was updated by another request. Please retry.",
+        409,
+      );
+    }
+
+    const updatedProduct = await prisma.products.findUnique({
+      where: { productId: id },
+    });
+    if (!updatedProduct) {
+      throw new AppError("Product does not exist", 404);
+    }
+    return updatedProduct;
   } catch (error) {
     throw error;
   }

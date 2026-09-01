@@ -1,6 +1,7 @@
 import ReactHookForm from '@/components/forms/ReactHookForm'
 import Header from '@/components/Header'
 import { buildProductFormFields } from '@/constants/ProductForm'
+import { PRODUCT_STATUS } from '@/constants/productStatus'
 import { ReusableFieldConfig } from '@/types/components/ReactHookForm'
 import { ProductFormValues } from '@/types/pages/Products'
 import { useEffect, useMemo, useState } from 'react'
@@ -29,7 +30,7 @@ const EMPTY_PRODUCT_FORM: ProductFormValues = {
 	condition: '',
 	price: 0,
 	stockQuantity: 0,
-	status: 'Available',
+	status: PRODUCT_STATUS.Available,
 	description: '',
 	paymentMethods: [],
 	meetupLocations: [createMeetupLocation()],
@@ -44,6 +45,7 @@ const ProductModal = ({
 	defaultValues,
 }: ProductModalProps) => {
 	const [paymentMethodInput, setPaymentMethodInput] = useState('')
+	const [submitError, setSubmitError] = useState<string | null>(null)
 
 	const form = useForm<ProductFormValues>()
 	const {
@@ -62,6 +64,7 @@ const ProductModal = ({
 		if (!isOpen) return
 		reset(defaultValues ?? EMPTY_PRODUCT_FORM)
 		setPaymentMethodInput('')
+		setSubmitError(null)
 	}, [isOpen, defaultValues, reset])
 
 	useEffect(() => {
@@ -164,8 +167,17 @@ const ProductModal = ({
 	}
 
 	const onSubmit = async (data: ProductFormValues) => {
-		await Promise.resolve(onSend(data))
-		onClose()
+		setSubmitError(null)
+		try {
+			await Promise.resolve(onSend(data))
+			onClose()
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: 'Failed to save product',
+			)
+		}
 	}
 
 	if (!isOpen) return null
@@ -349,6 +361,15 @@ const ProductModal = ({
 								</div>
 							) : null}
 						</div>
+
+						{submitError ? (
+							<div
+								role="alert"
+								className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+							>
+								{submitError}
+							</div>
+						) : null}
 					</div>
 				</ReactHookForm>
 			</div>

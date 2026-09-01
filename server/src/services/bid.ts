@@ -399,26 +399,41 @@ export const removeBid = async (bidId: string, userId: string) => {
 
     await settleAuctionIfClosed(existingBid.productId);
 
-    const auction = await prisma.auctions.findFirst({
-      where: { productId: existingBid.productId },
-    });
+    await prisma.$transaction(async (tx) => {
+      await lockAuction(tx, existingBid.productId);
 
-    if (!auction || !isAuctionOpen(auction)) {
-      throw new AppError(
-        "You cannot withdraw a bid after the auction has closed",
-        400,
-      );
-    }
-
-    await prisma.$transaction([
-      prisma.bids.delete({
-        where: { bidId },
-      }),
-      prisma.auctions.update({
+      const auction = await tx.auctions.findFirst({
         where: { productId: existingBid.productId },
-        data: { bidCount: { decrement: 1 } },
-      }),
-    ]);
+      });
+
+      if (!auction) {
+        throw new AppError("Auction does not exist", 404);
+      }
+
+      if (!isAuctionOpen(auction) || auction.winningBidId === bidId) {
+        throw new AppError(
+          "You cannot withdraw a bid after the auction has closed",
+          400,
+        );
+      }
+
+      const currentBid = await tx.bids.findFirst({
+        where: { bidId, userId },
+      });
+
+      if (!currentBid) {
+        throw new AppError("Bid does not exist", 404);
+      }
+
+      await tx.bids.delete({
+        where: { bidId },
+      });
+
+      await tx.auctions.update({
+        where: { productId: existingBid.productId },
+        data: { bidCount: Math.max(auction.bidCount - 1, 0) },
+      });
+    });
 
     return getBidsByUserId(userId);
   } catch (error) {

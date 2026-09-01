@@ -16,7 +16,7 @@ type MakeOfferModalProps = {
 
 function parseOfferAmount(value: string) {
 	const amount = Number(value)
-	if (!value.trim() || Number.isNaN(amount) || amount <= 0) {
+	if (!value.trim() || !Number.isFinite(amount) || amount <= 0) {
 		return null
 	}
 	return amount

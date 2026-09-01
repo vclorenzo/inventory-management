@@ -3,11 +3,37 @@ import {
 	NewAuction,
 	UpdateAuction,
 } from '@/types/pages/Auctions'
+import { isAuctionStatus } from '@/constants/auctionStatus'
 import { api } from '../api'
 import {
 	normalizeQueryParams,
 	ProductQueryParams,
 } from './productsApi'
+
+function parseAuction(value: unknown): Auction | null {
+	if (!value || typeof value !== 'object') return null
+	const status = 'status' in value ? value.status : undefined
+	if (!isAuctionStatus(status)) return null
+	return { ...(value as Auction), status }
+}
+
+function parseAuctionList(response: { data?: unknown }): Auction[] {
+	const rows = Array.isArray(response.data) ? response.data : []
+	const auctions: Auction[] = []
+	for (const row of rows) {
+		const auction = parseAuction(row)
+		if (auction) auctions.push(auction)
+	}
+	return auctions
+}
+
+function parseAuctionRecord(response: { data?: unknown }): Auction {
+	const auction = parseAuction(response.data)
+	if (!auction) {
+		throw new Error('Invalid auction payload')
+	}
+	return auction
+}
 
 export const auctionsApi = api.injectEndpoints({
 	endpoints: (builder) => ({
@@ -19,8 +45,7 @@ export const auctionsApi = api.injectEndpoints({
 				url: '/auctions',
 				params: normalizeQueryParams(params),
 			}),
-			transformResponse: (response: { data?: Auction[] }) =>
-				Array.isArray(response?.data) ? response.data : [],
+			transformResponse: parseAuctionList,
 			providesTags: ['Auctions'],
 		}),
 
@@ -36,7 +61,7 @@ export const auctionsApi = api.injectEndpoints({
 					params: listed ? { listed: 'true' } : undefined,
 				}
 			},
-			transformResponse: (response: { data: Auction }) => response.data,
+			transformResponse: parseAuctionRecord,
 			providesTags: ['Auctions'],
 		}),
 
@@ -46,6 +71,7 @@ export const auctionsApi = api.injectEndpoints({
 				method: 'POST',
 				body,
 			}),
+			transformResponse: parseAuctionRecord,
 			invalidatesTags: ['Auctions'],
 		}),
 		updateAuction: builder.mutation<Auction, UpdateAuction>({
@@ -54,6 +80,7 @@ export const auctionsApi = api.injectEndpoints({
 				method: 'PUT',
 				body,
 			}),
+			transformResponse: parseAuctionRecord,
 			invalidatesTags: ['Auctions'],
 		}),
 

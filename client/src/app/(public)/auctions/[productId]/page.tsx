@@ -34,6 +34,7 @@ import {
 } from '@/constants/auctionStatus'
 import { useMe } from '@/hooks/useMe'
 import { formatPeso } from '@/utils/priceFormatter'
+import { getSafeHttpUrl } from '@/utils/url'
 
 const productImageUrls = (productId: string, length: number) => {
 	let hash = 0
@@ -283,8 +284,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 								This auction is no longer listed.
 							</p>
 							<p className="mt-1 text-sm text-gray-700">
-								The seller has unpublished this listing, so bidding
-								is closed.
+								The seller has unpublished this listing, so bidding is closed.
 							</p>
 							{product.viewerBid && (
 								<p className="mt-2 text-sm font-medium text-slate-700">
@@ -325,7 +325,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 					)}
 					{isOpen && product.viewerBid && (
 						<div
-							className={`ring-emerald-200} mt-6 rounded-xl bg-emerald-50 p-4 ring-1`}
+							className={`mt-6 rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200`}
 						>
 							<p className="mt-1 text-center text-sm font-semibold text-gray-700">
 								Your current bid: {formatPeso(product.viewerBid.offerPrice)}
@@ -391,16 +391,31 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							<p className="text-xl font-semibold text-gray-900">Meet-up</p>
 							{meetupLocations.length > 0 ? (
 								<div className="mt-2 space-y-2 text-gray-700">
-									{meetupLocations.map((location) => (
-										<div
-											key={location.name}
-											className="flex items-center gap-2"
-										>
-											<MapPin className="h-4 w-4 text-gray-500" />
-											<Link href={location.mapLink}>{location.name}</Link>
-											<ExternalLink className="h-4 w-4 text-gray-500" />
-										</div>
-									))}
+									{meetupLocations.map((location) => {
+										const mapLink = getSafeHttpUrl(location.mapLink)
+										return (
+											<div
+												key={location.name}
+												className="flex items-center gap-2"
+											>
+												<MapPin className="h-4 w-4 text-gray-500" />
+												{mapLink ? (
+													<>
+														<Link
+															href={mapLink}
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															{location.name}
+														</Link>
+														<ExternalLink className="h-4 w-4 text-gray-500" />
+													</>
+												) : (
+													<span>{location.name}</span>
+												)}
+											</div>
+										)
+									})}
 								</div>
 							) : (
 								<p className="mt-1 text-gray-700">
