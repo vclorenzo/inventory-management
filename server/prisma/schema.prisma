@@ -141,6 +141,7 @@ model Auctions {
   shippingDetails  String?
   biddingEndsAt    DateTime
   bidCount         Int           @default(0)
+  revision         Int           @default(0)
   winningBidId     String?       @unique
   settledAt        DateTime?
   owner            Users         @relation(fields: [userId], references: [userId])

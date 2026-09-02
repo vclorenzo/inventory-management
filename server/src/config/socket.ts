@@ -15,6 +15,7 @@ export type AuctionBidUpdatePayload = {
   productId: string;
   bidCount: number;
   currentHighestBid: number | null;
+  revision: number;
 };
 
 const auctionRoom = (productId: string) => `auction:${productId}`;

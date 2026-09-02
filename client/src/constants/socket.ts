@@ -8,4 +8,5 @@ export interface AuctionBidUpdatePayload {
 	productId: string
 	bidCount: number
 	currentHighestBid: number | null
+	revision: number
 }
