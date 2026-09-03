@@ -18,6 +18,7 @@ export interface Auction extends Omit<Product, 'status' | 'rating' | 'stockQuant
 	status: AuctionStatus
 	biddingEndsAt: string
 	bidCount: number
+	revision?: number
 	winningBidId?: string | null
 	settledAt?: string | null
 	currentHighestBid?: number | null

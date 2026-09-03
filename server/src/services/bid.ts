@@ -1,5 +1,10 @@
 import { AppError } from "#error/AppError.ts";
 import { AUCTION_STATUS } from "#src/constants/auctionStatus.ts";
+import logger from "#config/logger.ts";
+import {
+  emitAuctionBidUpdate,
+  type AuctionBidUpdatePayload,
+} from "#config/socket.ts";
 import {
   isAuctionOpen,
   settleAuctionIfClosed,
@@ -107,6 +112,14 @@ const formatBidGroups = (
   return Array.from(groups.values());
 };
 
+const publishAuctionBidUpdate = (payload: AuctionBidUpdatePayload) => {
+  try {
+    emitAuctionBidUpdate(payload);
+  } catch (error) {
+    logger.error("Failed to publish auction bid update", error);
+  }
+};
+
 const assertValidOffer = (offerPrice: number, startingPrice: number) => {
   if (offerPrice < startingPrice) {
     throw new AppError(
@@ -171,6 +184,30 @@ const findLeadingBid = (
     },
     orderBy: highestValidBidOrder,
   });
+
+const snapshotAuctionBidUpdate = async (
+  tx: Prisma.TransactionClient,
+  productId: string,
+  data: Prisma.AuctionsUpdateInput = {},
+): Promise<AuctionBidUpdatePayload> => {
+  const auction = await tx.auctions.update({
+    where: { productId },
+    data: {
+      ...data,
+      revision: { increment: 1 },
+    },
+    select: { bidCount: true, price: true, revision: true },
+  });
+
+  const leading = await findLeadingBid(tx, productId, auction.price);
+
+  return {
+    productId,
+    bidCount: auction.bidCount,
+    currentHighestBid: leading?.offerPrice ?? null,
+    revision: auction.revision,
+  };
+};
 
 const leadingBidsForProducts = async (productIds: string[]) => {
   const leadingByProductId = new Map<
@@ -260,7 +297,7 @@ export const addBid = async ({
   try {
     await settleAuctionIfClosed(productId);
 
-    await prisma.$transaction(async (tx) => {
+    const snapshot = await prisma.$transaction(async (tx) => {
       await lockAuction(tx, productId);
 
       const auction = await tx.auctions.findFirst({
@@ -303,7 +340,7 @@ export const addBid = async ({
           where: { bidId: existingBid.bidId },
           data: { offerPrice, currency },
         });
-        return;
+        return snapshotAuctionBidUpdate(tx, productId);
       }
 
       await tx.bids.create({
@@ -314,12 +351,12 @@ export const addBid = async ({
           currency,
         },
       });
-      await tx.auctions.update({
-        where: { productId },
-        data: { bidCount: { increment: 1 } },
+      return snapshotAuctionBidUpdate(tx, productId, {
+        bidCount: { increment: 1 },
       });
     });
 
+    publishAuctionBidUpdate(snapshot);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
@@ -343,7 +380,7 @@ export const updateBidOffer = async ({
 
     await settleAuctionIfClosed(existingBid.productId);
 
-    await prisma.$transaction(async (tx) => {
+    const snapshot = await prisma.$transaction(async (tx) => {
       await lockAuction(tx, existingBid.productId);
 
       const auction = await tx.auctions.findFirst({
@@ -382,8 +419,11 @@ export const updateBidOffer = async ({
         where: { bidId },
         data: { offerPrice },
       });
+
+      return snapshotAuctionBidUpdate(tx, existingBid.productId);
     });
 
+    publishAuctionBidUpdate(snapshot);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
@@ -399,7 +439,7 @@ export const removeBid = async (bidId: string, userId: string) => {
 
     await settleAuctionIfClosed(existingBid.productId);
 
-    await prisma.$transaction(async (tx) => {
+    const snapshot = await prisma.$transaction(async (tx) => {
       await lockAuction(tx, existingBid.productId);
 
       const auction = await tx.auctions.findFirst({
@@ -429,12 +469,12 @@ export const removeBid = async (bidId: string, userId: string) => {
         where: { bidId },
       });
 
-      await tx.auctions.update({
-        where: { productId: existingBid.productId },
-        data: { bidCount: Math.max(auction.bidCount - 1, 0) },
+      return snapshotAuctionBidUpdate(tx, existingBid.productId, {
+        bidCount: Math.max(auction.bidCount - 1, 0),
       });
     });
 
+    publishAuctionBidUpdate(snapshot);
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;

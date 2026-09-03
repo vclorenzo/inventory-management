@@ -679,3 +679,56 @@
 {"body":"{\\","expose":true,"level":"error","message":"Expected property name or '}' in JSON at position 1 (line 1 column 2)","service":"acquisitions-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n    at invokeCallback (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:238:16)\n    at done (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:518:28)\n    at IncomingMessage.emit (node:domain:489:12)\n    at endReadableNT (node:internal/streams/readable:1698:12)","status":400,"statusCode":400,"timestamp":"2026-09-01T14:13:33.016Z","type":"entity.parse.failed"}
 {"body":"{\\","expose":true,"level":"error","message":"Expected property name or '}' in JSON at position 1 (line 1 column 2)","service":"acquisitions-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n    at invokeCallback (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:238:16)\n    at done (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:518:28)\n    at IncomingMessage.emit (node:domain:489:12)\n    at endReadableNT (node:internal/streams/readable:1698:12)","status":400,"statusCode":400,"timestamp":"2026-09-01T14:13:33.262Z","type":"entity.parse.failed"}
 {"body":"{\\","expose":true,"level":"error","message":"Expected property name or '}' in JSON at position 1 (line 1 column 2)","service":"acquisitions-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1 (line 1 column 2)\n    at JSON.parse (<anonymous>)\n    at parse (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n    at invokeCallback (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:238:16)\n    at done (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (C:\\Users\\Vanz\\Desktop\\PERN\\server\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:518:28)\n    at IncomingMessage.emit (node:domain:489:12)\n    at endReadableNT (node:internal/streams/readable:1698:12)","status":400,"statusCode":400,"timestamp":"2026-09-01T14:13:33.728Z","type":"entity.parse.failed"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-09-01T15:33:56.407Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:33:56.418Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:34:01.953Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:34:12.258Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:34:15.458Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:34:26.861Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:34:26.875Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:34:26.884Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:34:26.886Z"}
+{"level":"info","message":"Socket.IO initialized","service":"acquisitions-api","timestamp":"2026-09-01T15:40:48.748Z"}
+{"level":"info","message":"User signed in successfully: test4@gmail.com","service":"acquisitions-api","timestamp":"2026-09-01T15:46:31.578Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:31.588Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:37.956Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:37.961Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:46:37.970Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:46:38.030Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:46.671Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:46.702Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:49.996Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:46:49.998Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:46:50.001Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:46:50.010Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:47:23.251Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:47:46.172Z"}
+{"level":"info","message":"Profile test4@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:51:25.900Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:51:31.547Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:52:47.203Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:52:47.206Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:52:47.211Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:52:47.216Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:52:58.043Z"}
+{"level":"info","message":"Profile test4@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-01T15:52:59.855Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-01T15:53:01.234Z"}
+{"level":"info","message":"Socket.IO initialized","service":"acquisitions-api","timestamp":"2026-09-02T02:20:40.258Z"}
+{"level":"info","message":"User signed in successfully: test4@gmail.com","service":"acquisitions-api","timestamp":"2026-09-02T07:37:00.521Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:37:00.535Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:37:14.834Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:37:14.852Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:37:14.872Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:37:14.939Z"}
+{"level":"info","message":"Socket.IO initialized","service":"acquisitions-api","timestamp":"2026-09-02T07:38:18.515Z"}
+{"level":"info","message":"User signed in successfully: test4@gmail.com","service":"acquisitions-api","timestamp":"2026-09-02T07:38:25.777Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:38:25.787Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:38:39.705Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:38:39.713Z"}
+{"level":"info","message":"User atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:38:39.721Z"}
+{"level":"info","message":"Profile atondeur3@posterous.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:38:39.789Z"}
+{"level":"info","message":"Profile test4@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:38:51.568Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:38:55.995Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:39:04.100Z"}
+{"level":"info","message":"User authenticated test4@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-09-02T07:39:47.437Z"}
+{"level":"info","message":"User test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:39:47.443Z"}
+{"level":"info","message":"Profile test1@gmail.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-09-02T07:39:47.447Z"}

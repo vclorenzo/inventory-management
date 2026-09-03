@@ -1,4 +1,5 @@
 import { errorHandler } from "#middleware/error.middleware.ts";
+import { initSocket } from "#config/socket.ts";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -6,6 +7,7 @@ import dotenv from "dotenv";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import { createServer } from "http";
 import authRoutes from "./routes/auth.routes";
 import dashboardRoutes from "./routes/dashboard.routes";
 import expenseRoutes from "./routes/expense.routes";
@@ -66,7 +68,9 @@ app.use(errorHandler);
 
 // SERVER
 const port = Number(process.env.PORT) || 8000;
-app.listen(port, "0.0.0.0", () => {
+const httpServer = createServer(app);
+initSocket(httpServer, corsOrigins);
+httpServer.listen(port, "0.0.0.0", () => {
   console.log(`server is running on port ${port}`);
   settleExpiredAuctions().catch((error) => {
     logger.error("Failed to settle expired auctions on startup", error);

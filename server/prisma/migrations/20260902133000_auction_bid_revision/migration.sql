@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Auctions" ADD COLUMN "revision" INTEGER NOT NULL DEFAULT 0;
