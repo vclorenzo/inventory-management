@@ -26,6 +26,7 @@ model Users {
   products Products[]
   auctions Auctions[]
   cartItems CartItems[]
+  bookmarks Bookmarks[]
   bids Bids[]
   purchases Purchases[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
@@ -126,6 +127,11 @@ enum AuctionStatus {
   Unlisted
 }
 
+enum BookmarkListingType {
+  Marketplace
+  Auction
+}
+
 model Auctions {
   productId        String        @id @default(uuid())
   userId           String
@@ -151,6 +157,21 @@ model Auctions {
   @@index([biddingEndsAt])
   @@index([settledAt])
   @@index([status])
+}
+
+model Bookmarks {
+  bookmarkId   String              @id @default(uuid())
+  userId       String
+  itemId       String
+  listingType  BookmarkListingType
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@unique([userId, listingType, itemId])
+  @@index([userId, listingType])
 }
 
 model CartItems {

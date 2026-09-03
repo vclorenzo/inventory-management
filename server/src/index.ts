@@ -19,6 +19,7 @@ import reviewRoutes from "./routes/review.routes ";
 import cartRoutes from "./routes/cart.routes";
 import bidRoutes from "./routes/bid.routes";
 import purchaseRoutes from "./routes/purchase.routes";
+import bookmarkRoutes from "./routes/bookmark.routes";
 import { parseReviewPagination } from "#middleware/pagination.middleware.ts";
 import { settleExpiredAuctions } from "#services/auction.service.ts";
 import logger from "#config/logger.ts";
@@ -62,6 +63,7 @@ app.use("/reviews", parseReviewPagination, reviewRoutes);
 app.use("/cart", cartRoutes);
 app.use("/bids", bidRoutes);
 app.use("/purchases", purchaseRoutes);
+app.use("/bookmarks", bookmarkRoutes);
 
 // Error Handler
 app.use(errorHandler);
