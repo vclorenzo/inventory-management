@@ -24,6 +24,7 @@ export const api = createApi({
     "Bids",
     "Purchases",
     "Auctions",
+    "Bookmarks",
   ],
   endpoints: () => ({}),
 });
