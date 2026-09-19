@@ -2,6 +2,7 @@ export const SOCKET_EVENTS = {
 	JOIN_AUCTION: 'joinAuction',
 	LEAVE_AUCTION: 'leaveAuction',
 	AUCTION_BID_UPDATE: 'auction:bidUpdate',
+	NOTIFICATION_CREATED: 'notification:created',
 } as const
 
 export interface AuctionBidUpdatePayload {

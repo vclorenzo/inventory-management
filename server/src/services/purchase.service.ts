@@ -1,4 +1,6 @@
 import { AppError } from '#error/AppError.ts'
+import logger from '#config/logger.ts'
+import { notifyMarketplaceSoldOut } from '#services/notification.service.ts'
 import {
 	isPurchasableProductStatus,
 	PRODUCT_STATUS,
@@ -222,6 +224,11 @@ export const placeOrder = async ({
 
 	const result = await prisma.$transaction(async (tx) => {
 		const items: PlaceOrderItem[] = []
+		const soldOutProducts: {
+			productId: string
+			productName: string
+			ownerUserId: string
+		}[] = []
 
 		for (const item of cartItems) {
 			const { product, quantity } = item
@@ -275,6 +282,11 @@ export const placeOrder = async ({
 				await tx.products.update({
 					where: { productId: product.productId },
 					data: { status: PRODUCT_STATUS.SoldOut },
+				})
+				soldOutProducts.push({
+					productId: product.productId,
+					productName: product.name,
+					ownerUserId: product.userId,
 				})
 			}
 
@@ -338,8 +350,20 @@ export const placeOrder = async ({
 			currency,
 			items,
 			placedAt: placedAt.toISOString(),
-		} satisfies PlaceOrderResult
+			soldOutProducts,
+		}
 	})
 
-	return result
+	const { soldOutProducts, ...order } = result
+	for (const product of soldOutProducts) {
+		notifyMarketplaceSoldOut({
+			productId: product.productId,
+			productName: product.productName,
+			excludeUserIds: [userId, product.ownerUserId],
+		}).catch((error) => {
+			logger.error('Failed to notify marketplace sold out', error)
+		})
+	}
+
+	return order
 }

@@ -1,4 +1,5 @@
 'use client';
+import { ToastProvider } from '@/components/ToastProvider';
 import StoreProvider from '@/state/redux';
 import React from 'react';
 
@@ -7,7 +8,11 @@ type Props = {
 };
 
 const ProviderWrapper = ({ children }: Props) => {
-	return <StoreProvider>{children}</StoreProvider>;
+	return (
+		<StoreProvider>
+			<ToastProvider>{children}</ToastProvider>
+		</StoreProvider>
+	);
 };
 
 export default ProviderWrapper;

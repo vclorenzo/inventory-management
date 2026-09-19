@@ -25,6 +25,7 @@ export const api = createApi({
     "Purchases",
     "Auctions",
     "Bookmarks",
+    "Notifications",
   ],
   endpoints: () => ({}),
 });

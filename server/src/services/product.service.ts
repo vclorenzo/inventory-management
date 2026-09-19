@@ -1,8 +1,14 @@
 import {
   MARKETPLACE_PRODUCT_STATUS,
+  PRODUCT_STATUS,
   resolveProductStatus,
 } from "#src/constants/productStatus.ts";
 import { AppError } from "#error/AppError.ts";
+import logger from "#config/logger.ts";
+import {
+  notifyMarketplacePriceDrop,
+  notifyMarketplaceSoldOut,
+} from "#services/notification.service.ts";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -299,73 +305,108 @@ type ProductUpdatePayload = {
 
 export const updateProduct = async (id: string, data: ProductUpdatePayload) => {
   try {
-    const existingProduct = await getProductById(id);
-    if (!existingProduct) {
-      throw new AppError("Product does not exist", 404);
-    }
+    const { predecessor, successor } = await prisma.$transaction(
+      async (tx) => {
+        await tx.$queryRaw`
+          SELECT "productId" FROM "Products"
+          WHERE "productId" = ${id}
+          FOR UPDATE
+        `;
 
-    const shouldWriteStatus =
-      data.stockQuantity !== undefined || data.status !== undefined;
+        const lockedProduct = await tx.products.findUnique({
+          where: { productId: id },
+        });
+        if (!lockedProduct) {
+          throw new AppError("Product does not exist", 404);
+        }
 
-    const updateData: Prisma.ProductsUpdateManyMutationInput = {
-      name: data.name,
-      productCategory: data.productCategory,
-      brand: data.brand,
-      condition: data.condition,
-      description: data.description,
-      price: data.price,
-      rating: data.rating,
-      stockQuantity: data.stockQuantity,
-      paymentMethods: data.paymentMethods,
-      meetupLocations: data.meetupLocations,
-      shippingDetails: data.shippingDetails,
-    };
+        const shouldWriteStatus =
+          data.stockQuantity !== undefined || data.status !== undefined;
 
-    if (!shouldWriteStatus) {
-      return await prisma.products.update({
-        where: { productId: id },
-        data: updateData,
-      });
-    }
+        const updateData: Prisma.ProductsUpdateInput = {
+          name: data.name,
+          productCategory: data.productCategory,
+          brand: data.brand,
+          condition: data.condition,
+          description: data.description,
+          price: data.price,
+          rating: data.rating,
+          stockQuantity: data.stockQuantity,
+          paymentMethods: data.paymentMethods,
+          meetupLocations: data.meetupLocations,
+          shippingDetails: data.shippingDetails,
+        };
 
-    updateData.status = resolveProductStatus({
-      status: data.status ?? existingProduct.status,
-      stockQuantity: data.stockQuantity ?? existingProduct.stockQuantity,
-    });
+        if (shouldWriteStatus) {
+          updateData.status = resolveProductStatus({
+            status: data.status ?? lockedProduct.status,
+            stockQuantity:
+              data.stockQuantity ?? lockedProduct.stockQuantity,
+          });
+        }
 
-    const { count } = await prisma.products.updateMany({
-      where: {
-        productId: id,
-        status: existingProduct.status,
-        stockQuantity: existingProduct.stockQuantity,
+        const updatedProduct = await tx.products.update({
+          where: { productId: id },
+          data: updateData,
+        });
+
+        return {
+          predecessor: lockedProduct,
+          successor: updatedProduct,
+        };
       },
-      data: updateData,
-    });
+    );
 
-    if (count === 0) {
-      const current = await prisma.products.findUnique({
-        where: { productId: id },
-      });
-      if (!current) {
-        throw new AppError("Product does not exist", 404);
-      }
-      throw new AppError(
-        "Product was updated by another request. Please retry.",
-        409,
-      );
-    }
-
-    const updatedProduct = await prisma.products.findUnique({
-      where: { productId: id },
-    });
-    if (!updatedProduct) {
-      throw new AppError("Product does not exist", 404);
-    }
-    return updatedProduct;
+    publishMarketplaceProductNotifications(predecessor, successor);
+    return successor;
   } catch (error) {
     throw error;
   }
 };
+
+const publishMarketplaceProductNotifications = (
+  existingProduct: {
+    productId: string;
+    userId: string;
+    name: string;
+    price: number;
+    status: string;
+  },
+  updatedProduct: {
+    productId: string;
+    name: string;
+    price: number;
+    status: string;
+  },
+) => {
+  const excludeUserIds = [existingProduct.userId];
+
+  if (updatedProduct.price < existingProduct.price) {
+    notifyMarketplacePriceDrop({
+      productId: updatedProduct.productId,
+      productName: updatedProduct.name,
+      previousPrice: existingProduct.price,
+      newPrice: updatedProduct.price,
+      excludeUserIds,
+    }).catch((error) => {
+      logger.error("Failed to notify marketplace price drop", error);
+    });
+  }
+
+  if (
+    existingProduct.status !== PRODUCT_STATUS.SoldOut &&
+    updatedProduct.status === PRODUCT_STATUS.SoldOut
+  ) {
+    notifyMarketplaceSoldOut({
+      productId: updatedProduct.productId,
+      productName: updatedProduct.name,
+      excludeUserIds,
+    }).catch((error) => {
+      logger.error("Failed to notify marketplace sold out", error);
+    });
+  }
+};
+
 export const deleteProduct = async (id: string) => {
   try {
     const existingProduct = await getProductById(id);
