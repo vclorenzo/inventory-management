@@ -7,20 +7,14 @@ import React from 'react'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-	Bookmark,
-	ChevronLeft,
-	ExternalLink,
-	Gavel,
-	MapPin,
-	Package,
-} from 'lucide-react'
+import { ChevronLeft, ExternalLink, Gavel, MapPin, Package } from 'lucide-react'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/scrollbar'
 
 import AddToCartButton from '@/components/AddToCartButton'
+import AddBookmarkButton from '@/components/AddBookmarkButton'
 import BiddingCountdown from '@/components/BiddingCountdown'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
@@ -346,12 +340,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 							currentHighestBid={currentHighestBid}
 							hasExistingBid={Boolean(product.viewerBid)}
 						/>
-						<Link
-							href="/products"
-							className="inline-flex justify-center rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
-						>
-							<Bookmark />
-						</Link>
+						<AddBookmarkButton itemId={product.productId} listingType="Auction" />
 					</div>
 					{isOwner && isOpen && (
 						<p className="mt-2 text-center text-sm text-gray-500">
