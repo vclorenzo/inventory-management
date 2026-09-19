@@ -9,6 +9,7 @@ import {
   isAuctionOpen,
   settleAuctionIfClosed,
 } from "#services/auction.service.ts";
+import { notifyOutbid } from "#services/notification.service.ts";
 import { Prisma, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -118,6 +119,33 @@ const publishAuctionBidUpdate = (payload: AuctionBidUpdatePayload) => {
   } catch (error) {
     logger.error("Failed to publish auction bid update", error);
   }
+};
+
+const publishOutbidNotification = ({
+  previousLeaderUserId,
+  bidderUserId,
+  productId,
+  auctionName,
+  currentHighestBid,
+}: {
+  previousLeaderUserId?: string | null;
+  bidderUserId: string;
+  productId: string;
+  auctionName: string;
+  currentHighestBid: number;
+}) => {
+  if (!previousLeaderUserId || previousLeaderUserId === bidderUserId) {
+    return;
+  }
+
+  notifyOutbid({
+    userId: previousLeaderUserId,
+    productId,
+    auctionName,
+    currentHighestBid,
+  }).catch((error) => {
+    logger.error("Failed to notify outbid user", error);
+  });
 };
 
 const assertValidOffer = (offerPrice: number, startingPrice: number) => {
@@ -326,37 +354,57 @@ export const addBid = async ({
         throw new AppError("You can only increase your current bid", 400);
       }
 
-      const leadingBid = await findLeadingBid(
+      const previousLeadingBid = await findLeadingBid(
+        tx,
+        productId,
+        auction.price,
+      );
+      const competingLead = await findLeadingBid(
         tx,
         productId,
         auction.price,
         existingBid?.bidId,
       );
 
-      assertBeatsLeadingBid(offerPrice, leadingBid?.offerPrice);
+      assertBeatsLeadingBid(offerPrice, competingLead?.offerPrice);
 
       if (existingBid) {
         await tx.bids.update({
           where: { bidId: existingBid.bidId },
           data: { offerPrice, currency },
         });
-        return snapshotAuctionBidUpdate(tx, productId);
+      } else {
+        await tx.bids.create({
+          data: {
+            userId,
+            productId,
+            offerPrice,
+            currency,
+          },
+        });
       }
 
-      await tx.bids.create({
-        data: {
-          userId,
-          productId,
-          offerPrice,
-          currency,
-        },
-      });
-      return snapshotAuctionBidUpdate(tx, productId, {
-        bidCount: { increment: 1 },
-      });
+      const snapshot = await snapshotAuctionBidUpdate(
+        tx,
+        productId,
+        existingBid ? {} : { bidCount: { increment: 1 } },
+      );
+
+      return {
+        snapshot,
+        previousLeaderUserId: previousLeadingBid?.userId ?? null,
+        auctionName: auction.name,
+      };
     });
 
-    publishAuctionBidUpdate(snapshot);
+    publishAuctionBidUpdate(snapshot.snapshot);
+    publishOutbidNotification({
+      previousLeaderUserId: snapshot.previousLeaderUserId,
+      bidderUserId: userId,
+      productId,
+      auctionName: snapshot.auctionName,
+      currentHighestBid: offerPrice,
+    });
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;
@@ -406,24 +454,46 @@ export const updateBidOffer = async ({
         throw new AppError("You can only increase your current bid", 400);
       }
 
-      const leadingBid = await findLeadingBid(
+      const previousLeadingBid = await findLeadingBid(
+        tx,
+        existingBid.productId,
+        auction.price,
+      );
+      const competingLead = await findLeadingBid(
         tx,
         existingBid.productId,
         auction.price,
         bidId,
       );
 
-      assertBeatsLeadingBid(offerPrice, leadingBid?.offerPrice);
+      assertBeatsLeadingBid(offerPrice, competingLead?.offerPrice);
 
       await tx.bids.update({
         where: { bidId },
         data: { offerPrice },
       });
 
-      return snapshotAuctionBidUpdate(tx, existingBid.productId);
+      const nextSnapshot = await snapshotAuctionBidUpdate(
+        tx,
+        existingBid.productId,
+      );
+
+      return {
+        snapshot: nextSnapshot,
+        previousLeaderUserId: previousLeadingBid?.userId ?? null,
+        auctionName: auction.name,
+        productId: existingBid.productId,
+      };
     });
 
-    publishAuctionBidUpdate(snapshot);
+    publishAuctionBidUpdate(snapshot.snapshot);
+    publishOutbidNotification({
+      previousLeaderUserId: snapshot.previousLeaderUserId,
+      bidderUserId: userId,
+      productId: snapshot.productId,
+      auctionName: snapshot.auctionName,
+      currentHighestBid: offerPrice,
+    });
     return getBidsByUserId(userId);
   } catch (error) {
     throw error;

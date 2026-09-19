@@ -29,6 +29,7 @@ model Users {
   bookmarks Bookmarks[]
   bids Bids[]
   purchases Purchases[]
+  notifications Notifications[]
   reviewsReceived Reviews[] @relation("ReviewedUser")
   reviewsWritten  Reviews[] @relation("Reviewer")
   productReviewsWritten ProductReviews[] @relation("ProductReviewer")
@@ -132,6 +133,13 @@ enum BookmarkListingType {
   Auction
 }
 
+enum NotificationType {
+  OUTBID
+  AUCTION_ENDED
+  MARKETPLACE_SOLD_OUT
+  MARKETPLACE_PRICE_DROP
+}
+
 model Auctions {
   productId        String        @id @default(uuid())
   userId           String
@@ -172,6 +180,26 @@ model Bookmarks {
 
   @@unique([userId, listingType, itemId])
   @@index([userId, listingType])
+}
+
+model Notifications {
+  notificationId String           @id @default(uuid())
+  userId         String
+  type           NotificationType
+  productId      String
+  title          String
+  message        String
+  metadata       Json             @default("{}")
+  readAt         DateTime?
+  idempotencyKey String           @unique
+
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([userId, created_at])
+  @@index([userId, readAt])
 }
 
 model CartItems {

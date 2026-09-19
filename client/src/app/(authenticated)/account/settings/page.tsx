@@ -5,6 +5,7 @@ import SectionCard from '@/components/SectionCard'
 import { useAppDispatch, useAppSelector } from '@/state/redux'
 import { UserSetting } from '@/types/pages/User'
 import { toggleDarkMode } from '@/utils/global'
+import { setIsNotificationBubbleEnabled } from '@/state'
 import { useState } from 'react'
 import { mockPreferencesSettings } from '../../constants/User'
 
@@ -15,15 +16,20 @@ const Preferences = () => {
 
 	const dispatch = useAppDispatch()
 	const isDarkMode = useAppSelector((state) => state.global.isDarkMode)
+	const isNotificationBubbleEnabled = useAppSelector(
+		(state) => state.global.isNotificationBubbleEnabled !== false,
+	)
 
 	const handleToggleChange = (index: number) => {
 		const settingsCopy = [...preferencesSettings]
 		switch (index) {
 			case 0:
+				dispatch(
+					setIsNotificationBubbleEnabled(!isNotificationBubbleEnabled),
+				)
 				break
 			case 1:
 				toggleDarkMode(dispatch, isDarkMode)
-				settingsCopy[index].value = !isDarkMode
 				break
 		}
 
@@ -56,7 +62,9 @@ const Preferences = () => {
 											checked={
 												setting.label === 'Dark Mode'
 													? isDarkMode
-													: (setting.value as boolean)
+													: setting.label === 'Notification'
+														? isNotificationBubbleEnabled
+														: (setting.value as boolean)
 											}
 											onChange={() => handleToggleChange(index)}
 										/>

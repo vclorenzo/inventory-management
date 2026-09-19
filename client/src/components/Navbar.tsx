@@ -1,24 +1,17 @@
 'use client'
+import { disconnectSocket } from '@/lib/socket'
 import { setIsSidebarCollapsed } from '@/state'
 import { api } from '@/state/api'
 import { externalApi } from '@/state/externalApi'
 import { useSignOutMutation } from '@/state/internal/authApi'
 import { useAppDispatch, useAppSelector } from '@/state/redux'
 import { toggleDarkMode } from '@/utils/global'
-import {
-	Bell,
-	Bookmark,
-	Gavel,
-	Menu,
-	Moon,
-	ShoppingCart,
-	Sun,
-} from 'lucide-react'
+import { Bookmark, Gavel, Menu, Moon, ShoppingCart, Sun } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-//hooks
+import NotificationBell from '@/components/NotificationBell'
 import { useMe } from '@/hooks/useMe'
 
 const Navbar = () => {
@@ -103,14 +96,7 @@ const Navbar = () => {
 							</button>
 						</div>
 
-						<div className="relative">
-							<Link href={'/notifications'}>
-								<Bell className="cursor-pointer text-gray-500" size={24} />
-								<span className="absolute -right-2 -top-2 inline-flex items-center justify-center rounded-full bg-red-400 px-[0.4rem] py-1 text-xs font-semibold leading-none text-red-100">
-									3
-								</span>
-							</Link>
-						</div>
+						{me ? <NotificationBell /> : null}
 
 						{me ? (
 							<div>
@@ -181,10 +167,14 @@ const Navbar = () => {
 										onClick={async () => {
 											setIsOpen(false)
 
-											await signOut().unwrap()
-											dispatch(api.util.resetApiState())
-											dispatch(externalApi.util.resetApiState())
-											router.push('/login')
+											try {
+												await signOut().unwrap()
+												dispatch(api.util.resetApiState())
+												dispatch(externalApi.util.resetApiState())
+												router.push('/login')
+											} finally {
+												disconnectSocket()
+											}
 										}}
 									>
 										Logout

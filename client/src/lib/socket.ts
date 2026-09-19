@@ -18,3 +18,7 @@ export function getSocket(): Socket | null {
 
 	return socket
 }
+
+export function disconnectSocket() {
+	socket?.disconnect()
+}

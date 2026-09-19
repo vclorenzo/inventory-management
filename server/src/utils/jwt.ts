@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '#config/env.ts';
 import logger from '#config/logger.ts';
 import { AppError } from '#error/AppError.ts';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'test';
 const JWT_EXPIRES_IN = '1d';
 
 export const jwtToken = {

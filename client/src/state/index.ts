@@ -4,12 +4,14 @@ export interface InitialStateTypes {
   isSidebarCollapsed: boolean;
   isDropdownExpanded: boolean;
   isDarkMode: boolean;
+  isNotificationBubbleEnabled: boolean;
 }
 
 const initialState: InitialStateTypes = {
   isSidebarCollapsed: false,
   isDropdownExpanded: false,
   isDarkMode: false,
+  isNotificationBubbleEnabled: true,
 };
 
 export const globalSlice = createSlice({
@@ -25,10 +27,17 @@ export const globalSlice = createSlice({
     setIsDarkMode: (state, action: PayloadAction<boolean>) => {
       state.isDarkMode = action.payload;
     },
+    setIsNotificationBubbleEnabled: (state, action: PayloadAction<boolean>) => {
+      state.isNotificationBubbleEnabled = action.payload;
+    },
   },
 });
 
-export const { setIsSidebarCollapsed, setIsDropdownExpanded, setIsDarkMode } =
-  globalSlice.actions;
+export const {
+  setIsSidebarCollapsed,
+  setIsDropdownExpanded,
+  setIsDarkMode,
+  setIsNotificationBubbleEnabled,
+} = globalSlice.actions;
 
 export default globalSlice.reducer;

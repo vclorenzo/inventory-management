@@ -1,14 +1,12 @@
 'use client'
 
+import AddBookmarkButton from '@/components/AddBookmarkButton'
 import Header from '@/components/Header'
 import { CircularProgress } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-	useGetBookmarksQuery,
-	useRemoveBookmarkMutation,
-} from '@/state/internal/bookmarksApi'
+import { useGetBookmarksQuery } from '@/state/internal/bookmarksApi'
 import { formatPeso } from '@/utils/priceFormatter'
 
 type BookmarkTab = 'Marketplace' | 'Auction'
@@ -25,40 +23,6 @@ const productImageUrl = (productId: string) => {
 const Bookmarks = () => {
 	const [activeTab, setActiveTab] = useState<BookmarkTab>('Marketplace')
 	const { data, isLoading, isError } = useGetBookmarksQuery()
-	const [removeBookmark] = useRemoveBookmarkMutation()
-	const [removingBookmarkId, setRemovingBookmarkId] = useState<
-		string | null
-	>(null)
-	const [removeErrors, setRemoveErrors] = useState<Record<string, string>>(
-		{},
-	)
-
-	const handleRemoveBookmark = async (bookmarkId: string) => {
-		setRemoveErrors((prev) => {
-			if (!(bookmarkId in prev)) {
-				return prev
-			}
-
-			const next = { ...prev }
-			delete next[bookmarkId]
-			return next
-		})
-		setRemovingBookmarkId(bookmarkId)
-
-		try {
-			await removeBookmark(bookmarkId).unwrap()
-		} catch {
-			setRemoveErrors((prev) => ({
-				...prev,
-				[bookmarkId]:
-					'Could not remove bookmark. Please try again.',
-			}))
-		} finally {
-			setRemovingBookmarkId((current) =>
-				current === bookmarkId ? null : current,
-			)
-		}
-	}
 
 	const marketplaceBookmarks = data?.marketplace ?? []
 	const auctionBookmarks = data?.auctions ?? []
@@ -127,11 +91,6 @@ const Bookmarks = () => {
 										bookmark.item.currentHighestBid ?? bookmark.item.price,
 									)
 								: formatPeso(bookmark.item.price)
-						const isRemovingCard =
-							removingBookmarkId === bookmark.bookmarkId
-						const removeError =
-							removeErrors[bookmark.bookmarkId]
-						const removeErrorId = `remove-bookmark-error-${bookmark.bookmarkId}`
 						return (
 							<div
 								key={bookmark.bookmarkId}
@@ -150,47 +109,30 @@ const Bookmarks = () => {
 											className="h-full w-full rounded-2xl object-cover"
 										/>
 									</div>
-									<h3 className="mt-3 line-clamp-2 text-lg font-semibold text-gray-900">
-										{item.name}
-									</h3>
-									<p className="mt-1 text-gray-800">
-										{isAuction
-											? `Current Price: ${displayPrice}`
-											: displayPrice}
-									</p>
-									<p className="mt-1 text-sm text-gray-500">
-										{item.brand} • {item.condition}
-									</p>
 								</Link>
-								<button
-									type="button"
-									onClick={() => {
-										void handleRemoveBookmark(
-											bookmark.bookmarkId,
-										)
-									}}
-									disabled={isRemovingCard}
-									aria-busy={isRemovingCard}
-									aria-describedby={
-										removeError
-											? removeErrorId
-											: undefined
-									}
-									className="mt-4 w-full rounded-lg bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-								>
-									{isRemovingCard
-										? 'Removing...'
-										: 'Remove bookmark'}
-								</button>
-								{removeError ? (
-									<p
-										id={removeErrorId}
-										role="alert"
-										className="mt-2 text-sm text-red-600"
+								<div className="mt-3 flex items-start gap-2">
+									<Link
+										href={`/${isAuction ? 'auctions' : 'marketplace'}/${item.productId}`}
+										className="min-w-0 flex-1"
 									>
-										{removeError}
-									</p>
-								) : null}
+										<h3 className="line-clamp-2 text-lg font-semibold text-gray-900">
+											{item.name}
+										</h3>
+										<p className="mt-1 text-gray-800">
+											{isAuction
+												? `Current Price: ${displayPrice}`
+												: displayPrice}
+										</p>
+										<p className="mt-1 text-sm text-gray-500">
+											{item.brand} • {item.condition}
+										</p>
+									</Link>
+									<AddBookmarkButton
+										itemId={item.productId}
+										listingType={bookmark.listingType}
+										variant="ghost"
+									/>
+								</div>
 							</div>
 						)
 					})}

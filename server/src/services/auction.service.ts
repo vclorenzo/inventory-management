@@ -6,7 +6,13 @@ import {
   resolveCreateAuctionStatus,
   resolveUpdatedAuctionStatus,
 } from "#src/constants/auctionStatus.ts";
-import { AuctionStatus, Prisma, PrismaClient } from "@prisma/client";
+import { notifyAuctionEnded } from "#services/notification.service.ts";
+import {
+  AuctionStatus,
+  BookmarkListingType,
+  Prisma,
+  PrismaClient,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -52,7 +58,7 @@ const findHighestValidBid = (
 
 export const settleAuctionIfClosed = async (productId: string) => {
   try {
-    return await prisma.$transaction(async (tx) => {
+    const settlement = await prisma.$transaction(async (tx) => {
       await tx.$queryRaw`
         SELECT "productId" FROM "Auctions"
         WHERE "productId" = ${productId}
@@ -63,18 +69,39 @@ export const settleAuctionIfClosed = async (productId: string) => {
         where: { productId },
       });
 
-      if (!auction) return null;
-      if (auction.settledAt) return auction;
-      if (auction.status !== AUCTION_STATUS.Available) return auction;
-      if (auction.biddingEndsAt.getTime() > Date.now()) return auction;
+      if (!auction) {
+        return { kind: "missing" as const };
+      }
+      if (auction.settledAt) {
+        return { kind: "unchanged" as const, auction };
+      }
+      if (auction.status !== AUCTION_STATUS.Available) {
+        return { kind: "unchanged" as const, auction };
+      }
+      if (auction.biddingEndsAt.getTime() > Date.now()) {
+        return { kind: "unchanged" as const, auction };
+      }
 
       const winner = await findHighestValidBid(
         tx,
         productId,
         auction.price,
       );
+      const [bidders, bookmarks] = await Promise.all([
+        tx.bids.findMany({
+          where: { productId },
+          select: { userId: true },
+        }),
+        tx.bookmarks.findMany({
+          where: {
+            itemId: productId,
+            listingType: BookmarkListingType.Auction,
+          },
+          select: { userId: true },
+        }),
+      ]);
 
-      return tx.auctions.update({
+      const updated = await tx.auctions.update({
         where: { productId },
         data: {
           winningBidId: winner?.bidId ?? null,
@@ -82,7 +109,39 @@ export const settleAuctionIfClosed = async (productId: string) => {
           status: winner ? AUCTION_STATUS.SoldOut : AUCTION_STATUS.Unsold,
         },
       });
+
+      return {
+        kind: "settled" as const,
+        auction: updated,
+        auctionName: auction.name,
+        winnerUserId: winner?.userId ?? null,
+        winningOfferPrice: winner?.offerPrice ?? null,
+        recipientUserIds: [
+          ...new Set([
+            ...bidders.map((bid) => bid.userId),
+            ...bookmarks.map((bookmark) => bookmark.userId),
+          ]),
+        ],
+      };
     });
+
+    if (settlement.kind === "missing") return null;
+
+    if (settlement.kind === "settled") {
+      try {
+        await notifyAuctionEnded({
+          productId,
+          auctionName: settlement.auctionName,
+          recipientUserIds: settlement.recipientUserIds,
+          winnerUserId: settlement.winnerUserId,
+          winningOfferPrice: settlement.winningOfferPrice,
+        });
+      } catch (error) {
+        logger.error("Failed to notify auction ended", error);
+      }
+    }
+
+    return settlement.auction;
   } catch (error) {
     throw error;
   }

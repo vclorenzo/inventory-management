@@ -1,3 +1,4 @@
+import "#config/env.ts";
 import { errorHandler } from "#middleware/error.middleware.ts";
 import { initSocket } from "#config/socket.ts";
 import bodyParser from "body-parser";
@@ -20,6 +21,7 @@ import cartRoutes from "./routes/cart.routes";
 import bidRoutes from "./routes/bid.routes";
 import purchaseRoutes from "./routes/purchase.routes";
 import bookmarkRoutes from "./routes/bookmark.routes";
+import notificationRoutes from "./routes/notification.routes";
 import { parseReviewPagination } from "#middleware/pagination.middleware.ts";
 import { settleExpiredAuctions } from "#services/auction.service.ts";
 import logger from "#config/logger.ts";
@@ -64,6 +66,7 @@ app.use("/cart", cartRoutes);
 app.use("/bids", bidRoutes);
 app.use("/purchases", purchaseRoutes);
 app.use("/bookmarks", bookmarkRoutes);
+app.use("/notifications", notificationRoutes);
 
 // Error Handler
 app.use(errorHandler);
