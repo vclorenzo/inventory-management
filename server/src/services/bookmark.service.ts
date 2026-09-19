@@ -1,5 +1,6 @@
+import logger from "#config/logger.ts";
 import { AppError } from "#error/AppError.ts";
-import { isAuctionOpen, settleExpiredAuctions } from "#services/auction.service.ts";
+import { isAuctionOpen, settleAuctionIfClosed } from "#services/auction.service.ts";
 import { BookmarkListingType, PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -115,8 +116,6 @@ export const addBookmark = async ({
 export const getBookmarksByUserId = async (
   userId: string,
 ): Promise<BookmarkCollection> => {
-  await settleExpiredAuctions();
-
   const bookmarks = await prisma.bookmarks.findMany({
     where: { userId },
     orderBy: { created_at: "desc" },
@@ -128,6 +127,16 @@ export const getBookmarksByUserId = async (
   const auctionIds = bookmarks
     .filter((bookmark) => bookmark.listingType === BookmarkListingType.Auction)
     .map((bookmark) => bookmark.itemId);
+
+  if (auctionIds.length) {
+    await Promise.all(
+      auctionIds.map((productId) =>
+        settleAuctionIfClosed(productId).catch((error) => {
+          logger.error("Failed to settle bookmarked auction", error);
+        }),
+      ),
+    );
+  }
 
   const [products, auctions, highestBids] = await Promise.all([
     marketplaceIds.length
