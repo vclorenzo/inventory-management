@@ -1,3 +1,4 @@
+import logger from "#config/logger.ts";
 import { AppError } from "#error/AppError.ts";
 import * as notificationService from "#services/notification.service.ts";
 import { Request, Response } from "express";
@@ -27,6 +28,7 @@ export const getNotifications = async (
       res.status(error.statusCode).json({ message: error.message });
       return;
     }
+    logger.error("Error retrieving notifications", error);
     res.status(500).json({ message: "Error retrieving notifications" });
   }
 };
@@ -61,6 +63,7 @@ export const markNotificationRead = async (
       res.status(error.statusCode).json({ message: error.message });
       return;
     }
+    logger.error("Error updating notification", error);
     res.status(500).json({ message: "Error updating notification" });
   }
 };
@@ -87,6 +90,7 @@ export const markAllNotificationsRead = async (
       res.status(error.statusCode).json({ message: error.message });
       return;
     }
+    logger.error("Error updating notifications", error);
     res.status(500).json({ message: "Error updating notifications" });
   }
 };
