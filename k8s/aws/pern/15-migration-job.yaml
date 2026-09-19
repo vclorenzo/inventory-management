@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pern-migrate
+  namespace: pern
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      labels:
+        app: pern-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: PERN_SERVER_IMAGE
+          imagePullPolicy: Always
+          command:
+            - npx
+            - prisma
+            - migrate
+            - deploy
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pern-secrets
+                  key: database-url
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

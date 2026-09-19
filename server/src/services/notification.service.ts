@@ -80,7 +80,7 @@ const formatOffer = (amount: number | null) =>
 const mapWithConcurrency = async <T>(
   items: T[],
   concurrency: number,
-  worker: (item: T) => Promise<void>,
+  worker: (item: T) => Promise<unknown>,
 ) => {
   if (items.length === 0) return;
 

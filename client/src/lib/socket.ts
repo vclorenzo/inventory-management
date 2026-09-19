@@ -9,10 +9,17 @@ export function getSocket(): Socket | null {
 	if (!url) return null
 
 	if (!socket) {
-		socket = io(url, {
+		const isRelativeUrl = url.startsWith('/')
+		const socketUrl = isRelativeUrl ? window.location.origin : url
+		const socketPath = isRelativeUrl
+			? `${url.replace(/\/$/, '')}/socket.io`
+			: '/socket.io'
+
+		socket = io(socketUrl, {
 			autoConnect: false,
 			withCredentials: true,
 			transports: ['websocket', 'polling'],
+			path: socketPath,
 		})
 	}
 
