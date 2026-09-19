@@ -2,6 +2,7 @@
 
 import ReactHookForm from '@/components/forms/ReactHookForm'
 import Header from '@/components/Header'
+import SectionCard from '@/components/SectionCard'
 import { buildChangePasswordFields } from '@/constants/ChangePasswordForm'
 import { useMe } from '@/hooks/useMe'
 import { useChangePasswordMutation } from '@/state/internal/authApi'
@@ -92,43 +93,47 @@ const ChangePassword = () => {
 	const isSubmitting = isChangeLoading || isMeLoading
 
 	return (
-		<div className="w-full">
-			<Header name="Change Password" />
-			<div className="mt-5 overflow-x-auto shadow-md">
-				<table className="min-w-full rounded-lg bg-white">
-					<thead className="bg-gray-800 text-white">
-						<tr>
-							<th className="px-4 py-3 text-left text-sm font-semibold uppercase">
-								Password Details
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td className="p-10">
-								{formError ? (
-									<div className="mb-4 max-w-md rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
-										{formError}
-									</div>
-								) : null}
-								{formSuccess ? (
-									<div className="mb-4 max-w-md rounded-lg border border-green-100 bg-green-50 px-3 py-2 text-sm text-green-700">
-										{formSuccess}
-									</div>
-								) : null}
-								<ReactHookForm
-									form={form}
-									fields={fields}
-									onSubmit={onSubmit}
-									submitLabel="Save"
-									isSubmitting={isSubmitting}
-								>
-									<PasswordRequirementsChecklist password={newPassword ?? ''} />
-								</ReactHookForm>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+		<div className="flex w-full flex-col items-center">
+			<div className="flex w-full max-w-2xl flex-col gap-4">
+				<Header name="Change Password" />
+				<form
+					className="flex w-full flex-col gap-4"
+					onSubmit={form.handleSubmit(onSubmit)}
+				>
+					<SectionCard title="Password Details">
+						{formError ? (
+							<div className="mb-4 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-600">
+								{formError}
+							</div>
+						) : null}
+						{formSuccess ? (
+							<div className="mb-4 rounded-lg border border-green-100 bg-green-50 px-3 py-2 text-sm text-green-700">
+								{formSuccess}
+							</div>
+						) : null}
+						<ReactHookForm
+							form={form}
+							fields={fields}
+							onSubmit={onSubmit}
+							renderAs="div"
+							showSubmit={false}
+							className="flex flex-col gap-4"
+						>
+							<PasswordRequirementsChecklist password={newPassword ?? ''} />
+						</ReactHookForm>
+					</SectionCard>
+					<button
+						type="submit"
+						disabled={isSubmitting}
+						className={`h-[50px] w-[150px] rounded px-4 py-2 ${
+							isSubmitting
+								? 'cursor-not-allowed bg-blue-300 text-white'
+								: 'bg-blue-500 text-white hover:bg-blue-700'
+						}`}
+					>
+						Save
+					</button>
+				</form>
 			</div>
 		</div>
 	)

@@ -95,7 +95,10 @@ const ReactHookForm = <TFormValues extends FieldValues>({
             key={field.name}
             className={field.className ?? "justify-start items-center"}
           >
-            <label htmlFor={field.name} className="min-w-[200px] font-bold">
+            <label
+              htmlFor={field.name}
+              className="min-w-[200px] font-bold text-gray-800"
+            >
               {field.label}
             </label>
 
