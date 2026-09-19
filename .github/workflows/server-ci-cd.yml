@@ -1,0 +1,169 @@
+name: Server CI/CD
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "server/**"
+      - "k8s/aws/pern/00-namespace.yaml"
+      - "k8s/aws/pern/01-configmap.yaml"
+      - "k8s/aws/pern/10-postgres.yaml"
+      - "k8s/aws/pern/15-migration-job.yaml"
+      - "k8s/aws/pern/20-server.yaml"
+      - ".github/workflows/server-ci-cd.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "server/**"
+      - "k8s/aws/pern/00-namespace.yaml"
+      - "k8s/aws/pern/01-configmap.yaml"
+      - "k8s/aws/pern/10-postgres.yaml"
+      - "k8s/aws/pern/15-migration-job.yaml"
+      - "k8s/aws/pern/20-server.yaml"
+      - ".github/workflows/server-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: server-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-southeast-2' }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/pern-server
+
+jobs:
+  quality:
+    name: TypeScript build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  image:
+    name: Publish image
+    if: github.ref == 'refs/heads/master' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: server
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to EKS
+    needs: image
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Connect to EKS
+        run: |
+          test -n "$EKS_CLUSTER_NAME"
+          aws eks update-kubeconfig --name "$EKS_CLUSTER_NAME" --region "$AWS_REGION"
+          kubectl get nodes
+
+      - name: Configure namespace and application settings
+        env:
+          CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+        run: |
+          test -n "$CORS_ORIGIN"
+          kubectl apply -f k8s/aws/pern/00-namespace.yaml
+          kubectl -n pern create configmap pern-config \
+            --from-literal=NODE_ENV=production \
+            --from-literal=SERVER_PORT=8000 \
+            --from-literal=CLIENT_PORT=3000 \
+            --from-literal=POSTGRES_USER=postgres \
+            --from-literal=POSTGRES_DB=inventory \
+            --from-literal=CORS_ORIGIN="$CORS_ORIGIN" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Configure application secrets
+        env:
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          test -n "$POSTGRES_PASSWORD"
+          test -n "$JWT_SECRET"
+          ENCODED_PASSWORD="$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["POSTGRES_PASSWORD"], safe=""))')"
+          DATABASE_URL="postgresql://postgres:${ENCODED_PASSWORD}@postgres:5432/inventory?schema=public"
+          kubectl -n pern create secret generic pern-secrets \
+            --from-literal=postgres-password="$POSTGRES_PASSWORD" \
+            --from-literal=database-url="$DATABASE_URL" \
+            --from-literal=jwt-secret="$JWT_SECRET" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy PostgreSQL
+        run: |
+          kubectl apply -f k8s/aws/pern/10-postgres.yaml
+          kubectl -n pern rollout status statefulset/postgres --timeout=5m
+
+      - name: Run database migrations
+        env:
+          SERVER_IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          kubectl -n pern delete job pern-migrate --ignore-not-found
+          sed "s|PERN_SERVER_IMAGE|${SERVER_IMAGE}|g" k8s/aws/pern/15-migration-job.yaml | kubectl apply -f -
+          if ! kubectl -n pern wait --for=condition=complete job/pern-migrate --timeout=5m; then
+            kubectl -n pern logs job/pern-migrate
+            exit 1
+          fi
+
+      - name: Deploy server
+        env:
+          SERVER_IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          sed "s|PERN_SERVER_IMAGE|${SERVER_IMAGE}|g" k8s/aws/pern/20-server.yaml | kubectl apply -f -
+          kubectl -n pern rollout status deployment/pern-server --timeout=5m

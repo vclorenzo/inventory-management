@@ -5,3 +5,6 @@ Dockerfile
 .dockerignore
 .git
 .gitignore
+.env
+.env.*
+coverage

@@ -54,6 +54,9 @@ app.use(cookieParser());
 // app.use(securityMiddleware);
 
 // ROUTES
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 app.use("/dashboard", dashboardRoutes);
 app.use("/products", productRoutes);
 app.use("/auctions", auctionRoutes);

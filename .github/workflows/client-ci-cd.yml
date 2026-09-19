@@ -1,0 +1,138 @@
+name: Client CI/CD
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "client/**"
+      - "k8s/aws/pern/30-client.yaml"
+      - "k8s/aws/pern/40-ingress.yaml"
+      - ".github/workflows/client-ci-cd.yml"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - "client/**"
+      - "k8s/aws/pern/30-client.yaml"
+      - "k8s/aws/pern/40-ingress.yaml"
+      - ".github/workflows/client-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: client-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'ap-southeast-2' }}
+  EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/pern-client
+
+jobs:
+  quality:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: /api
+        run: npm run build
+
+  image:
+    name: Publish image
+    if: github.ref == 'refs/heads/master' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push')
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: client
+          push: true
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=/api
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to EKS
+    needs: image
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Connect to EKS
+        run: |
+          test -n "$EKS_CLUSTER_NAME"
+          aws eks update-kubeconfig --name "$EKS_CLUSTER_NAME" --region "$AWS_REGION"
+          kubectl get nodes
+
+      - name: Deploy client and ingress
+        env:
+          CLIENT_IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          APP_HOST: ${{ vars.APP_HOST }}
+          TLS_CERTIFICATE: ${{ secrets.TLS_CERTIFICATE }}
+          TLS_PRIVATE_KEY: ${{ secrets.TLS_PRIVATE_KEY }}
+        run: |
+          test -n "$APP_HOST"
+          test -n "$TLS_CERTIFICATE"
+          test -n "$TLS_PRIVATE_KEY"
+          kubectl apply -f k8s/aws/pern/00-namespace.yaml
+          printf '%s' "$TLS_CERTIFICATE" > "$RUNNER_TEMP/tls.crt"
+          printf '%s' "$TLS_PRIVATE_KEY" > "$RUNNER_TEMP/tls.key"
+          kubectl -n pern create secret tls pern-tls \
+            --cert="$RUNNER_TEMP/tls.crt" \
+            --key="$RUNNER_TEMP/tls.key" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          sed "s|PERN_CLIENT_IMAGE|${CLIENT_IMAGE}|g" k8s/aws/pern/30-client.yaml | kubectl apply -f -
+          sed "s|PERN_APP_HOST|${APP_HOST}|g" k8s/aws/pern/40-ingress.yaml | kubectl apply -f -
+          kubectl -n pern rollout status deployment/pern-client --timeout=5m
