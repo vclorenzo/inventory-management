@@ -33,9 +33,9 @@ const Address = () => {
 	}
 
 	return (
-		<div className="flex w-full flex-col gap-4">
-			<Header name="Address" />
-			<div className="max-w-2xl">
+		<div className="flex w-full flex-col items-center">
+			<div className="flex w-full max-w-2xl flex-col gap-4">
+				<Header name="Address" />
 				<AddressManager
 					userId={userId}
 					addresses={profile?.addresses ?? []}

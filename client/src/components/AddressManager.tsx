@@ -2,6 +2,7 @@
 
 import AddressLine from '@/components/AddressLine'
 import AddressModal from '@/components/AddressModal'
+import SectionCard from '@/components/SectionCard'
 import {
 	useCreateAddressMutation,
 	useDeleteAddressMutation,
@@ -80,16 +81,11 @@ const AddressManager = ({
 
 	return (
 		<>
-			<section
-				className={`rounded-sm border border-[#ebebeb] bg-white shadow-sm ${className ?? ''}`}
-			>
-				<div className="flex items-start justify-between gap-3 border-b border-[#ebebeb] bg-[#f5f5f5] px-4 py-3">
-					<div>
-						<h2 className="text-sm font-semibold text-gray-800">{title}</h2>
-						{description ? (
-							<div className="mt-1 text-xs text-gray-500">{description}</div>
-						) : null}
-					</div>
+			<SectionCard
+				title={title}
+				description={description}
+				className={className}
+				action={
 					<button
 						type="button"
 						onClick={openCreateAddress}
@@ -98,10 +94,9 @@ const AddressManager = ({
 						<Plus className="h-3.5 w-3.5" />
 						New Address
 					</button>
-				</div>
-
-				<div className="p-4">
-					{addresses.length === 0 ? (
+				}
+			>
+				{addresses.length === 0 ? (
 						<div className="flex flex-col items-center gap-3 py-8 text-center">
 							<MapPin className="h-8 w-8 text-gray-300" />
 							<p className="text-sm text-gray-500">No addresses saved yet.</p>
@@ -118,7 +113,7 @@ const AddressManager = ({
 							{addresses.map((address) => (
 								<li
 									key={address.addressId}
-									className="flex items-start justify-between gap-3 rounded border border-[#ebebeb] p-3"
+									className="flex items-start justify-between gap-3 rounded border border-gray-200 p-3"
 								>
 									<div className="min-w-0">
 										<div className="mb-1 flex flex-wrap items-center gap-2">
@@ -161,9 +156,8 @@ const AddressManager = ({
 								</li>
 							))}
 						</ul>
-					)}
-				</div>
-			</section>
+				)}
+			</SectionCard>
 
 			<AddressModal
 				isOpen={isAddressModalOpen}
