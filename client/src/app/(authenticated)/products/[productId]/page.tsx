@@ -22,7 +22,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/scrollbar'
-import { breadcrumbItems } from '../../constants/User'
+import { accountProductBreadcrumbs } from '@/constants/breadcrumbs'
 import ProductModal from '../ProductModal'
 import Reviews from '@/components/Reviews'
 import ProfileBanner from '@/components/ProfileBanner'
@@ -195,7 +195,7 @@ const ProductDetails = ({ params }: { params: { productId: string } }) => {
 	return (
 		<div className="mx-auto w-full max-w-5xl pb-10">
 			<div className="mb-6 flex items-center justify-between gap-3">
-				<Breadcrumbs items={breadcrumbItems(product.name)} />
+				<Breadcrumbs items={accountProductBreadcrumbs(product.name)} />
 			</div>
 
 			<div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

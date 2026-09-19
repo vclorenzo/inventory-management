@@ -19,7 +19,7 @@ import BiddingCountdown from '@/components/BiddingCountdown'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import ProfileBanner from '@/components/ProfileBanner'
 import Reviews from '@/components/Reviews'
-import { breadcrumbItems } from '@/app/(authenticated)/constants/User'
+import { auctionProductBreadcrumbs } from '@/constants/breadcrumbs'
 import {
 	AUCTION_STATUS,
 	auctionStatusLabel,
@@ -131,7 +131,7 @@ const AuctionDetails = ({ params }: { params: { productId: string } }) => {
 	return (
 		<div className="mx-auto w-full max-w-5xl pb-10">
 			<div className="mb-6 flex items-center justify-between gap-3">
-				<Breadcrumbs items={breadcrumbItems(product.name)} />
+				<Breadcrumbs items={auctionProductBreadcrumbs(product.name)} />
 				{/* <Link
           href="/products"
           className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-900 ring-1 ring-gray-200 hover:bg-gray-50"

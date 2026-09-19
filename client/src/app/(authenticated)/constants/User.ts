@@ -36,14 +36,6 @@ export const mockPreferencesSettings: UserSetting[] = [
   },
 ];
 
-export const breadcrumbItems = (productId: string) => {
-  return [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Products", href: "/products" },
-    { label: productId },
-  ];
-};
-
 export const roleOptions = [
   {
     value: "admin",
