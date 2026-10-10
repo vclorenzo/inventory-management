@@ -5,7 +5,7 @@ import { formatEndedAt } from '@/utils/dateFormatter'
 import { getProductImageUrl } from '@/utils/productImage'
 import { Package } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 import { useEffect, useState } from 'react'
 
 const IMAGE_SIZE = 72

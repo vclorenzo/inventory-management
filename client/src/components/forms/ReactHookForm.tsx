@@ -7,7 +7,7 @@ import type {
   RegisterOptions,
   UseFormReturn,
 } from "react-hook-form";
-import Link from "next/link";
+import Link from "@/components/LocalizedLink";
 
 type Props<TFormValues extends FieldValues> = {
   form: UseFormReturn<TFormValues>;
