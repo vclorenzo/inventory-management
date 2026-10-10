@@ -6,7 +6,7 @@ import { useGetNotificationsQuery } from '@/state/internal/notificationsApi'
 import { useAppSelector } from '@/state/redux'
 import { NotificationItem } from '@/types/pages/Notifications'
 import { Bell } from 'lucide-react'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 import { useCallback, useState } from 'react'
 
 function NotificationBell() {

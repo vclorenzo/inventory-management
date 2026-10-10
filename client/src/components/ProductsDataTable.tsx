@@ -13,9 +13,9 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
+import Link from "@/components/LocalizedLink";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ProductModal from "@/app/(authenticated)/products/ProductModal";
+import ProductModal from "@/app/[locale]/(authenticated)/products/ProductModal";
 import { productToFormValues } from "@/utils/productForm";
 import {
   PRODUCT_STATUS,

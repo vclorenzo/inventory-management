@@ -4,7 +4,7 @@ import { formatClosingDay } from '@/utils/dateFormatter'
 import { formatPeso } from '@/utils/priceFormatter'
 import { Rating } from '@mui/material'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 
 type CatalogItem = Product | Auction
 

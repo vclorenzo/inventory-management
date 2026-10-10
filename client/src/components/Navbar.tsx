@@ -7,8 +7,8 @@ import { useSignOutMutation } from '@/state/internal/authApi'
 import { useAppDispatch, useAppSelector } from '@/state/redux'
 import { toggleDarkMode } from '@/utils/global'
 import { Bookmark, Gavel, Menu, Moon, ShoppingCart, Sun } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import Link from '@/components/LocalizedLink'
+import { useLocalePath } from '@/hooks/useLocalePath'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import NotificationBell from '@/components/NotificationBell'
@@ -17,7 +17,7 @@ import { useMe } from '@/hooks/useMe'
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement | null>(null)
-	const router = useRouter()
+	const { push } = useLocalePath()
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
@@ -171,7 +171,7 @@ const Navbar = () => {
 												await signOut().unwrap()
 												dispatch(api.util.resetApiState())
 												dispatch(externalApi.util.resetApiState())
-												router.push('/login')
+												push('/login')
 											} finally {
 												disconnectSocket()
 											}
