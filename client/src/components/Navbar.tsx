@@ -10,7 +10,7 @@ import { Bookmark, Gavel, Menu, Moon, ShoppingCart, Sun } from 'lucide-react'
 import Link from '@/components/LocalizedLink'
 import { useLocalePath } from '@/hooks/useLocalePath'
 import { useCallback, useEffect, useRef, useState } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import NotificationBell from '@/components/NotificationBell'
 import { useMe } from '@/hooks/useMe'
 
@@ -18,6 +18,7 @@ const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement | null>(null)
 	const { push } = useLocalePath()
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
@@ -70,13 +71,13 @@ const Navbar = () => {
 								href="/marketplace"
 								className="px-4 py-2 font-bold text-blue-500 hover:text-blue-700"
 							>
-								Marketplace
+								{t('header.marketplace')}
 							</Link>
 							<Link
 								href="/auctions"
 								className="px-4 py-2 font-bold text-blue-500 hover:text-blue-700"
 							>
-								Auctions
+								{t('header.auctions')}
 							</Link>
 						</>
 					)}

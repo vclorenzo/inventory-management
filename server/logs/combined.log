@@ -1120,3 +1120,22 @@
 {"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:14:56.425Z"}
 {"level":"info","message":"User sinston5@issuu.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-10-10T00:14:56.432Z"}
 {"level":"info","message":"Profile sinston5@issuu.com retrieved successfully","service":"acquisitions-api","timestamp":"2026-10-10T00:14:56.441Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:21:46.626Z"}
+{"level":"info","message":"Socket.IO initialized","service":"acquisitions-api","timestamp":"2026-10-10T00:34:10.413Z"}
+{"level":"info","message":"User signed in successfully: test1@gmail.com","service":"acquisitions-api","timestamp":"2026-10-10T00:34:30.805Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:34:30.816Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:34:34.187Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:35:12.623Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:35:12.670Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:35:37.310Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:35:37.383Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:41:27.033Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:41:27.553Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:41:40.124Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:41:40.170Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:41:58.132Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:42:43.896Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:42:43.900Z"}
+{"level":"info","message":"User authenticated test1@gmail.com (admin)","service":"acquisitions-api","timestamp":"2026-10-10T00:42:43.906Z"}
+{"level":"info","message":"User tbridywater2@wikimedia.org retrieved successfully","service":"acquisitions-api","timestamp":"2026-10-10T00:42:43.909Z"}
+{"level":"info","message":"Profile tbridywater2@wikimedia.org retrieved successfully","service":"acquisitions-api","timestamp":"2026-10-10T00:42:43.979Z"}
