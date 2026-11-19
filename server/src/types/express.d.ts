@@ -12,6 +12,14 @@ declare global {
 				page: number;
 				limit?: number;
 			};
+			file?: {
+				fieldname: string;
+				originalname: string;
+				encoding: string;
+				mimetype: string;
+				size: number;
+				buffer: Buffer;
+			};
 		}
 	}
 }

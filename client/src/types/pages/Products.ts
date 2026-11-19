@@ -51,3 +51,12 @@ export type ProductFormValues = {
 export type UpdateProduct = ProductFormValues & {
 	productId: string
 }
+
+export type ProductBulkUploadResult = {
+	createdCount: number
+}
+
+export type ProductCsvRowError = {
+	row: number
+	message: string
+}

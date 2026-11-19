@@ -1,6 +1,7 @@
 import {
 	Product,
 	NewProduct,
+	ProductBulkUploadResult,
 	UpdateProduct,
 } from '@/types/pages/Products'
 import { isProductStatus } from '@/constants/productStatus'
@@ -150,6 +151,24 @@ export const productsApi = api.injectEndpoints({
 			}),
 			invalidatesTags: ['Products'],
 		}),
+
+		bulkCreateProducts: builder.mutation<ProductBulkUploadResult, File>({
+			query: (file) => {
+				const body = new FormData()
+				body.append('file', file)
+				return {
+					url: '/products/bulk',
+					method: 'POST',
+					body,
+				}
+			},
+			transformResponse: (response: {
+				data?: { createdCount?: number }
+			}) => ({
+				createdCount: response.data?.createdCount ?? 0,
+			}),
+			invalidatesTags: ['Products'],
+		}),
 	}),
 })
 
@@ -159,4 +178,5 @@ export const {
 	useCreateProductMutation,
 	useUpdateProductMutation,
 	useDeleteProductMutation,
+	useBulkCreateProductsMutation,
 } = productsApi
