@@ -17,8 +17,8 @@ import {
   UserRoundPen,
 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from "@/components/LocalizedLink";
+import { useLocalePath } from "@/hooks/useLocalePath";
 import { useMe } from "@/hooks/useMe";
 
 type SidebarLinkProps = {
@@ -47,7 +47,7 @@ const SidebarLink = ({
   isSubLinkExpanded,
   toggleDropdown,
 }: SidebarLinkProps) => {
-  const pathname = usePathname();
+  const { pathname } = useLocalePath();
   let isActive =
     pathname === href || (pathname === "/" && href === "/dashboard");
 

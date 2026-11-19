@@ -5,7 +5,7 @@ import { useMe } from '@/hooks/useMe'
 import { useProfile } from '@/hooks/useProfile'
 import { useReviews } from '@/hooks/useReviews'
 import { useUser } from '@/hooks/useUser'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 
 type Props = {
 	userId?: string

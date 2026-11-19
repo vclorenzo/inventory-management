@@ -5,7 +5,7 @@ import { useCart } from '@/hooks/useCart'
 import { useMe } from '@/hooks/useMe'
 import { useAddBidMutation } from '@/state/internal/bidsApi'
 import { CircularProgress } from '@mui/material'
-import { usePathname, useRouter } from 'next/navigation'
+import { useLocalePath } from '@/hooks/useLocalePath'
 import { useState } from 'react'
 
 type AddToCartButtonProps = {
@@ -50,8 +50,7 @@ function AddToCartButton({
 	currentHighestBid,
 	hasExistingBid = false,
 }: AddToCartButtonProps) {
-	const router = useRouter()
-	const pathname = usePathname()
+	const { pathname, push } = useLocalePath()
 	const isAuction = pathname.startsWith('/auctions')
 	const { me } = useMe()
 	const { addCartItem, addCartItemState } = useCart()
@@ -73,10 +72,10 @@ function AddToCartButton({
 
 		try {
 			await addCartItem({ productId, quantity: 1 }).unwrap()
-			router.push('/cart')
+			push('/cart')
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
-				router.push('/login')
+				push('/login')
 				return
 			}
 
@@ -94,7 +93,7 @@ function AddToCartButton({
 			setIsOfferModalOpen(false)
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
-				router.push('/login')
+				push('/login')
 				return
 			}
 
@@ -106,7 +105,7 @@ function AddToCartButton({
 
 	const handleButtonClick = async () => {
 		if (!me) {
-			router.push('/login')
+			push('/login')
 			return
 		}
 

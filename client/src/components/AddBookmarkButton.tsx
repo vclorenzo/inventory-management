@@ -10,7 +10,7 @@ import {
 import { BookmarkListingType } from '@/types/pages/Bookmarks'
 import { getMutationErrorMessage } from '@/utils/mutation'
 import { Bookmark } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import { useLocalePath } from '@/hooks/useLocalePath'
 import { useId, useState } from 'react'
 
 type AddBookmarkButtonProps = {
@@ -33,7 +33,7 @@ function AddBookmarkButton({
 	listingType,
 	variant = 'solid',
 }: AddBookmarkButtonProps) {
-	const router = useRouter()
+	const { push } = useLocalePath()
 	const { me } = useMe()
 	const { showToast } = useToast()
 	const {
@@ -77,7 +77,7 @@ function AddBookmarkButton({
 
 	const handleToggleBookmark = async () => {
 		if (!me) {
-			router.push('/login')
+			push('/login')
 			return
 		}
 
@@ -98,7 +98,7 @@ function AddBookmarkButton({
 			showToast('You bookmarked this item')
 		} catch (error) {
 			if (isUnauthorizedError(error)) {
-				router.push('/login')
+				push('/login')
 				return
 			}
 

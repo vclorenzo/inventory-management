@@ -13,9 +13,9 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
+import Link from "@/components/LocalizedLink";
 import { useEffect, useMemo, useRef, useState } from "react";
-import AuctionModal from "@/app/(authenticated)/products/AuctionModal";
+import AuctionModal from "@/app/[locale]/(authenticated)/products/AuctionModal";
 import { auctionToFormValues } from "@/utils/auctionForm";
 import {
   AUCTION_STATUS,

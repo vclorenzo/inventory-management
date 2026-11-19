@@ -5,7 +5,7 @@ import { BidItem, CompletedBidEntry } from '@/types/pages/Bids'
 import { formatEndedAt } from '@/utils/dateFormatter'
 import { CircularProgress } from '@mui/material'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 
 const formatPrice = (amount: number, currency: string) =>
 	`${currency}${amount.toLocaleString('en-PH')}`

@@ -7,7 +7,7 @@ import { CreateOrderReviewRequest } from '@/types/pages/Reviews'
 import { formatPurchasePrice, groupPurchasesByOrder } from '@/utils/purchases'
 import { CircularProgress } from '@mui/material'
 import Image from 'next/image'
-import Link from 'next/link'
+import Link from '@/components/LocalizedLink'
 import { useMemo, useState } from 'react'
 import { useGetPurchasesQuery } from '@/state/internal/purchasesApi'
 
