@@ -16,10 +16,7 @@ export function useLocalePath() {
 	const router = useRouter()
 	const pathname = stripLocale(usePathname() ?? '/')
 	const locale = resolveLocale(params?.locale)
-	const href = useCallback(
-		(path: string) => withLocale(locale, path),
-		[locale],
-	)
+	const href = useCallback((path: string) => withLocale(locale, path), [locale])
 	const push = useCallback(
 		(path: string) => {
 			router.push(href(path))
