@@ -1,6 +1,7 @@
 'use client'
 
 import AuctionModal from '@/app/[locale]/(authenticated)/products/AuctionModal'
+import BulkUploadModal from '@/app/[locale]/(authenticated)/products/BulkUploadModal'
 import ProductModal from '@/app/[locale]/(authenticated)/products/ProductModal'
 import { AuctionsDataTable } from '@/components/AuctionsDataTable'
 import Header from '@/components/Header'
@@ -17,7 +18,7 @@ import {
 import { AuctionFormValues } from '@/types/pages/Auctions'
 import { ProductFormValues } from '@/types/pages/Products'
 import { CircularProgress } from '@mui/material'
-import { PlusCircleIcon } from 'lucide-react'
+import { PlusCircleIcon, Upload } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import Tabs from '@/components/Tabs'
 import { getMutationErrorMessage } from '@/utils/mutation'
@@ -57,6 +58,7 @@ function InventoryPanel({
 function Inventory() {
 	const [tab, setTab] = useState<InventoryTab>('marketplace')
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [isBulkOpen, setIsBulkOpen] = useState(false)
 	const { me } = useMe()
 	const userId = me?.data.userId ?? ''
 	const {
@@ -100,6 +102,7 @@ function Inventory() {
 	const handleTabChange = (index: number) => {
 		setTab(INVENTORY_TABS[index] ?? 'marketplace')
 		setIsModalOpen(false)
+		setIsBulkOpen(false)
 	}
 
 	const isMarketplace = tab === 'marketplace'
@@ -108,14 +111,26 @@ function Inventory() {
 		<div className="flex flex-col">
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<Header name="Inventory" />
-				<button
-					type="button"
-					className="flex items-center justify-center rounded bg-blue-500 px-4 py-2 font-bold text-gray-200 hover:bg-blue-700 sm:shrink-0"
-					onClick={() => setIsModalOpen(true)}
-				>
-					<PlusCircleIcon className="mr-2 h-5 w-5 !text-gray-200" />
-					{isMarketplace ? 'Create Product' : 'Create Auction'}
-				</button>
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+					{isMarketplace ? (
+						<button
+							type="button"
+							className="flex items-center justify-center rounded bg-blue-500 px-4 py-2 font-bold text-gray-200 hover:bg-blue-700 sm:shrink-0"
+							onClick={() => setIsBulkOpen(true)}
+						>
+							<Upload className="mr-2 h-5 w-5 !text-gray-200" />
+							Bulk Upload
+						</button>
+					) : null}
+					<button
+						type="button"
+						className="flex items-center justify-center rounded bg-blue-500 px-4 py-2 font-bold text-gray-200 hover:bg-blue-700 sm:shrink-0"
+						onClick={() => setIsModalOpen(true)}
+					>
+						<PlusCircleIcon className="mr-2 h-5 w-5 !text-gray-200" />
+						{isMarketplace ? 'Create Product' : 'Create Auction'}
+					</button>
+				</div>
 			</div>
 
 			<Tabs
@@ -150,6 +165,13 @@ function Inventory() {
 					},
 				]}
 			/>
+
+			{isMarketplace ? (
+				<BulkUploadModal
+					isOpen={isBulkOpen}
+					onClose={() => setIsBulkOpen(false)}
+				/>
+			) : null}
 
 			{isMarketplace ? (
 				<ProductModal
