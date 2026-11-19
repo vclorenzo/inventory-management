@@ -10,14 +10,16 @@ import { Bookmark, Gavel, Menu, Moon, ShoppingCart, Sun } from 'lucide-react'
 import Link from '@/components/LocalizedLink'
 import { useLocalePath } from '@/hooks/useLocalePath'
 import { useCallback, useEffect, useRef, useState } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import NotificationBell from '@/components/NotificationBell'
 import { useMe } from '@/hooks/useMe'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const Navbar = () => {
 	const [isOpen, setIsOpen] = useState(false)
 	const dropdownRef = useRef<HTMLDivElement | null>(null)
 	const { push } = useLocalePath()
+	const { t } = useTranslation()
 
 	useEffect(() => {
 		const handleClickOutside = (e: MouseEvent) => {
@@ -70,13 +72,13 @@ const Navbar = () => {
 								href="/marketplace"
 								className="px-4 py-2 font-bold text-blue-500 hover:text-blue-700"
 							>
-								Marketplace
+								{t('header.marketplace')}
 							</Link>
 							<Link
 								href="/auctions"
 								className="px-4 py-2 font-bold text-blue-500 hover:text-blue-700"
 							>
-								Auctions
+								{t('header.auctions')}
 							</Link>
 						</>
 					)}
@@ -97,17 +99,8 @@ const Navbar = () => {
 						</div>
 
 						{me ? <NotificationBell /> : null}
+						<LanguageSwitcher isLocale={true} />
 
-						{me ? (
-							<div>
-								<Link href={'/bookmarks'}>
-									<Bookmark
-										className="cursor-pointer text-gray-500"
-										size={24}
-									/>
-								</Link>
-							</div>
-						) : undefined}
 						<hr className="mx-3 h-7 w-0 border border-l border-solid border-gray-300" />
 						<div className="relative" ref={dropdownRef}>
 							<div
@@ -183,6 +176,13 @@ const Navbar = () => {
 							)}
 						</div>
 					</div>
+					{me ? (
+						<div>
+							<Link href={'/bookmarks'}>
+								<Bookmark className="cursor-pointer text-gray-500" size={24} />
+							</Link>
+						</div>
+					) : undefined}
 					{me ? (
 						<>
 							<Link href={'/bids'}>

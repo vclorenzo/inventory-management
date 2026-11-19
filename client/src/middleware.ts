@@ -5,8 +5,7 @@ import i18nConfig from '../i18nConfig'
 export function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
 	const pathLocale = i18nConfig.locales.find(
-		(locale) =>
-			pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+		(locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
 	)
 
 	if (pathLocale) {

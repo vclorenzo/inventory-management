@@ -8,6 +8,7 @@ import { toggleDarkMode } from '@/utils/global'
 import { setIsNotificationBubbleEnabled } from '@/state'
 import { useState } from 'react'
 import { mockPreferencesSettings } from '../../constants/User'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 
 const Preferences = () => {
 	const [preferencesSettings, setPreferencesSettings] = useState<UserSetting[]>(
@@ -24,12 +25,10 @@ const Preferences = () => {
 		const settingsCopy = [...preferencesSettings]
 		switch (index) {
 			case 0:
-				dispatch(
-					setIsNotificationBubbleEnabled(!isNotificationBubbleEnabled),
-				)
+				toggleDarkMode(dispatch, isDarkMode)
 				break
 			case 1:
-				toggleDarkMode(dispatch, isDarkMode)
+				dispatch(setIsNotificationBubbleEnabled(!isNotificationBubbleEnabled))
 				break
 		}
 
@@ -71,17 +70,7 @@ const Preferences = () => {
 										<div className="h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:ring-4 peer-focus:ring-blue-400" />
 									</label>
 								) : (
-									<input
-										id={`setting-${index}`}
-										type="text"
-										className="rounded-lg border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none"
-										value={setting.value as string}
-										onChange={(e) => {
-											const settingsCopy = [...preferencesSettings]
-											settingsCopy[index].value = e.target.value
-											setPreferencesSettings(settingsCopy)
-										}}
-									/>
+									<LanguageSwitcher isLocale={false} />
 								)}
 							</li>
 						))}

@@ -14,10 +14,7 @@ function resolveLocale(value: string | string[] | undefined) {
 	return i18nConfig.defaultLocale
 }
 
-export default function LocalizedLink({
-	href,
-	...props
-}: LocalizedLinkProps) {
+export default function LocalizedLink({ href, ...props }: LocalizedLinkProps) {
 	const params = useParams()
 	const locale = resolveLocale(params?.locale)
 	const localizedHref =
