@@ -2,6 +2,7 @@ import {
 	Product,
 	NewProduct,
 	ProductBulkUploadResult,
+	ProductCsvRowError,
 	UpdateProduct,
 } from '@/types/pages/Products'
 import { isProductStatus } from '@/constants/productStatus'
@@ -163,11 +164,35 @@ export const productsApi = api.injectEndpoints({
 				}
 			},
 			transformResponse: (response: {
-				data?: { createdCount?: number }
+				data?: {
+					createdCount?: number
+					errors?: ProductCsvRowError[]
+				}
 			}) => ({
 				createdCount: response.data?.createdCount ?? 0,
+				errors: Array.isArray(response.data?.errors)
+					? response.data.errors.flatMap((item) => {
+							if (
+								item &&
+								typeof item === 'object' &&
+								typeof item.row === 'number' &&
+								typeof item.message === 'string'
+							) {
+								return [{ row: item.row, message: item.message }]
+							}
+							return []
+						})
+					: [],
 			}),
 			invalidatesTags: ['Products'],
+		}),
+
+		downloadProductTemplate: builder.query<string, void>({
+			query: () => ({
+				url: '/products/template',
+				responseHandler: (response) => response.text(),
+			}),
+			keepUnusedDataFor: 0,
 		}),
 	}),
 })
@@ -179,4 +204,5 @@ export const {
 	useUpdateProductMutation,
 	useDeleteProductMutation,
 	useBulkCreateProductsMutation,
+	useLazyDownloadProductTemplateQuery,
 } = productsApi

@@ -54,6 +54,7 @@ export type UpdateProduct = ProductFormValues & {
 
 export type ProductBulkUploadResult = {
 	createdCount: number
+	errors: ProductCsvRowError[]
 }
 
 export type ProductCsvRowError = {
