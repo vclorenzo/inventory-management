@@ -8,11 +8,16 @@ let transporter: Transporter | null = null;
 export const getTransporter = (): Transporter => {
 	if (transporter) return transporter;
 
-	const { accessKeyId, secretAccessKey, region } = getMailConfig();
+	const { accessKeyId, secretAccessKey, sessionToken, region } =
+		getMailConfig();
 
 	const sesClient = new SESv2Client({
 		region,
-		credentials: { accessKeyId, secretAccessKey },
+		credentials: {
+			accessKeyId,
+			secretAccessKey,
+			...(sessionToken && { sessionToken }),
+		},
 	});
 
 	transporter = nodemailer.createTransport({

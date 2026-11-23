@@ -21,6 +21,8 @@ export const JWT_SECRET = requireEnv('JWT_SECRET');
 export type MailConfig = {
 	accessKeyId: string;
 	secretAccessKey: string;
+	/** Only set for temporary (STS) credentials. */
+	sessionToken?: string;
 	region: string;
 	fromEmail: string;
 };
@@ -32,6 +34,7 @@ export type MailConfig = {
 export const getMailConfig = (): MailConfig => ({
 	accessKeyId: requireEnv('AWS_ACCESS_KEY_ID'),
 	secretAccessKey: requireEnv('AWS_SECRET_ACCESS_KEY'),
+	sessionToken: process.env.AWS_SESSION_TOKEN?.trim() || undefined,
 	region: requireEnv('AWS_REGION'),
 	fromEmail: requireEnv('SES_FROM_EMAIL'),
 });
