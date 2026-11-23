@@ -1,4 +1,5 @@
 import logger from "#config/logger.ts";
+import { sendWelcomeEmail } from "#services/email.service.ts";
 import * as userService from "#services/user.service.ts";
 import * as authService from "#src/services/auth.service.ts";
 import { CreateSigninInput, CreateSignupInput } from "#types/user.types.ts";
@@ -6,6 +7,7 @@ import { cookies } from "#utils/cookies.ts";
 import { sanitizeSigninInput, sanitizeSignupInput } from "#utils/sanitize.ts";
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
+import validator from "validator";
 
 const prisma = new PrismaClient();
 
@@ -27,6 +29,15 @@ export const signup = async (
 
     cookies.set(res, "token", token);
     logger.info(`User registered successfully: ${newUser.email}`);
+
+    // Fire-and-forget: a mail failure must not fail or delay registration.
+    // sendEmail already logs the underlying error.
+    // The name is stored HTML-escaped by the sanitizer; unescape it so the
+    // template (which escapes on render) doesn't double-escape.
+    sendWelcomeEmail(newUser.email, validator.unescape(newUser.name)).catch(
+      () => {},
+    );
+
     return res.status(201).json({
       message: "User registered",
       data: newUser,
