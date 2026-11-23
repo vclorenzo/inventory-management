@@ -6,12 +6,32 @@ const envFile =
 
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });
 
-const jwtSecret = process.env.JWT_SECRET;
+const requireEnv = (name: string): string => {
+	const value = process.env[name]?.trim();
+	if (!value) {
+		throw new Error(
+			`${name} is required. Set it in the environment before starting the application.`,
+		);
+	}
+	return value;
+};
 
-if (!jwtSecret) {
-	throw new Error(
-		'JWT_SECRET is required. Set it in the environment before starting the application.',
-	);
-}
+export const JWT_SECRET = requireEnv('JWT_SECRET');
 
-export const JWT_SECRET = jwtSecret;
+export type MailConfig = {
+	accessKeyId: string;
+	secretAccessKey: string;
+	region: string;
+	fromEmail: string;
+};
+
+/**
+ * AWS SES settings. Validated lazily (on first use) so the server can still
+ * boot when email is not configured yet.
+ */
+export const getMailConfig = (): MailConfig => ({
+	accessKeyId: requireEnv('AWS_ACCESS_KEY_ID'),
+	secretAccessKey: requireEnv('AWS_SECRET_ACCESS_KEY'),
+	region: requireEnv('AWS_REGION'),
+	fromEmail: requireEnv('SES_FROM_EMAIL'),
+});
